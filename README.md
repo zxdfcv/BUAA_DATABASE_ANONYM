@@ -1,2 +1,14 @@
-# BUAA_DATABASE_ANONYM
-ANONYM
+# 北航数据库大作业 2023
+实现一个类似闲鱼平台的网站
+
+组员：孙奕博、范程、张翼翔
+
+前后端分离
+
+前端：vue
+
+后端：django
+
+版本为 2023 年 11 月时的最新版
+
+服务器端：Redis、Nginx、uwsgi
