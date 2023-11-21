@@ -52,6 +52,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'myapp.middlewares.logMiddleware.OpLogs',
 ]
 
 ROOT_URLCONF = "buaa_db_backend.urls"
