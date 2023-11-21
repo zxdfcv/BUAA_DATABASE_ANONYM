@@ -22,6 +22,7 @@ class LoginView(TokenObtainPairView):
             serializer.is_valid(raise_exception=True)
         except Exception as e:
             return APIResponse(code=1, msg='用户名或密码错误', data={"details": str(e)})
+
         return APIResponse(code=0, msg='登录成功', data=serializer.validated_data)
 
 
@@ -42,10 +43,10 @@ class RegistrationView(APIView):
         email = request.data.get('email')
         if not username or not password:
             return APIResponse(code=1, msg='用户名或密码不能为空')
-        if not email:
-            return APIResponse(code=1, msg='邮箱不能为空')
         if not confirm_password or password != confirm_password:
             return APIResponse(code=1, msg='密码不一致')
+        if not email:
+            return APIResponse(code=1, msg='邮箱不能为空')
         if User.objects.filter(username=username).exists():
             return APIResponse(code=1, msg='该用户名已存在')
 
@@ -67,5 +68,6 @@ class RegistrationView(APIView):
             'expire': expiration_datetime_local.strftime('%Y-%m-%d %H:%M:%S'),
             'user': UserSerializer(user).data,
         }
-
+        user.last_login = timezone.now()
+        user.save()
         return APIResponse(code=0, msg='创建成功', data=response_data)

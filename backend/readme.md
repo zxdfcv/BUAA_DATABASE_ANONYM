@@ -1,11 +1,19 @@
-### 待定
+## 接口
 
-使用邮箱、手机号登入
+/myapp/login/
 
-自定义认证方法
+body包含：username、password（返回的expire是token过期时间）
 
-注册
+/myapp/token/refresh/
 
-权限管理
+body包含refresh，刷新token
 
-日志
+/myapp/token/verify/
+
+body包含token，检查token是否过期
+
+/myapp/register/
+
+body包含：username、password、confirm_password、email
+
+会直接返回token和refresh
