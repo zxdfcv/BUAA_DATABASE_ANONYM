@@ -1,19 +1,17 @@
-## 接口
+## 进度
 
-/myapp/login/
+登入注册、日志系统已完工（后端跨域已经配置了）
 
-body包含：username、password（返回的expire是token过期时间）
+## 注意
 
-/myapp/token/refresh/
+依赖项见`requirements.txt`
 
-body包含refresh，刷新token
+接口文档见`接口文档.md`
 
-/myapp/token/verify/
+请在`settings.py`中设置自己的配置，比如数据库配置
 
-body包含token，检查token是否过期
+**注册的用户会自动加入组“普通用户”，普通用户有什么权限需要自己设置（目前只能用超级账号在django后台界面修改用户和组的权限）**
 
-/myapp/register/
+**日志操作需要相关表的view和delete权限（可以用超级账号操作，或者去后台手动添加权限）**
 
-body包含：username、password、confirm_password、email
-
-会直接返回token和refresh
+有啥问题直接call我

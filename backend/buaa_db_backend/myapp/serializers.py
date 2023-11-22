@@ -57,7 +57,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        group = Group.objects.get(name='普通用户')
+        group, created = Group.objects.get_or_create(name='普通用户')
         user.groups.add(group)
         return user
 

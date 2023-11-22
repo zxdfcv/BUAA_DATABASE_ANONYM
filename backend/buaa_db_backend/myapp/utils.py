@@ -36,7 +36,7 @@ def get_ua(request):
     return ua[0:200]
 
 
-def login_log(request):
+def make_login_log(request):
     username = request.data['username']
     data = {
         "username": username,
@@ -50,7 +50,7 @@ def login_log(request):
         print(serializer.errors)
 
 
-def error_log(request, content):
+def make_error_log(request, content):
     ip = get_ip(request)
     method = request.method
     url = request.path

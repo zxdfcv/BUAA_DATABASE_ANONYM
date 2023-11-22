@@ -2,13 +2,14 @@ from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from ..serializers import MyTokenObtainPairSerializer, UserSerializer
-from ..utils import APIResponse, login_log
+from ..utils import APIResponse, make_login_log
 
 User = get_user_model()
 
@@ -20,9 +21,9 @@ class LoginView(TokenObtainPairView):
         serializer = self.get_serializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
-        except Exception as e:
-            return APIResponse(code=1, msg='用户名或密码错误', data={"details": str(e)})
-        login_log(request)
+        except ValidationError:
+            return APIResponse(code=1, msg='用户名或密码错误', data=serializer.errors)
+        make_login_log(request)
         return APIResponse(code=0, msg='登录成功', data=serializer.validated_data)
 
 
@@ -36,6 +37,7 @@ class TestView(APIView):
 class RegistrationView(APIView):
     authentication_classes = []
     permission_classes = [AllowAny]
+
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -70,5 +72,5 @@ class RegistrationView(APIView):
         }
         user.last_login = timezone.now()
         user.save()
-        login_log(request)
+        make_login_log(request)
         return APIResponse(code=0, msg='创建成功', data=response_data)
