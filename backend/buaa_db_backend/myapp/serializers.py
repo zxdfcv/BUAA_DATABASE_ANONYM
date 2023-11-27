@@ -41,6 +41,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # 将日期时间对象格式化为字符串
         data['expire'] = expiration_datetime_local.strftime('%Y-%m-%d %H:%M:%S')
 
+        data['id'] = user.id
         data['username'] = user.username
         data['email'] = user.email
         data['phone'] = user.phone
@@ -49,7 +50,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return data
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password']
@@ -84,3 +85,26 @@ class ErrorLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = ErrorLog
         fields = '__all__'
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ['username', 'first_name', 'last_name', 'email', 'phone', 'nickname', 'gender', 'avatar',
+                  'description', 'date_joined']
+
+    # def update(self, instance, validated_data):
+    #     # 自定义 update 方法，处理更新逻辑
+    #     instance.username = validated_data.get('username', instance.username)
+    #     instance.first_name = validated_data.get('first_name', instance.first_name)
+    #     instance.last_name = validated_data.get('last_name', instance.last_name)
+    #     instance.email = validated_data.get('email', instance.email)
+    #     instance.phone = validated_data.get('phone', instance.phone)
+    #     instance.nickname = validated_data.get('nickname', instance.nickname)
+    #     instance.gender = validated_data.get('gender', instance.gender)
+    #     instance.avatar = validated_data.get('avatar', instance.avatar)
+    #     instance.description = validated_data.get('description', instance.description)
+    #     instance.save()
+    #     return instance

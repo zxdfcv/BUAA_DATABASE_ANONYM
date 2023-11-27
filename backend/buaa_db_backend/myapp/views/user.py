@@ -1,15 +1,18 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import PasswordChangeForm
 from django.utils import timezone
+from rest_framework.decorators import permission_classes
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from ..serializers import MyTokenObtainPairSerializer, UserSerializer
-from ..utils import APIResponse, make_login_log
+from ..permissions import CanEditUserPermission
+from ..serializers import MyTokenObtainPairSerializer, UserLoginSerializer, UserDetailSerializer
+from ..utils import APIResponse, make_login_log, make_error_log
 
 User = get_user_model()
 
@@ -52,7 +55,7 @@ class RegistrationView(APIView):
         if User.objects.filter(username=username).exists():
             return APIResponse(code=1, msg='该用户名已存在')
 
-        serializer = UserSerializer(data=request.data)
+        serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
         else:
@@ -68,9 +71,54 @@ class RegistrationView(APIView):
             'refresh': str(refresh),
             'token': str(refresh.access_token),
             'expire': expiration_datetime_local.strftime('%Y-%m-%d %H:%M:%S'),
-            'user': UserSerializer(user).data,
+            'user': UserLoginSerializer(user).data,
         }
         user.last_login = timezone.now()
         user.save()
         make_login_log(request)
         return APIResponse(code=0, msg='创建成功', data=response_data)
+
+
+@permission_classes([CanEditUserPermission])
+class EditUserView(APIView):
+    # 必能找到该用户，不然的话过不了权限验证（？）
+    def post(self, request):
+        user_id = request.GET.get('user_id')
+        user = User.objects.get(pk=user_id)
+        data = request.data.copy()
+        # # 用户名唯一且不准改，邮箱和电话也唯一，但是能改
+        # excluded_fields = ['username', ]
+        # for field in excluded_fields:
+        #     data.pop(field, None)
+        serializer = UserDetailSerializer(user, data=data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='更新成功', data=serializer.data)
+        make_error_log(request, '用户更新失败')
+        return APIResponse(code=1, msg='更新失败', data=serializer.errors)
+
+    def get(self, request):
+        user_id = request.GET.get('user_id')
+        user = User.objects.get(pk=user_id)
+        serializer = UserDetailSerializer(user)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+    def delete(self, request):
+        user_id = request.GET.get('user_id')
+        user = User.objects.get(pk=user_id)
+        user.is_active = False
+        user.save()
+        return APIResponse(code=0, msg='注销成功')
+
+
+@permission_classes([CanEditUserPermission])
+class UserChangePasswordView(APIView):
+    def post(self, request):
+        user_id = request.GET.get('user_id')
+        user = User.objects.get(pk=user_id)
+        form = PasswordChangeForm(user, request.data)
+        if form.is_valid():
+            form.save()
+            return APIResponse(code=0, msg='密码更新成功')
+        make_error_log(request, '用户密码更新失败')
+        return APIResponse(code=1, msg='密码更新失败', data=form.errors)

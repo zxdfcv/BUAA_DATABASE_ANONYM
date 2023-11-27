@@ -31,13 +31,13 @@ class OpLogs(MiddlewareMixin):
                 re_content = json.loads(request.body.decode('utf-8'))
             except json.JSONDecodeError:
                 re_content = None
-
+        # re_content只截了200个字符，有点暴力的处理，之后有时间再改吧
         self.data.update(
             {
                 're_url': request.path,
                 're_method': re_method,
                 're_ip': re_ip,
-                're_content': json.dumps(re_content) if re_content else None,
+                're_content': json.dumps(re_content)[:200] if re_content else None,
             }
         )
 

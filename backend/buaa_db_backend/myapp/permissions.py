@@ -14,3 +14,31 @@ class HasOpLogVDPermission(BasePermission):
 class HasErrorLogVDPermission(BasePermission):
     def has_permission(self, request, view):
         return request.user.has_perm('myapp.view_errorlog') and request.user.has_perm('myapp.delete_errorlog')
+
+
+class CanEditUserPermission(BasePermission):
+    def has_permission(self, request, view):
+        is_admin_or_self = request.user.is_staff or str(request.user.id) == request.GET.get('user_id', '')
+        has_permission = (
+                request.user.has_perm('myapp.change_user') and
+                request.user.has_perm('myapp.delete_user') and
+                request.user.has_perm('myapp.view_user'))
+        return is_admin_or_self and has_permission
+
+    # username_param = view.kwargs.get('username')  # 假设用户名是从 URL 参数中获取的
+    #
+    # # 获取请求中的用户对象
+    # try:
+    #     user = get_user_model().objects.get(username=username_param)
+    # except get_user_model().DoesNotExist:
+    #     return False  # 用户不存在，拒绝权限
+    #
+    # # 检查权限
+    # is_admin_or_self = request.user.is_staff or str(request.user.id) == str(user.id)
+    # has_permission = (
+    #         request.user.has_perm('myapp.change_user') and
+    #         request.user.has_perm('myapp.delete_user') and
+    #         request.user.has_perm('myapp.view_errorlog')
+    # )
+    #
+    # return is_admin_or_self and has_permission

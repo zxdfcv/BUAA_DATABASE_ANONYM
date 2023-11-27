@@ -17,5 +17,9 @@ urlpatterns = [
     path("log/error/", log.ErrorLogView.as_view(), name="errorLog_list"),
     path("log/error/delete", log.ErrorLogView.as_view(), name="errorLog_delete"),
 
+    path("user/detail", user.EditUserView.as_view(), name="user_information"),
+    path("user/update", user.EditUserView.as_view(), name="user_update"),
+    path("user/delete", user.EditUserView.as_view(), name="user_delete"),
+    path("user/update/pwd", user.UserChangePasswordView.as_view(), name="user_changePwd"),
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

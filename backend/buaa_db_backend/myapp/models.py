@@ -10,7 +10,7 @@ class User(AbstractUser):
         ('F', '女'),
         ('O', 'Other'),
     ]
-    phone = models.CharField(max_length=13, null=True, blank=True, unique=True)
+    phone = models.CharField(max_length=13, null=True, blank=True)
     nickname = models.CharField(verbose_name="昵称", max_length=36, null=True, blank=True)
     gender = models.CharField(verbose_name="性别", max_length=1, choices=GENDER_CHOICES, blank=True, null=True)
     avatar = models.FileField(verbose_name="头像", upload_to='avatar/', null=True, blank=True)
