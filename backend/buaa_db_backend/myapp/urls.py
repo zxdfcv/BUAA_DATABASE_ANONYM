@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import user, log
+from .views import user, log, admin
 
 app_name = 'myapp'
 urlpatterns = [
@@ -21,5 +21,13 @@ urlpatterns = [
     path("user/update", user.EditUserView.as_view(), name="user_update"),
     path("user/delete", user.EditUserView.as_view(), name="user_delete"),
     path("user/update/pwd", user.UserChangePasswordView.as_view(), name="user_changePwd"),
+
+
+    path("admin/user/detail", admin.UserAllDetailView.as_view(), name="user_allInformation"),
+    path("admin/user/update", admin.UserAllDetailView.as_view(), name="user_allUpdate"),
+    path("admin/user/list", admin.UserListView.as_view(), name="user_list"),
+    path("admin/user/delete", admin.UserListView.as_view(), name="user_allDelete"),
+
+
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

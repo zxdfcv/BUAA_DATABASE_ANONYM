@@ -3,17 +3,26 @@ from rest_framework.permissions import BasePermission
 
 class HasLoginLogVDPermission(BasePermission):
     def has_permission(self, request, view):
-        return request.user.has_perm('myapp.view_loginlog') and request.user.has_perm('myapp.delete_loginlog')
+        has_permission = (
+                request.user.has_perm('myapp.view_loginlog') and
+                request.user.has_perm('myapp.delete_loginlog'))
+        return request.user.is_staff or has_permission
 
 
 class HasOpLogVDPermission(BasePermission):
     def has_permission(self, request, view):
-        return request.user.has_perm('myapp.view_oplog') and request.user.has_perm('myapp.delete_oplog')
+        has_permission = (
+                request.user.has_perm('myapp.view_oplog') and
+                request.user.has_perm('myapp.delete_oplog'))
+        return request.user.is_staff or has_permission
 
 
 class HasErrorLogVDPermission(BasePermission):
     def has_permission(self, request, view):
-        return request.user.has_perm('myapp.view_errorlog') and request.user.has_perm('myapp.delete_errorlog')
+        has_permission = (
+                request.user.has_perm('myapp.view_errorlog') and
+                request.user.has_perm('myapp.delete_errorlog'))
+        return request.user.is_staff or has_permission
 
 
 class CanEditUserPermission(BasePermission):

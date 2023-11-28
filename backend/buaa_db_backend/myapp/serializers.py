@@ -108,3 +108,25 @@ class UserDetailSerializer(serializers.ModelSerializer):
     #     instance.description = validated_data.get('description', instance.description)
     #     instance.save()
     #     return instance
+
+
+class UserAllDetailSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    groups = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=Group.objects.all()
+    )
+    class Meta:
+        model = get_user_model()
+        # fields = '__all__'
+        exclude = ('password', 'is_superuser','user_permissions')
+        extra_kwargs = {'id': {'read_only': True},
+                        'last_login': {'read_only': True},
+                        }
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'username', 'is_active', 'is_staff', 'date_joined']

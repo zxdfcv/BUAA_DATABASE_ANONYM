@@ -82,7 +82,7 @@ class RegistrationView(APIView):
 @permission_classes([CanEditUserPermission])
 class EditUserView(APIView):
     # 必能找到该用户，不然的话过不了权限验证（？）
-    def post(self, request):
+    def put(self, request):
         user_id = request.GET.get('user_id')
         user = User.objects.get(pk=user_id)
         data = request.data.copy()
@@ -113,7 +113,7 @@ class EditUserView(APIView):
 
 @permission_classes([CanEditUserPermission])
 class UserChangePasswordView(APIView):
-    def post(self, request):
+    def put(self, request):
         user_id = request.GET.get('user_id')
         user = User.objects.get(pk=user_id)
         form = PasswordChangeForm(user, request.data)
