@@ -1,0 +1,1 @@
+import{j as s}from"./index-68c43909.js";const o=async a=>s({url:"/myapp/admin/overview/count",params:a,data:{},headers:{}}),n=async a=>s({url:"/myapp/admin/overview/sysInfo",params:a,data:{},headers:{}});export{o as l,n as s};
