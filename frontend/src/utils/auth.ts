@@ -1,3 +1,4 @@
+/* TODO: 目前看似没用 */
 const TokenKey = 'fast-token';
 const TokenPrefix = 'Bearer ';
 const isLogin = () => {

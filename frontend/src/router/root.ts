@@ -8,112 +8,109 @@ const constantRouterMap = [
   {
     path: '/index',
     name: 'index',
-    redirect: '/index/welcome',
-    component: () => import('/@/views/index/index.vue'),
+    redirect: '/welcome',
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('/@/views/index/login.vue')
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('/@/views/index/register.vue')
+  },
+  {
+    path: '/portal',
+    name: 'portal',
+    component: () => import('/@/views/index/portal.vue')
+  },
+  {
+    path: '/share',
+    name: 'share',
+    component: () => import('/@/views/index/share.vue')
+  },
+  {
+    path: '/detail',
+    name: 'detail',
+    component: () => import('/@/views/index/detail.vue')
+  },
+  {
+    path: '/detailCanteen',
+    name: 'detailCanteen',
+    component: () => import('/@/views/index/detailCanteen.vue')
+  },
+  {
+    path: '/detailCounter',
+    name: 'detailCounter',
+    component: () => import('/@/views/index/detailCounter.vue')
+  },
+  {
+    path: '/search',
+    name: 'search',
+    component: () => import('/@/views/index/search.vue')
+  },
+  {
+    path: '/welcome',
+    name: 'welcome',
+    component: () => import('/@/views/index/welcome.vue')
+  },
+  {
+    path: '/usercenter',
+    name: 'usercenter',
+    redirect: '/index/usercenter/addressView',
+    component: () => import('/@/views/index/usercenter.vue'),
     children: [
       {
-        path: 'login',
-        name: 'login',
-        component: () => import('/@/views/index/login.vue')
+        path: 'addressView',
+        name: 'addressView',
+        component: () => import('/@/views/index/user/address-view.vue')
       },
       {
-        path: 'register',
-        name: 'register',
-        component: () => import('/@/views/index/register.vue')
+        path: 'wishThingView',
+        name: 'wishThingView',
+        component: () => import('/@/views/index/user/wish-thing-view.vue')
       },
       {
-        path: 'portal',
-        name: 'portal',
-        component: () => import('/@/views/index/portal.vue')
+        path: 'thingHistory',
+        name: 'thingHistory',
+        component: () => import('/@/views/index/user/thingHistory.vue')
       },
       {
-        path: 'share',
-        name: 'share',
-        component: () => import('/@/views/index/share.vue')
+        path: 'collectThingView',
+        name: 'collectThingView',
+        component: () => import('/@/views/index/user/collect-thing-view.vue')
       },
       {
-        path: 'detail',
-        name: 'detail',
-        component: () => import('/@/views/index/detail.vue')
+        path: 'userInfoEditView',
+        name: 'userInfoEditView',
+        component: () => import('/@/views/index/user/userinfo-edit-view.vue')
       },
       {
-        path: 'detailCanteen',
-        name: 'detailCanteen',
-        component: () => import('/@/views/index/detailCanteen.vue')
+        path: 'scoreView',
+        name: 'scoreView',
+        component: () => import('/@/views/index/user/score-view.vue')
       },
       {
-        path: 'detailCounter',
-        name: 'detailCounter',
-        component: () => import('/@/views/index/detailCounter.vue')
+        path: 'commentView',
+        name: 'commentView',
+        component: () => import('/@/views/index/user/comment-view.vue')
       },
       {
-        path: 'search',
-        name: 'search',
-        component: () => import('/@/views/index/search.vue')
+        path: 'securityView',
+        name: 'securityView',
+        component: () => import('/@/views/index/user/security-view.vue')
       },
       {
-        path: 'welcome',
-        name: 'welcome',
-        component: () => import('/@/views/index/welcome.vue')
+        path: 'pushView',
+        name: 'pushView',
+        component: () => import('/@/views/index/user/push-view.vue')
       },
       {
-        path: 'usercenter',
-        name: 'usercenter',
-        redirect: '/index/usercenter/addressView',
-        component: () => import('/@/views/index/usercenter.vue'),
-        children: [
-          {
-            path: 'addressView',
-            name: 'addressView',
-            component: () => import('/@/views/index/user/address-view.vue')
-          },
-          {
-            path: 'wishThingView',
-            name: 'wishThingView',
-            component: () => import('/@/views/index/user/wish-thing-view.vue')
-          },
-          {
-            path: 'thingHistory',
-            name: 'thingHistory',
-            component: () => import('/@/views/index/user/thingHistory.vue')
-          },
-          {
-            path: 'collectThingView',
-            name: 'collectThingView',
-            component: () => import('/@/views/index/user/collect-thing-view.vue')
-          },
-          {
-            path: 'userInfoEditView',
-            name: 'userInfoEditView',
-            component: () => import('/@/views/index/user/userinfo-edit-view.vue')
-          },
-          {
-            path: 'scoreView',
-            name: 'scoreView',
-            component: () => import('/@/views/index/user/score-view.vue')
-          },
-          {
-            path: 'commentView',
-            name: 'commentView',
-            component: () => import('/@/views/index/user/comment-view.vue')
-          },
-          {
-            path: 'securityView',
-            name: 'securityView',
-            component: () => import('/@/views/index/user/security-view.vue')
-          },
-          {
-            path: 'pushView',
-            name: 'pushView',
-            component: () => import('/@/views/index/user/push-view.vue')
-          },
-          {
-            path: 'messageView',
-            name: 'messageView',
-            component: () => import('/@/views/index/user/message-view.vue')
-          },
-        ]
-      }
+        path: 'messageView',
+        name: 'messageView',
+        component: () => import('/@/views/index/user/message-view.vue')
+      },
     ]
   },
   {
@@ -141,6 +138,11 @@ const constantRouterMap = [
       { path: 'sysInfo', name: 'sysInfo', component: () => import('/@/views/admin/sys-info.vue') },
     ]
   },
+  {
+    path: '/:catchAll(.*)',
+    name: '404',
+    component: () => import('/@/views/admin/404.vue')
+  }
 ];
 
 export default constantRouterMap;

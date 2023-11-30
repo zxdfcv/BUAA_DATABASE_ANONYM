@@ -2,6 +2,9 @@ import { defineStore } from 'pinia';
 import piniaStore from '/@/store/index';
 import { AppState } from './types';
 
+/**
+ * 应用状态信息留存
+ */
 export const useAppStore = defineStore(
   // 唯一ID
   'app',

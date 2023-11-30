@@ -1,3 +1,6 @@
+/**
+ * 应用状态信息字段
+ */
 export interface AppState {
   theme: string;
   colorWeek: boolean;

@@ -1,35 +1,15 @@
 <template>
-    <div>
-        <Carousel autoplay autoplay-speed="3000" v-model="value" loop>
-        <CarouselItem>
-            <div class="demo-carousel">
-                <div class="StyleFour">
-                    <p>WElCOME TO OUR WORK</p>
-                </div>
-                <div class="StyleThree">
-                    <p>RECOMMOND FOODS IN BEIHANG</p>
-                </div>
-                <div class="StyleFive">
-                    <Button size="large" type="success" shape="circle" icon="md-jet" @click="saveProgress">Let's Start!</Button>
-                </div>
-                <div class="ImgStyleOne"></div>
-            </div>
-        </CarouselItem>
-        <CarouselItem>
-            <div class="demo-carousel">
-                <div class="StyleSix">
-                    <p>DIRECT BY:DJANGO</p>
-                </div>
-                <div class="StyleSeven">
-                    <p>WE BUILD EVETHING WITH PASSION</p>
-                </div>
-                <div class="StyleEight">
-                    <Button size="large" type="success" shape="circle" icon="md-jet" @click="saveProgress">Let's Start!</Button>
-                </div>
-                <div class="ImgStyleTwo"></div>
-            </div>
-        </CarouselItem>
-        </Carousel>
+    <div class="demo-carousel">
+        <div class="StyleFour">
+            <p>WElCOME TO OUR WORK</p>
+        </div>
+        <div class="StyleThree">
+            <p>RECOMMOND FOODS IN BEIHANG</p>
+        </div>
+        <div class="StyleFive">
+            <Button size="large" type="success" shape="circle" icon="md-jet" @click="saveProgress">Jump to login</Button>
+        </div>
+        <div class="ImgStyleOne"></div>
     </div>
 </template>
 <script>
