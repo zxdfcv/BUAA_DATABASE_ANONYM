@@ -1,40 +1,47 @@
 <template>
-  <div class="container">
-    <div class="login-page pc-style">
-      <img :src="LogoIcon" alt="logo" class="logo-icon">
-      <div class="login-tab">
-        <div class="tab-selected">
-          <span>登录</span>
-          <span class="tabline tabline-width"></span>
-        </div>
+  <div class="container" :class="{ 'sign-up-mode': signUpMode }" style="width: 100%">
+    <!-- form表单容器 -->
+    <div class="form-container">
+      <div class="signin-signup">
+        <!-- 登录 -->
+        <h1>{{title}}</h1>
+        <LoginView
+            v-show="login"
+            @toRegister="signUpMode = !signUpMode"
+            :display="login"
+            style="margin: 15px; width: 85%;"
+            class="content"
+        />
+        <!-- 注册 -->
+        <RegisterView
+            v-show="!login"
+            @toLogin="signUpMode = !signUpMode"
+            style="margin: 15px; width: 85%;"
+            class="content"
+        />
       </div>
-      <div class="mail-login" type="login">
-        <div class="common-input">
-          <img :src="MailIcon" class="left-icon">
-          <div class="input-view">
-            <input placeholder="请输入用户名" v-model="pageData.loginForm.username" type="text" class="input">
-            <p class="err-view">
-            </p>
-          </div>
-          <!---->
+    </div>
+    <!-- 左右切换动画 -->
+    <div class="panels-container">
+      <div class="panel left-panel">
+        <div class="content">
+          <h3>BUAA Salty Fish Platform</h3>
+          <p>只因你太美</p>
+          <button @click="signUpMode = !signUpMode" class="btn transparent">
+            注册
+          </button>
         </div>
-        <div class="common-input">
-          <img :src="PwdIcon" class="left-icon">
-          <div class="input-view">
-            <input placeholder="请输入密码" v-model="pageData.loginForm.password" type="password" class="input">
-            <p class="err-view">
-            </p>
-          </div>
-<!--          <img src="@/assets/pwd-hidden.svg" class="right-icon">-->
-          <!---->
-        </div>
-        <div class="next-btn-view">
-          <button class="next-btn btn-active" style="margin: 16px 0px;" @click="handleLogin">登录</button>
-        </div>
+        <!-- <img src="@/assets" alt=""> -->
       </div>
-      <div class="operation">
-        <a @click="handleCreateUser" class="forget-pwd" style="text-align: left;">注册新帐号</a>
-        <a class="forget-pwd" style="text-align: right;">忘记密码？</a>
+      <div class="panel right-panel">
+        <div class="content">
+          <h3>Merrily,merrily,merrily,merrily,</h3>
+          <p>Life is but a dream</p>
+          <button @click="signUpMode = !signUpMode" class="btn transparent">
+            登录
+          </button>
+        </div>
+        <!-- <img src="@/assets" alt=""> -->
       </div>
     </div>
   </div>
@@ -43,9 +50,9 @@
 <script setup lang="ts">
 import {useUserStore} from '/@/store';
 import {message} from "ant-design-vue";
-import LogoIcon from '/@/assets/images/logo_b.png';
-import MailIcon from '/@/assets/images/username.svg';
-import PwdIcon from '/@/assets/images/password.svg';
+
+import LoginView from "/@/views/index/components/login/LoginView.vue";
+import RegisterView from "/@/views/index/components/login/RegisterView.vue";
 
 
 const router = useRouter();
@@ -57,6 +64,20 @@ const pageData = reactive({
     password: ''
   }
 })
+const signUpMode = ref(false);
+const login = ref(true);
+const title = ref('登录');
+
+watch(signUpMode, () => {
+  setTimeout(() => {
+    if (title.value === '登录') {
+      title.value = '注册'
+    } else {
+      title.value = '登录'
+    }
+    login.value = !login.value
+  }, 1100);
+})
 
 const handleLogin = ()=> {
   userStore.login({
@@ -66,7 +87,7 @@ const handleLogin = ()=> {
     loginSuccess()
     console.log('success==>', userStore.user_name)
     console.log('success==>', userStore.user_id)
-    console.log('success==>', userStore.user_token)
+    console.log('success==>', userStore.user_access)
     console.log('success==>', userStore.user_avatar)
   }).catch(err => {
     message.warn(err.msg || '登录失败')
@@ -82,194 +103,378 @@ const loginSuccess= ()=> {
   message.success('登录成功！')
 }
 
-
 </script>
-<style scoped lang="less">
-div {
-  display: block;
-}
-
+<style scoped>
 .container {
-  //background-color: #f1f1f1;
-  background-image: url('../images/buaa_old_main.png');
-  background-size: cover;
-  object-fit: cover;
-  height: 100%;
-  max-width: 100%;
-  display:flex;
-  justify-content: center;
-  align-items:center;
+  position: absolute;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #fff;
+  overflow: hidden;
 }
 
-.new-content {
+.form-container {
   position: absolute;
   left: 0;
-  right: 0;
-  margin: 80px auto 0;
-  width: 980px;
-}
-
-.logo-img {
-  width: 125px;
-  display: block;
-  margin-left: 137.5px;
-}
-
-.login-page {
-  overflow: hidden;
-  background: #fff;
-
-  .logo-icon {
-    margin-top: 20px;
-    margin-left: 175px;
-    width: 48px;
-    height: 48px;
-  }
-}
-
-.pc-style {
-  position: relative;
-  width: 400px;
-  height: 464px;
-  background: #fff;
-  border-radius: 4px;
-  -webkit-box-shadow: 2px 2px 6px #aaa;
-  box-shadow: 2px 2px 6px #aaa;
-}
-
-.login-tab {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  color: #1e1e1e;
-  font-size: 14px;
-  color: #1e1e1e;
-  font-weight: 500;
-  height: 46px;
-  line-height: 44px;
-  margin-bottom: 40px;
-  border-bottom: 1px solid #c3c9d5;
-
-  div {
-    position: relative;
-    -webkit-box-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-    text-align: center;
-    cursor: pointer;
-  }
-
-  .tabline {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    margin: 0 auto;
-    display: inline-block;
-    width: 0;
-    height: 2px;
-    background: #3d5b96;
-    -webkit-transition: width .5s cubic-bezier(.46, 1, .23, 1.52);
-    transition: width .5s cubic-bezier(.46, 1, .23, 1.52);
-  }
-
-  tab-selected {
-    color: #1e1e1e;
-    font-weight: 500;
-  }
-
-  .mail-login, .tel-login {
-    padding: 0 28px;
-  }
-
-}
-
-.mail-login {
-  margin: 0px 24px;
-}
-
-.common-input {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: start;
-  -ms-flex-align: start;
-  align-items: flex-start;
-
-  .left-icon {
-    margin-right: 12px;
-    width: 24px;
-  }
-
-  .input-view {
-    -webkit-box-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
-
-    .input {
-      font-weight: 500;
-      font-size: 14px;
-      color: #1e1e1e;
-      height: 26px;
-      line-height: 26px;
-      border: none;
-      padding: 0;
-      display: block;
-      width: 100%;
-      letter-spacing: 1.5px;
-    }
-
-    err-view {
-      margin-top: 4px;
-      height: 16px;
-      line-height: 16px;
-      font-size: 12px;
-      color: #f62a2a;
-    }
-  }
-}
-
-.next-btn {
-  background: #3d5b96;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
+  top: 0;
   width: 100%;
-  outline: none;
-  cursor: pointer;
+  height: 100%;
 }
 
-button {
-  background: transparent;
-  padding: 0;
-  border-width: 0px;
+.signin-signup {
+  position: relative;
+  top: 50%;
+  left: 75%;
+  transform: translate(-50%, -50%);
+  width: 44%;
+  transition: 1s 0.7s ease-in-out;
+  display: grid;
+  grid-template-columns: 1fr;
+  z-index: 5;
 }
 
-button, input, select, textarea {
-  margin: 0;
-  padding: 0;
-  outline: none;
+/* 左右切换动画 */
+.social-text {
+  padding: 0.7rem 0;
+  font-size: 1rem;
 }
 
-.operation {
+.social-media {
   display: flex;
-  flex-direction: row;
-  margin: 0 24px;
+  justify-content: center;
 }
 
-.forget-pwd {
-  //text-align: center;
-  display: block;
-  overflow: hidden;
-  flex:1;
-  margin: 0 auto;
-  color: #3d5b96;
-  font-size: 14px;
+.social-icon {
+  height: 46px;
+  width: 46px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 0.45rem;
+  color: #333;
+  border-radius: 50%;
+  border: 1px solid #333;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: 0.3s;
+}
+
+.social-icon:hover {
+  color: #4481eb;
+  border-color: #4481eb;
+}
+
+.btn {
+  width: 150px;
+  background-color: #5995fd;
+  border: none;
+  outline: none;
+  height: 49px;
+  border-radius: 49px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin: 10px 0;
   cursor: pointer;
+  transition: 0.5s;
 }
 
+.btn:hover {
+  background-color: #4d84e2;
+}
+
+.panels-container {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.container:before {
+  content: '';
+  position: absolute;
+  height: 2000px;
+  width: 2000px;
+  top: -10%;
+  right: 48%;
+  transform: translateY(-50%);
+  background-image: linear-gradient(-45deg, #4481eb 0%, #04befe 100%);
+  transition: 1.8s ease-in-out;
+  border-radius: 50%;
+  z-index: 6;
+}
+
+.image {
+  width: 100%;
+  transition: transform 1.1s ease-in-out;
+  transition-delay: 0.4s;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: space-around;
+  text-align: center;
+  z-index: 6;
+}
+
+.left-panel {
+  pointer-events: all;
+  padding: 3rem 17% 2rem 12%;
+}
+
+.right-panel {
+  pointer-events: none;
+  padding: 3rem 12% 2rem 17%;
+}
+
+.panel .content {
+  color: #fff;
+  transition: transform 0.9s ease-in-out;
+  transition-delay: 1.6s;
+}
+
+.panel h3 {
+  font-weight: 600;
+  line-height: 1;
+  font-size: 1.5rem;
+}
+
+.panel p {
+  font-size: 0.95rem;
+  padding: 0.7rem 0;
+}
+
+.btn.transparent {
+  margin: 0;
+  background: none;
+  border: 2px solid #fff;
+  width: 130px;
+  height: 41px;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.right-panel .image,
+.right-panel .content {
+  transform: translateX(800px);
+}
+
+/* ANIMATION */
+
+.container.sign-up-mode:before {
+  transform: translate(100%, -50%);
+  right: 52%;
+}
+
+.container.sign-up-mode .left-panel .image,
+.container.sign-up-mode .left-panel .content {
+  transform: translateX(-800px);
+}
+
+.container.sign-up-mode .signin-signup {
+  left: 25%;
+}
+
+.container.sign-up-mode .sign-up-form {
+  opacity: 1;
+  z-index: 2;
+}
+
+.container.sign-up-mode .sign-in-form {
+  opacity: 0;
+  z-index: 1;
+}
+
+.container.sign-up-mode .right-panel .image,
+.container.sign-up-mode .right-panel .content {
+  transform: translateX(0%);
+}
+
+.container.sign-up-mode .left-panel {
+  pointer-events: none;
+}
+
+.container.sign-up-mode .right-panel {
+  pointer-events: all;
+}
+
+@media (max-width: 870px) {
+  .container {
+    min-height: 800px;
+    height: 100vh;
+  }
+
+  .signin-signup {
+    width: 100%;
+    top: 95%;
+    transform: translate(-50%, -100%);
+    transition: 1s 0.8s ease-in-out;
+  }
+
+  .signin-signup,
+  .container.sign-up-mode .signin-signup {
+    left: 50%;
+  }
+
+  .panels-container {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 2fr 1fr;
+  }
+
+  .panel {
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 2.5rem 8%;
+    grid-column: 1 / 2;
+  }
+
+  .right-panel {
+    grid-row: 3 / 4;
+  }
+
+  .left-panel {
+    grid-row: 1 / 2;
+  }
+
+  .image {
+    width: 200px;
+    transition: transform 0.9s ease-in-out;
+    transition-delay: 0.6s;
+  }
+
+  .panel .content {
+    padding-right: 15%;
+    transition: transform 0.9s ease-in-out;
+    transition-delay: 0.3s;
+  }
+
+  .panel h3 {
+    font-size: 1.2rem;
+  }
+
+  .panel p {
+    font-size: 0.7rem;
+    padding: 0.5rem 0;
+  }
+
+  .btn.transparent {
+    width: 110px;
+    height: 35px;
+    font-size: 0.7rem;
+  }
+
+  .container:before {
+    width: 1500px;
+    height: 1500px;
+    transform: translateX(-50%);
+    left: 30%;
+    bottom: 68%;
+    right: initial;
+    top: initial;
+    transition: 2s ease-in-out;
+  }
+
+  .container.sign-up-mode:before {
+    transform: translate(-50%, 100%);
+    bottom: 32%;
+    right: initial;
+  }
+
+  .container.sign-up-mode .left-panel .image,
+  .container.sign-up-mode .left-panel .content {
+    transform: translateY(-300px);
+  }
+
+  .container.sign-up-mode .right-panel .image,
+  .container.sign-up-mode .right-panel .content {
+    transform: translateY(0px);
+  }
+
+  .right-panel .image,
+  .right-panel .content {
+    transform: translateY(300px);
+  }
+
+  .container.sign-up-mode .signin-signup {
+    top: 5%;
+    transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 570px) {
+  .sign-in-form .sign-up-form {
+    padding: 0 1.5rem;
+  }
+
+  .image {
+    display: none;
+  }
+
+  .panel .content {
+    padding: 0.5rem 1rem;
+  }
+
+  .container {
+    padding: 1.5rem;
+  }
+
+  .container:before {
+    bottom: 72%;
+    left: 50%;
+  }
+
+  .container.sign-up-mode:before {
+    bottom: 28%;
+    left: 50%;
+  }
+}
+
+/* 控制login & register显示 */
+.sign-in-form .sign-up-form {
+  padding: 0rem 5rem;
+  transition: all 0.2s 0.7s;
+  overflow: hidden;
+}
+
+.sign-in-form {
+  z-index: 2;
+}
+
+.sign-up-form {
+  opacity: 0;
+  z-index: 1;
+}
+
+/* register */
+.LoginView,
+.RegisterView {
+  margin-top: 20px;
+  background-color: #fff;
+  padding: 20px 40px 20px 20px;
+  border-radius: 5px;
+  box-shadow: 0px 5px 10px #cccc;
+}
+
+.submit-btn {
+  width: 100%;
+}
+
+.tiparea {
+  text-align: right;
+  font-size: 12px;
+  color: #333;
+  width: 100%;
+}
+
+.tiparea a {
+  color: #409eff;
+}
 </style>
+
+

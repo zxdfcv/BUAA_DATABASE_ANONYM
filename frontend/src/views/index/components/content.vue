@@ -77,7 +77,7 @@ import { listApi as listTagList } from '/@/api/index/tag'
 import { listApi as listThingList } from '/@/api/index/thing'
 import { BASE_URL } from "/@/store/constants";
 import { useUserStore } from "/@/store";
-import { USER_ID, USER_NAME, USER_TOKEN, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN } from "/@/store/constants";
+import { USER_ID, USER_NAME, USER_ACCESS, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN } from "/@/store/constants";
 import FoodIcon from '/@/assets/images/地道美食.svg';
 import PlayIcon from '/@/assets/images/Play.png'
 

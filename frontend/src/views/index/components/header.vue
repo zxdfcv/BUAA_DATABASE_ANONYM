@@ -9,7 +9,7 @@
     </div>
     <div class="right-view">
       <a href="/admin" target="__black" type="a-link" style="line-height: 32px;width:60px;">后台入口</a>
-      <template v-if="userStore.user_token">
+      <template v-if="userStore.user_access">
         <a-dropdown>
           <a class="ant-dropdown-link" @click="e => e.preventDefault()">
             <img v-if = "SelfAvatar(userStore.user_avatar)" :src="BASE_URL+userStore.user_avatar" class="self-img">

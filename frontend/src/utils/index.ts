@@ -1,25 +1,6 @@
-// import { resolve } from 'path';
-// const fs = require('fs');
-//
-// function pathResolve(dir: string) {
-//   return resolve(process.cwd(), '.', dir);
-// }
-//
-// export const getFolder = (path: any) => {
-//   const components: Array<string> = [];
-//   const files = fs.readdirSync(path);
-//   files.forEach(function (item: string) {
-//     const stat = fs.lstatSync(path + '/' + item);
-//     if (stat.isDirectory() === true && item != 'components') {
-//       components.push(path + '/' + item);
-//       components.push(pathResolve(path + '/' + item));
-//     }
-//   });
-//   return components;
-// };
-
-export function getFormatTime(dateTime,flag) {
-  if(dateTime != null ) {
+/* TODO: 时间格式处理函数，考虑内部使用 Unix Timestamp，对外转成字符串/Date 格式 */
+export function getFormatTime(dateTime, flag) {
+  if(dateTime != null) {
     //若传入的dateTime为字符串类型，需要进行转换成数值，若不是无需下面注释代码
     var time = parseInt(dateTime)
     var date = new Date(time);
