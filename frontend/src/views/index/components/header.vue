@@ -9,6 +9,19 @@
       <input placeholder="今天想搜些什么？" ref="keywordRef" @keyup.enter="search"/>
     </div>
     <Button type="primary" shape="circle" icon="ios-search" style="margin-left: 15px;" @click="search">Search</Button>
+    <a-dropdown trigger="click">
+      <Button type="default" style="margin-left: 15px;">
+        All Category
+        <Icon type="ios-arrow-down" />
+      </Button>
+      <template #overlay>
+        <a-menu>
+          <a-menu-item v-for="item in search_index">
+            <a @click="router.push({name: 'search', query: {keyword: item}});">{{ item }}</a>
+          </a-menu-item>
+        </a-menu>
+      </template>
+    </a-dropdown>
 
 
     <div class="right-view">
@@ -25,12 +38,6 @@
             <a-menu style="width: 120px">
               <a-menu-item>
                 <a @click="router.push({name: 'collectThingView'})">菜肴收藏</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="router.push({name: 'scoreView'})">柜台收藏</a>
-              </a-menu-item>
-              <a-menu-item>
-                <a @click="router.push({name: 'wishThingView'})">食堂收藏</a>
               </a-menu-item>
               <a-menu-item>
                 <template #icon><UserOutlined /></template>
@@ -153,7 +160,6 @@ import MessageIcon from '/@/assets/images/message-icon.svg';
 import {BASE_URL} from "/@/store/constants";
 
 const router = useRouter();
-const route = useRoute();
 const userStore = useUserStore();
 
 const keywordRef = ref()
@@ -164,17 +170,15 @@ let msgData = ref([] as any)
 let HasNewMessage = ref(false)
 let pointKey = 0
 
+const search_index = ['1', '2', '3', '4'];
+
 const hasAvatar = (avatar) => {
-  if (avatar === "null" || avatar===null || avatar === undefined) {
-    return false
-  } else {
-    return true
-  }
+  return !(avatar === "null" || avatar === null || avatar === undefined);
 }
 
 onMounted(() => {
   getMessageList()
-  console.log(userStore.user_avatar)
+  console.log("avatar: ", userStore.user_avatar);
 })
 
 const getMessageList = () => {
@@ -282,6 +286,7 @@ const UpdateState = () => {
   position: relative;
   width: 25%;
   max-width: 500px;
+  min-width: 300px;
   height: 32px;
   background: #ecf3fc;
   padding: 0 12px;

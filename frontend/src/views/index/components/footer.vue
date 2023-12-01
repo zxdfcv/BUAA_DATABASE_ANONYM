@@ -2,7 +2,7 @@
   <div class="footer-view">
     <div class="foot-link-box flex-view">
       <div class="link-split"></div>
-      <a href="/admin" class="foot-link" target="_blank">后台管理</a>
+      <a href="/admin" class="foot-link" target="_blank">前往后台</a>
       <div class="link-split"></div>
       <a class="foot-link" @click="handleSource">关于我们</a>
     </div>
@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import {Modal} from "ant-design-vue";
+import { Modal } from "ant-design-vue";
 
 export default {
   name: 'Footer',
@@ -40,7 +40,7 @@ export default {
 .footer-view {
   max-width: 1108px;
   margin: 0 auto;
-  padding: 24px 54 20px 54px;
+  padding: 24px 54px 20px 54px;
   
 
   .foot-link-box {
