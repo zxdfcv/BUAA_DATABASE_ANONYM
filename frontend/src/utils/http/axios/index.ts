@@ -83,7 +83,7 @@ service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     if (whiteList.includes(config.url as string)) {
       return config;
     } else if (userStore.token_expire_time > Date.now()) { /* 客户端判断 Access token valid */
-    config.headers['Authorization'] = userStore.user_access;
+    config.headers['Authorization'] = "Bearer " + userStore.user_access;
     } else { /* Access token invalid */
       userStore.user_access = undefined;
       addRequest(config)
