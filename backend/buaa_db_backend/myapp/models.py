@@ -39,6 +39,7 @@ class Follow(models.Model):
 
 class Classification1(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.name
@@ -51,6 +52,7 @@ class Classification1(models.Model):
 class Classification2(models.Model):
     name = models.CharField(max_length=255, unique=True)
     classification_1 = models.ForeignKey(Classification1, on_delete=models.CASCADE, related_name='c1_c2')
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return self.name

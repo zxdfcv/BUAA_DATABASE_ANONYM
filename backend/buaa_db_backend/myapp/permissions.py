@@ -51,3 +51,11 @@ class CanEditUserPermission(BasePermission):
     # )
     #
     # return is_admin_or_self and has_permission
+
+
+class CanViewClassificationPermission(BasePermission):
+    def has_permission(self, request, view):
+        has_permission = (
+                request.user.has_perm('myapp.view_classification1') and
+                request.user.has_perm('myapp.view_classification2'))
+        return request.user.is_staff or has_permission

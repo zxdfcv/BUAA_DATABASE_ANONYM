@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group
 
-from .models import LoginLog, OpLog, ErrorLog
+from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2
 
 User = get_user_model()
 
@@ -117,10 +117,11 @@ class UserAllDetailSerializer(serializers.ModelSerializer):
         slug_field='name',
         queryset=Group.objects.all()
     )
+
     class Meta:
         model = get_user_model()
         # fields = '__all__'
-        exclude = ('password', 'is_superuser','user_permissions')
+        exclude = ('password', 'is_superuser', 'user_permissions')
         extra_kwargs = {'id': {'read_only': True},
                         'last_login': {'read_only': True},
                         }
@@ -130,3 +131,20 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ['id', 'username', 'is_active', 'is_staff', 'date_joined']
+
+
+class Classification1Serializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    class Meta:
+        model = Classification1
+        fields = '__all__'
+
+
+class Classification2Serializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    classification_1_name = serializers.ReadOnlyField(source='classification_1.name')
+
+    class Meta:
+        model = Classification2
+        fields = '__all__'

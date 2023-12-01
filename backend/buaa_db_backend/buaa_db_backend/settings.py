@@ -164,7 +164,7 @@ REST_FRAMEWORK  = {
 
 SIMPLE_JWT = {
     # token有效时长(返回的 access 有效时长)
-    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=30),
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=60),
     # token刷新的有效时间(返回的 refresh 有效时长)
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(hours=3),
 }
