@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import piniaStore from '/@/store/index';
-import { AppState } from './types';
+import {viewC1Api, viewC2Api} from "/@/api/index/classification";
 
 /**
  * 应用状态信息留存
@@ -10,31 +10,38 @@ export const useAppStore = defineStore(
   'app',
   {
     state: () => ({
-      title: 'FastVue3, 一个快速开箱即用的Vue3+Vite模板',
-      h1: 'Vue3 + Vite3.x + TypeScript + Pinia大厂开发必备',
-      theme: '',
+        classificationReNewed: false,
+        classification1: undefined,
+        classification2: undefined,
     }),
     getters: {},
     actions: {
-      updateSettings(partial: Partial<AppState>) {
-        this.$patch(partial);
-      },
-
-      // Change theme color
-      toggleTheme(dark: boolean) {
-        if (dark) {
-          this.theme = 'dark';
-          document.documentElement.classList.add('dark');
-        } else {
-          this.theme = 'light';
-          document.documentElement.classList.remove('dark');
+        async reNewClass() {
+            const result1 = await viewC1Api();
+            const result2 = await viewC2Api();
+            if (result1.code === 0) {
+                const res1 = result1.data;
+                console.log(res1);
+                this.$patch((state)=> {
+                    state.classification1 = res1;
+                    state.classificationReNewed = true;
+                    console.log('Storage state ==> ', this)
+                })
+            }
+            if (result2.code === 0) {
+                const res2 = result1.data;
+                console.log(res2);
+                this.$patch((state)=> {
+                    state.classification2 = res2;
+                    console.log('Storage state ==> ', this)
+                })
+            }
+            return result1.data;
         }
-      },
     },
     persist: {
-      key: 'theme',
-      storage: localStorage,
-      paths: ['theme'],
+        key: 'app',
+        storage: sessionStorage,
     },
   },
 );

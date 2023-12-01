@@ -149,10 +149,9 @@
 
 <script setup lang="ts">
 import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons-vue';
-import { ChatLineSquare } from '@element-plus/icons-vue'
 
 import {listReceiveCommentsApi, SetStateToReadedApi} from '/@/api/index/comment'
-import {useUserStore} from "/@/store";
+import { useUserStore, useAppStore } from "/@/store";
 import logoImage from '/@/assets/images/logo_b.png';
 import SearchIcon from '/@/assets/images/search-icon.svg';
 import AvatarIcon from '/@/assets/images/avatar.jpg';
@@ -161,6 +160,7 @@ import {BASE_URL} from "/@/store/constants";
 
 const router = useRouter();
 const userStore = useUserStore();
+const appStore = useAppStore();
 
 const keywordRef = ref()
 
@@ -170,15 +170,26 @@ let msgData = ref([] as any)
 let HasNewMessage = ref(false)
 let pointKey = 0
 
-const search_index = ['1', '2', '3', '4'];
+let search_index = ['hello', 'world'];
 
 const hasAvatar = (avatar) => {
   return !(avatar === "null" || avatar === null || avatar === undefined);
 }
 
+const reNewClassification = () => {
+  console.log(appStore)
+  if (appStore.classificationReNewed !== true) {
+    console.log("刷新分类中")
+    return appStore.reNewClass();
+  } else {
+    return search_index;
+  }
+}
+
 onMounted(() => {
-  getMessageList()
-  console.log("avatar: ", userStore.user_avatar);
+  search_index = reNewClassification() as string[];
+  // getMessageList()
+  // console.log("avatar: ", userStore.user_avatar);
 })
 
 const getMessageList = () => {
@@ -261,7 +272,7 @@ const UpdateState = () => {
   position: fixed;
   top: 0;
   left: 0;
-  height: 80px;
+  height: 60px;
   width: 100%;
   background: rgb(255, 255, 255);
   border-bottom: 2px solid #cedce4;
