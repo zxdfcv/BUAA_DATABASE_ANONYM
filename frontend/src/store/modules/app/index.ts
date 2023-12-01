@@ -11,33 +11,42 @@ export const useAppStore = defineStore(
   {
     state: () => ({
         classificationReNewed: false,
-        classification1: undefined,
-        classification2: undefined,
+        classification1: [],
+        classification2: [],
     }),
     getters: {},
     actions: {
         async reNewClass() {
-            const result1 = await viewC1Api();
-            const result2 = await viewC2Api();
-            if (result1.code === 0) {
-                const res1 = result1.data;
-                console.log(res1);
-                this.$patch((state)=> {
-                    state.classification1 = res1;
-                    state.classificationReNewed = true;
-                    console.log('Storage state ==> ', this)
-                })
+            if (this.classificationReNewed !== true) {
+                const result1 = await viewC1Api();
+                const result2 = await viewC2Api();
+                if (result1.code === 0) {
+                    const res1 = result1.data;
+                    console.log(res1);
+                    this.$patch((state) => {
+                        for (var i = 0; i < res1.length; i++) {
+                            // @ts-ignore
+                            state.classification1.push(res1[i].name);
+                        }
+                        state.classificationReNewed = true;
+                        console.log('Storage state ==> ', this)
+                    })
+                }
+                if (result2.code === 0) {
+                    const res2 = result1.data;
+                    console.log(res2);
+                    this.$patch((state) => {
+                        for (var i = 0; i < res2.length; i++) {
+                            // @ts-ignore
+                            state.classification2.push(res2[i].name);
+                        }
+                        console.log('Storage state ==> ', this)
+                    })
+                }
             }
-            if (result2.code === 0) {
-                const res2 = result1.data;
-                console.log(res2);
-                this.$patch((state)=> {
-                    state.classification2 = res2;
-                    console.log('Storage state ==> ', this)
-                })
-            }
-            return result1.data;
-        }
+            return this.classification1;
+        },
+
     },
     persist: {
         key: 'app',
