@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import {ref} from 'vue';
-
+import * as echarts from 'echarts'
 import { InteractionOutlined, StarFilled, StarTwoTone } from '@ant-design/icons-vue';
 import {listApi} from '/@/api/admin/overview'
 
@@ -40,7 +40,11 @@ const pieChartDiv = ref()
 let visitChart, barChart, pieChart;
 
 let tdata = reactive({
-  data: {}
+  data: {
+    visit_data: {},
+    order_rank_data: {},
+    classification_rank_data: {} // 后端得提供信息
+  }
 })
 
 onMounted(() => {
@@ -161,7 +165,7 @@ const initBarChart = () => {
       bottom: '40px'
     },
     title: {
-      text: '热门菜肴排名',
+      text: '热门商品排名',
       textStyle: {
         color: '#aaa',
         fontStyle: 'normal',
@@ -238,7 +242,7 @@ const initPieChart = () => {
       bottom: '40px'
     },
     title: {
-      text: '热门菜肴分类',
+      text: '热门商品分类',
       textStyle: {
         color: '#aaa',
         fontStyle: 'normal',

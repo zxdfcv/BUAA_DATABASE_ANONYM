@@ -20,11 +20,11 @@
           </a-menu-item>
           <a-menu-item key="classification">
             <layout-outlined/>
-            <span>柜台管理</span>
+            <span>一级分类管理</span>
           </a-menu-item>
           <a-menu-item key="canteen">
             <layout-outlined/>
-            <span>食堂管理</span>
+            <span>二级分类管理</span>
           </a-menu-item>
           <a-menu-item key="tag">
             <tag-outlined/>
@@ -33,6 +33,14 @@
           <a-menu-item key="comment">
             <comment-outlined/>
             <span>评论管理</span>
+          </a-menu-item>
+          <a-menu-item key="reply">
+            <message-outlined/>
+            <span>回复管理</span>
+          </a-menu-item>
+          <a-menu-item key="chat">
+            <message-outlined/>
+            <span>私聊管理</span>
           </a-menu-item>
           <a-menu-item key="user">
             <user-outlined/>
@@ -70,10 +78,10 @@
               <span>错误日志</span>
             </a-menu-item>
           </a-sub-menu>
-          <!-- <a-menu-item key="overview">
+          <a-menu-item key="overview">
             <home-outlined/>
             <span>统计分析</span>
-          </a-menu-item> -->
+          </a-menu-item>
           <a-menu-item key="sysInfo">
             <info-circle-outlined/>
             <span>系统信息</span>
@@ -101,6 +109,7 @@ import {
   TagOutlined,
   PieChartOutlined,
   DollarOutlined,
+  MessageOutlined,
   LayoutOutlined,
   DatabaseOutlined
 } from '@ant-design/icons-vue';

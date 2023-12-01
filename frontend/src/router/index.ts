@@ -39,7 +39,8 @@ router.beforeEach(async (to, from, next) => {
         // 在免登录名单，直接进入
         next()
       } else {
-        next({ path: adminLoginRoutePath, query: { redirect: to.fullPath } })
+        next()
+        // next({ path: adminLoginRoutePath, query: { redirect: to.fullPath } })
       }
     }
 
