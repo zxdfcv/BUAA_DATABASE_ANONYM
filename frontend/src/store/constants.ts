@@ -1,4 +1,4 @@
-const BASE_URL = 'http://127.0.0.1:8000/myapp'
+const BASE_URL = 'http://127.0.0.1:8000'
 // const BASE_URL = 'http://118.178.121.33:80'
 
 const USER_ID = 'user_id'
