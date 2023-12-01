@@ -2,7 +2,6 @@
   <div class="portal">
     <Header />
     <Content />
-    <Footer />
   </div>
 </template>
 <script>
