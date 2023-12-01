@@ -25,9 +25,13 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # 实现邮箱和手机号登入:待定
         username = attrs.get("username")
         password = attrs.get("password")
+        login_type = self.initial_data.get("type",0)
+
         user = authenticate(username=username, password=password)
         if user is None:
             raise serializers.ValidationError("Invalid username or password")
+        if (not user.is_staff) and (login_type == "1"):
+            raise serializers.ValidationError("普通用户无法登入管理平台")
         user.last_login = timezone.now()
         user.save()
         data = super().validate(attrs)
