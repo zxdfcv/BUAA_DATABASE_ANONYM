@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import user, log, admin
+from .views import user, log, admin, classification
 
 app_name = 'myapp'
 urlpatterns = [
@@ -22,11 +22,21 @@ urlpatterns = [
     path("user/delete", user.EditUserView.as_view(), name="user_delete"),
     path("user/update/pwd", user.UserChangePasswordView.as_view(), name="user_changePwd"),
 
-
     path("admin/user/detail", admin.UserAllDetailView.as_view(), name="user_allInformation"),
     path("admin/user/update", admin.UserAllDetailView.as_view(), name="user_allUpdate"),
     path("admin/user/list", admin.UserListView.as_view(), name="user_list"),
     path("admin/user/delete", admin.UserListView.as_view(), name="user_allDelete"),
+
+
+    path("classification/viewC_1", classification.Classification1ListView.as_view(), name="classification1_view"),
+    path("classification/viewC_2", classification.Classification2ListView.as_view(), name="classification2_view"),
+    path("classification/createC_1", classification.EditClassification1View.as_view(), name="classification1_create"),
+    path("classification/createC_2", classification.EditClassification2View.as_view(), name="classification2_create"),
+    path("classification/updateC_1", classification.EditClassification1View.as_view(), name="classification1_update"),
+    path("classification/updateC_2", classification.EditClassification2View.as_view(), name="classification2_update"),
+    path("classification/deleteC_1", classification.EditClassification1View.as_view(), name="classification1_delete"),
+    path("classification/deleteC_2", classification.EditClassification2View.as_view(), name="classification2_delete"),
+
 
 
     path("test/", user.TestView.as_view(), name="token_test"),
