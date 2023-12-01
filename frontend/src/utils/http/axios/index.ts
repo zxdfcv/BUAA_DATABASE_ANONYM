@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { IResponse } from './type';
-import { ADMIN_USER_TOKEN, USER_ACCESS, BASE_URL } from '/@/store/constants'
+import { BASE_URL } from '/@/store/constants'
 import { useUserStore } from '/@/store';
 
 let waiting = [] as any;
@@ -41,7 +41,7 @@ export function post<T = any>(config: AxiosRequestConfig): Promise<T> {
 const retryRequest = () => {
   console.log("Retry failed request");
   waiting.forEach(config => request(config));
-  waiting = [] as any;
+  waiting = [];
 }
 
 const refresh = () => {
@@ -50,15 +50,17 @@ const refresh = () => {
     getting = true;
     let refreshToken = userStore.user_refresh;
     if (refreshToken) {
-      post({url: '/refresh', params: {}, data: {refresh: refreshToken}}).then((res) => {
-        if (res.status === 401) {
+      post({url: '/token/refresh/', params: {}, data: {refresh: refreshToken}}).then((res) => {
+        
+        if (res.access === null) {
           /* 长 Token 失效，直接登出 */
           getting = false;
           userStore.logout();
-        } else if (res.status === 200) {
+        } else {
           /* 长 Token 未过期，重新更新 */
-          // userStore.user_refresh = res.data.refresh; FIXME: '/refresh' 接口需要同时更新 freshToken 吗
-          userStore.user_access = res.data.access;
+          // userStore.user_refresh = res.data.refresh; '/refresh' 接口需要同时更新 freshToken 吗 -> 不需要
+          userStore.user_access = res.access;
+          userStore.token_expire_time = Date.now() + 1000 * 60 * 30;
           getting = false;
           retryRequest();
         }
@@ -69,7 +71,7 @@ const refresh = () => {
 
 
 /* 允许不携带 Token 访问的 Api 白名单 */
-const whiteList = ['/login', '/register', '/refresh']
+const whiteList = ['/login', '/register', '/token/refresh/']
 
 /* 拦截 Request 添加请求头 */
 service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
@@ -136,3 +138,5 @@ service.interceptors.response.use((response: AxiosResponse) => {
 export default request;
 
 export type { AxiosInstance, AxiosResponse };
+
+export { refresh }

@@ -25,7 +25,7 @@
     <div class="panels-container">
       <div class="panel left-panel">
         <div class="content">
-          <h3>BUAA Salty Fish Platform</h3>
+          <h3 style="color: #fff">BUAA Salty Fish Platform</h3>
           <p>只因你太美</p>
           <button @click="signUpMode = !signUpMode" class="btn transparent">
             注册
@@ -35,7 +35,7 @@
       </div>
       <div class="panel right-panel">
         <div class="content">
-          <h3>Merrily,merrily,merrily,merrily,</h3>
+          <h3 style="color: #fff">Merrily,merrily,merrily,merrily,</h3>
           <p>Life is but a dream</p>
           <button @click="signUpMode = !signUpMode" class="btn transparent">
             登录
@@ -65,10 +65,14 @@ const pageData = reactive({
   }
 })
 const signUpMode = ref(false);
+const visit = ref(true);
 const login = ref(true);
 const title = ref('登录');
 
 watch(signUpMode, () => {
+  setTimeout(() => {
+
+  }, 600);
   setTimeout(() => {
     if (title.value === '登录') {
       title.value = '注册'
@@ -78,30 +82,6 @@ watch(signUpMode, () => {
     login.value = !login.value
   }, 1100);
 })
-
-const handleLogin = ()=> {
-  userStore.login({
-    username: pageData.loginForm.username,
-    password: pageData.loginForm.password
-  }).then(res=> {
-    loginSuccess()
-    console.log('success==>', userStore.user_name)
-    console.log('success==>', userStore.user_id)
-    console.log('success==>', userStore.user_access)
-    console.log('success==>', userStore.user_avatar)
-  }).catch(err => {
-    message.warn(err.msg || '登录失败')
-  })
-}
-
-const handleCreateUser = () => {
-  router.push({name:'register'})
-}
-
-const loginSuccess= ()=> {
-  router.push({ name: 'portal' })
-  message.success('登录成功！')
-}
 
 </script>
 <style scoped>
@@ -377,7 +357,7 @@ const loginSuccess= ()=> {
     bottom: 68%;
     right: initial;
     top: initial;
-    transition: 2s ease-in-out;
+    transition: 1s ease-in-out;
   }
 
   .container.sign-up-mode:before {

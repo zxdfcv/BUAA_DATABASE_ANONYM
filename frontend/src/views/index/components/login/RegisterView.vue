@@ -1,6 +1,6 @@
 <template>
   <a-spin :spinning="loading">
-    <a-card :bordered="false" hoverable style="top: 5%; left: auto; background-color: #f9f9f9; height: auto">
+    <el-card :bordered="false" shadow="hover" style="top: 5%; left: auto; background-color: #f9f9f9; height: auto">
       <div style="text-align: left;font-size: 14px;margin-bottom: 30px">
         <b>BUAA Salty Fish Platform</b>
       </div>
@@ -46,7 +46,7 @@
           </div>
         </a-form>
       </div>
-    </a-card>
+    </el-card>
   </a-spin>
 </template>
 
