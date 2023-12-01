@@ -16,6 +16,7 @@
       </Button>
       <template #overlay>
         <a-menu>
+          <!-- TODO: 可以修改成大分类栏 -->
           <a-menu-item v-for="item in search_index">
             <a @click="router.push({name: 'search', query: {keyword: item}});">{{ item }}</a>
           </a-menu-item>
@@ -178,16 +179,17 @@ const hasAvatar = (avatar) => {
 
 const reNewClassification = () => {
   console.log(appStore)
-  if (appStore.classificationReNewed !== true) {
+  if (!appStore.classificationReNewed) {
     console.log("刷新分类中")
     return appStore.reNewClass();
   } else {
-    return search_index;
+    return appStore.classification1;
   }
 }
 
-onMounted(() => {
-  search_index = reNewClassification() as string[];
+onMounted(async () => {
+  search_index = await reNewClassification() as string[];
+  console.log(search_index)
   // getMessageList()
   // console.log("avatar: ", userStore.user_avatar);
 })
