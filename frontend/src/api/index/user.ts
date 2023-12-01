@@ -1,8 +1,8 @@
 import { get, post } from '/@/utils/http/axios';
 
 enum URL {
-    userLogin = '/login/',
-    userRegister = '/register/',
+    userLogin = '/myapp/login/',
+    userRegister = '/myapp/register/',
 
     /* TODO: 以下 UserApi 未实现 */
     detail = '/myapp/index/user/info',

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { IResponse } from './type';
-import { BASE_URL } from '/@/store/constants'
+import { BASE_URL, EXPIRE_MINUTE } from '/@/store/constants'
 import { useUserStore } from '/@/store';
 
 let waiting = [] as any;
@@ -50,7 +50,7 @@ const refresh = () => {
     getting = true;
     let refreshToken = userStore.user_refresh;
     if (refreshToken) {
-      post({url: '/token/refresh/', params: {}, data: {refresh: refreshToken}}).then((res) => {
+      post({url: '/myapp/token/refresh/', params: {}, data: {refresh: refreshToken}}).then((res) => {
         
         if (res.access === null) {
           /* 长 Token 失效，直接登出 */
@@ -60,7 +60,7 @@ const refresh = () => {
           /* 长 Token 未过期，重新更新 */
           // userStore.user_refresh = res.data.refresh; '/refresh' 接口需要同时更新 freshToken 吗 -> 不需要
           userStore.user_access = res.access;
-          userStore.token_expire_time = Date.now() + 1000 * 60 * 30;
+          userStore.token_expire_time = Date.now() + 1000 * 60 * EXPIRE_MINUTE;
           getting = false;
           retryRequest();
         }
@@ -83,7 +83,7 @@ service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     if (whiteList.includes(config.url as string)) {
       return config;
     } else if (userStore.token_expire_time > Date.now()) { /* 客户端判断 Access token valid */
-    config.headers.TOKEN = userStore.user_access;
+    config.headers['Authorization'] = userStore.user_access;
     } else { /* Access token invalid */
       userStore.user_access = undefined;
       addRequest(config)
