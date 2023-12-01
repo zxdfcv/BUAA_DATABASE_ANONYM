@@ -3,50 +3,93 @@
     <div class="logo">
       <img :src="logoImage" class="search-icon" @click="$router.push({name:'portal'})">
     </div>
+
     <div class="search-entry">
       <img :src="SearchIcon" class="search-icon">
-      <input placeholder="输入关键词" ref="keywordRef" @keyup.enter="search"/>
+      <input placeholder="今天想搜些什么？" ref="keywordRef" @keyup.enter="search"/>
     </div>
+    <Button type="primary" shape="circle" icon="ios-search" style="margin-left: 15px;" @click="search">Search</Button>
+
+
     <div class="right-view">
-      <a href="/admin" target="__black" type="a-link" style="line-height: 32px;width:60px;">后台入口</a>
+      
       <template v-if="userStore.user_access">
+        <!-- 确认有登陆权限 -->
+        <Button type="primary" @click="router.push({name: 'admin'})">后台入口</Button>
         <a-dropdown>
-          <a class="ant-dropdown-link" @click="e => e.preventDefault()">
-            <img v-if = "SelfAvatar(userStore.user_avatar)" :src="BASE_URL+userStore.user_avatar" class="self-img">
+          <a class="ant-dropdown-link" @click="e => e.preventDefault()"> <!-- TODO: 头像的 url 格式需确定 -->
+            <img v-if = "hasAvatar(userStore.user_avatar)" :src="BASE_URL + userStore.user_avatar" class="self-img">
             <img v-else :src="AvatarIcon" class="self-img">
           </a>
-          <template #overlay>
-            <a-menu>
+          <template #overlay >
+            <a-menu style="width: 120px">
               <a-menu-item>
-                <a @click="goUserCenter('collectThingView')">菜肴收藏</a>
+                <a @click="router.push({name: 'collectThingView'})">菜肴收藏</a>
               </a-menu-item>
               <a-menu-item>
-                <a @click="goUserCenter('scoreView')">柜台收藏</a>
+                <a @click="router.push({name: 'scoreView'})">柜台收藏</a>
               </a-menu-item>
               <a-menu-item>
-                <a @click="goUserCenter('wishThingView')">食堂收藏</a>
+                <a @click="router.push({name: 'wishThingView'})">食堂收藏</a>
               </a-menu-item>
               <a-menu-item>
-                <a @click="goUserCenter('userInfoEditView')">账号设置</a>
+                <template #icon><UserOutlined /></template>
+                <a @click="router.push({name: 'userInfoEditView'})">账号设置</a>
               </a-menu-item>
               <a-menu-item>
-                <a @click="quit()">退出</a>
+                <template #icon><LogoutOutlined /></template>
+                <a @click="quit()">退出登录</a>
               </a-menu-item>
             </a-menu>
           </template>
         </a-dropdown>
-        <!--        <div class="right-icon">-->
-        <!--          <img src="@/assets/cart-icon.svg">-->
-        <!--          <span>3</span>-->
-        <!--        </div>-->
       </template>
       <template v-else>
-        <button class="login btn hidden-sm" @click="goLogin()">登录</button>
+        <!-- 尚未登录，显示待登录和默认 -->
+        <Button type="primary" shape="circle" icon="md-log-in" @click="goLogin">登录</Button>
       </template>
 
-      <div class="right-icon" @click="msgVisible=true">
-        <img :src="MessageIcon">
-        <span class="msg-point" v-show="HasNewMessage"></span>
+      <div class="right-icon">
+        <el-popover
+          :width="300"
+          popper-style="box-shadow: rgb(14 18 22 / 35%) 0px 10px 38px -10px, rgb(14 18 22 / 20%) 0px 10px 20px -15px; padding: 20px;"
+        >
+          <template #reference>
+            <img :src="MessageIcon">
+            <span class="msg-point" v-show="HasNewMessage"></span>
+          </template>
+          <template #default>
+            <div
+              class="demo-rich-conent"
+              style="display: flex; gap: 16px; flex-direction: column"
+            >
+              <el-avatar
+                :size="60"
+                src="https://avatars.githubusercontent.com/u/72015883?v=4"
+                style="margin-bottom: 8px"
+              />
+              <div>
+                <p
+                  class="demo-rich-content__name"
+                  style="margin: 0; font-weight: 500"
+                >
+                  Element Plus
+                </p>
+                <p
+                  class="demo-rich-content__mention"
+                  style="margin: 0; font-size: 14px; color: var(--el-color-info)"
+                >
+                  @element-plus
+                </p>
+              </div>
+
+              <p class="demo-rich-content__desc" style="margin: 0">
+                Element Plus, a Vue 3 based component library for developers,
+                designers and product managers
+              </p>
+            </div>
+          </template>
+        </el-popover>
       </div>
       <div>
         <a-drawer
@@ -98,6 +141,9 @@
 </template>
 
 <script setup lang="ts">
+import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons-vue';
+import { ChatLineSquare } from '@element-plus/icons-vue'
+
 import {listReceiveCommentsApi, SetStateToReadedApi} from '/@/api/index/comment'
 import {useUserStore} from "/@/store";
 import logoImage from '/@/assets/images/logo_b.png';
@@ -115,11 +161,11 @@ const keywordRef = ref()
 let loading = ref(false)
 let msgVisible = ref(false)
 let msgData = ref([] as any)
-let HasNewMessage = true
+let HasNewMessage = ref(false)
 let pointKey = 0
 
-const SelfAvatar = (avatar) => {
-  if (avatar === "null" || avatar===null) {
+const hasAvatar = (avatar) => {
+  if (avatar === "null" || avatar===null || avatar === undefined) {
     return false
   } else {
     return true
@@ -147,12 +193,16 @@ const getMessageList = () => {
 }
 const search = () => {
   const keyword = keywordRef.value.value
-  if (route.name === 'search') {
-    router.push({name: 'search', query: {keyword: keyword}})
-  } else {
-    let text = router.resolve({name: 'search', query: {keyword: keyword}})
-    window.open(text.href, '_blank')
+  if (keyword === '') {
+    return;
   }
+  router.push({name: 'search', query: {keyword: keyword}});
+  // if (route.name === 'search') {
+    
+  // } else {
+  //   let text = router.resolve({name: 'search', query: {keyword: keyword}})
+  //   window.open(text.href, '_blank')
+  // }
 }
 const goLogin = () => {
   router.push({name: 'login'})
@@ -183,19 +233,19 @@ const setReadState = (id) => {
 const checkMessageList = () => {
   if (msgData == undefined || msgData.value.length <= 0) {
     console.log("无")
-    HasNewMessage = false
+    HasNewMessage.value = false
   } else {
     console.log("有")
-    HasNewMessage = true
+    HasNewMessage.value = true
   }
 }
 
 
 const UpdateState = () => {
-  if (HasNewMessage == true) {
-    HasNewMessage = false
+  if (HasNewMessage.value == true) {
+    HasNewMessage.value = false
   } else {
-    HasNewMessage = true
+    HasNewMessage.value = true
   }
   pointKey += 1
   console.log(pointKey)
@@ -207,38 +257,37 @@ const UpdateState = () => {
   position: fixed;
   top: 0;
   left: 0;
-  height: 56px;
+  height: 80px;
   width: 100%;
-  background: #fff;
-  border-bottom: 1px solid #cedce4;
+  background: rgb(255, 255, 255);
+  border-bottom: 2px solid #cedce4;
   padding-left: 48px;
   z-index: 16;
   display: flex;
   flex-direction: row;
-  //justify-content: center; /*水平居中*/
-  align-items: center; /*垂直居中*/
+  align-items: center;
 }
 
 .logo {
   margin-right: 24px;
 
   img {
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    cursor: default;
   }
 }
 
 .search-entry {
   position: relative;
-  width: 400px;
-  min-width: 200px;
+  width: 25%;
+  max-width: 500px;
   height: 32px;
   background: #ecf3fc;
   padding: 0 12px;
   border-radius: 16px;
   font-size: 0;
-  cursor: pointer;
+  cursor: text;
 
   img {
     max-width: 100%;
@@ -263,12 +312,15 @@ const UpdateState = () => {
   }
 }
 
+.svg {
+  vertical-align: top;
+}
 .right-view {
-  padding-right: 36px;
+  padding-right: 10px;
   flex: 1;
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 40px;
   justify-content: flex-end; /* 内容右对齐 */
 
   .username {
@@ -331,18 +383,18 @@ const UpdateState = () => {
     cursor: pointer;
   }
 
-  .btn {
-    background: #4684e2;
-    font-size: 14px;
-    color: #fff;
-    border-radius: 32px;
-    text-align: center;
-    width: 66px;
-    height: 32px;
-    line-height: 32px;
-    vertical-align: middle;
-    margin-left: 32px;
-  }
+  // .btn {
+  //   background: #4684e2;
+  //   font-size: 14px;
+  //   color: #fff;
+  //   border-radius: 32px;
+  //   text-align: center;
+  //   width: 66px;
+  //   height: 32px;
+  //   line-height: 32px;
+  //   vertical-align: middle;
+  //   margin-left: 32px;
+  // }
 }
 
 .content-list {

@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { ADMIN_USER_TOKEN, USER_ACCESS } from '/@/store/constants'
 import { useUserStore } from '/@/store'
+import { loadingOption } from '/@/utils/loading'
+import { ElLoading } from 'element-plus'
 
 import root from './root'
 
@@ -17,8 +19,10 @@ const router = createRouter({
   routes: root,
 });
 
+let loading;
 /* 路由守卫验证是否登录 */
 router.beforeEach(async (to, from, next) => {
+  loading = ElLoading.service(loadingOption);
   const userStore = useUserStore();
   console.log("Router: " + (from.name as string) + " ==> " + (to.name as string))
   // console.log(from);
@@ -69,6 +73,9 @@ router.beforeEach(async (to, from, next) => {
 });
 
 /* 导航后指向新页面的顶端 */
-router.afterEach((_to) => { document.getElementById("html")?.scrollTo(0, 0) });
+router.afterEach((_to) => { 
+  document.getElementById("html")?.scrollTo(0, 0)
+  loading.close();
+});
 
 export default router;
