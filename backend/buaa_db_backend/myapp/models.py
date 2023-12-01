@@ -27,7 +27,7 @@ class User(AbstractUser):
 class Follow(models.Model):
     follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
     following = models.ForeignKey(User, related_name='follower', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.follower} follows {self.following}"
@@ -86,7 +86,8 @@ class Product(models.Model):
     video = models.FileField(upload_to='product_videos/', null=True, blank=True)
     views = models.IntegerField(default=0)
     wants = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    is_sold = models.BooleanField(default=False)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     collectors = models.ManyToManyField(User, blank=True, related_name='商品收藏')
 
@@ -111,14 +112,21 @@ class ProductImage(models.Model):
 
 
 class Comment(models.Model):
+    TYPE_CHOICES = [
+        ('0', '评论区留言'),
+        ('1', '私聊'),
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comment')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_comment')
+    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=0)
     content = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
     like_count = models.IntegerField(default=0)
 
+    is_read = models.BooleanField(default=False)
+
     def __str__(self):
-        return f'{self.user} - {self.product} - {self.created_at}'
+        return f'{self.user} - {self.product} - {self.create_time}'
 
     class Meta:
         db_table = "buaa_db_comment"
@@ -129,13 +137,14 @@ class Reply(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reply')
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='comment_reply')
     content = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
     like_count = models.IntegerField(default=0)
+    is_read = models.BooleanField(default=False)
 
     mentioned_users = models.ManyToManyField(User, blank=True, related_name='被回复')
 
     def __str__(self):
-        return f'{self.user} - {self.comment.product} - {self.created_at}'
+        return f'{self.user} - {self.comment.product} - {self.create_time}'
 
     class Meta:
         db_table = "buaa_db_reply"

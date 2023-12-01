@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group
 
-from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2
+from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow
 
 User = get_user_model()
 
@@ -152,3 +152,11 @@ class Classification2Serializer(serializers.ModelSerializer):
     class Meta:
         model = Classification2
         fields = '__all__'
+
+class FollowSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    follower_name=serializers.ReadOnlyField(source='follower.username')
+    following_name=serializers.ReadOnlyField(source='following.username')
+    class Meta:
+        model = Follow
+        fields = ['follower', 'following', 'create_time']

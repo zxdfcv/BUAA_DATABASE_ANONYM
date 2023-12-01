@@ -1,5 +1,5 @@
 from rest_framework.decorators import permission_classes
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.views import APIView
 
 from ..models import Classification1, Classification2
@@ -8,8 +8,10 @@ from ..serializers import Classification1Serializer, Classification2Serializer
 from ..utils import APIResponse, make_error_log
 
 
-@permission_classes([CanViewClassificationPermission])
+# @permission_classes([CanViewClassificationPermission])
 class Classification1ListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
 
     def get(self, request):
         classifications = Classification1.objects.all().order_by('-create_time')
@@ -17,8 +19,10 @@ class Classification1ListView(APIView):
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
 
-@permission_classes([CanViewClassificationPermission])
+# @permission_classes([CanViewClassificationPermission])
 class Classification2ListView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
 
     def get(self, request):
         classifications = Classification2.objects.all().order_by('-create_time')
