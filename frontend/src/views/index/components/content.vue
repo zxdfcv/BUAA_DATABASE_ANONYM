@@ -2,69 +2,88 @@
   <div class="home">
     <div class="content">
       <Card style="width:100%">
-      <Row>
-        <Col span="5">
-      <div class="content-left">
-        <div class="left-search-item">
-          <Card>
-            <h4>食堂列表</h4>
-            <a-tree :tree-data="contentData.cData" :selected-keys="contentData.selectedKeys" @select="onSelect"
-              :load-data="onLoadData" style="min-height: 220px;">
-            </a-tree>
-          </Card>
-        </div>
-        <div class="left-search-item">
-          <Card>
-            <h4>热门标签</h4>
-            <div class="tag-view tag-flex-view">
-              <span class="tag" :class="{ 'tag-select': contentData.selectTagId === item.id }"
-                v-for="item in contentData.tagData" :key="item.id" @click="clickTag(item.id)">{{ item.title }}</span>
+        <Row>
+          <Col span="5">
+            <div class="content-left">
+              <div class="left-search-item">
+                <Card>
+                  <h3>商品分类</h3>
+                  <el-scrollbar>
+                    <el-tree
+                        :data="contentData.classifyData"
+                        :props="defaultProps"
+                        accordion
+                        highlight-current
+                        @node-click="clickTag"
+                        style="max-height: 300px; min-height: 200px;
+                       margin-left: 5px; margin-top: 10px"
+                    />
+                  </el-scrollbar>
+                </Card>
+              </div>
+              <div>
+                <Card
+                    style="max-height: 200px; min-height: 150px;
+                          margin: 24px 0 12px;">
+                  <h3>热门标签</h3>
+                  <div>
+                    <Button
+                        v-for="item in contentData.tagData"
+                        :key="item.id"
+                        @click="clickTag(item)"
+                        style="margin: 5px" size="small" shape="circle">
+                      {{ item }}
+                    </Button>
+                  </div>
+                </Card>
+              </div>
             </div>
-          </Card>
-        </div>
-      </div>
-        </Col>
-      <div class="content-right">
-        <div class="top-select-view flex-view">
-          <div class="order-view">
-            <span class="title"></span>
-              <span class="tab" :class="contentData.selectTabIndex === index ? 'tab-select' : ''"
-                v-for="(item, index) in contentData.tabData" :key="index" @click="selectTab(index)">
+          </Col>
+          <div class="content-right">
+            <div class="top-select-view flex-view">
+              <div class="order-view">
+                <span class="title"></span>
+                <span class="tab" :class="contentData.selectTabIndex === index ? 'tab-select' : ''"
+                      v-for="(item, index) in contentData.tabData" :key="index" @click="selectTab(index)">
                 <img :src="FoodIcon">
                 {{ item }}
               </span>
-            <span :style="{ left: contentData.tabUnderLeft + 'px' }" class="tab-underline"></span>
-          </div>
-        </div>
-        <a-spin :spinning="contentData.loading" style="min-height: 200px;">
-          <div class="pc-thing-list flex-view">
-            <div v-for="item in contentData.pageData" :key="item.id"
-              @click="handleDetail(item, contentData.selectTabIndex)" class="thing-item item-column-3"><!---->
-              <div class="img-view">
-                <img :src="item.cover">
-                <!-- <div style="position: absolute; left: 10px; bottom: 10px;">
-                <img :src="PlayIcon" style="width: 30px;height: 30px;">
-              </div> -->
+                <span :style="{ left: contentData.tabUnderLeft + 'px' }" class="tab-underline"></span>
               </div>
-              <Card>
-                <div class="info-view">
-                  <h3 class="thing-name">{{ item.title.substring(0, 12) }}</h3>
-                  <h4 v-if="item.price !== undefined" class="price">{{ item.price }}元</h4>
-                  <span style="color: #444; font-size: 11px;height: 11px;">{{ item.create_time.substring(0, 16) }}</span>
-                  <br />
-                  <span style="color: #444; font-size: 11px;height: 11px;">{{ item.pv }}次浏览</span>
-                </div>
-              </Card>
             </div>
-            <div v-if="contentData.pageData.length <= 0 && !contentData.loading" class="no-data" style="">暂无数据</div>
+            <a-spin :spinning="contentData.loading" style="min-height: 200px;">
+              <div class="pc-thing-list flex-view">
+                <div v-for="item in contentData.pageData" :key="item.id"
+                     @click="handleDetail(item, contentData.selectTabIndex)" class="thing-item item-column-3"><!---->
+                  <div class="img-view">
+                    <img :src="item.cover">
+                    <!-- <div style="position: absolute; left: 10px; bottom: 10px;">
+                    <img :src="PlayIcon" style="width: 30px;height: 30px;">
+                  </div> -->
+                  </div>
+                  <Card>
+                    <div class="info-view">
+                      <h3 class="thing-name">{{ item.title.substring(0, 12) }}</h3>
+                      <h4 v-if="item.price !== undefined" class="price">{{ item.price }}元</h4>
+                      <span style="color: #444; font-size: 11px;height: 11px;">{{
+                          item.create_time.substring(0, 16)
+                        }}</span>
+                      <br/>
+                      <span style="color: #444; font-size: 11px;height: 11px;">{{ item.pv }}次浏览</span>
+                    </div>
+                  </Card>
+                </div>
+                <div v-if="contentData.pageData.length <= 0 && !contentData.loading" class="no-data" style="">暂无数据
+                </div>
+              </div>
+            </a-spin>
+            <div class="page-view" style="">
+              <a-pagination v-model="contentData.page" size="small" @change="changePage" :hideOnSinglePage="true"
+                            :defaultPageSize="contentData.pageSize" :total="contentData.total"
+                            :showSizeChanger="false"/>
+            </div>
           </div>
-        </a-spin>
-        <div class="page-view" style="">
-          <a-pagination v-model="contentData.page" size="small" @change="changePage" :hideOnSinglePage="true"
-            :defaultPageSize="contentData.pageSize" :total="contentData.total" :showSizeChanger="false" />
-        </div>
-      </div>
-      </Row>
+        </Row>
       </Card>
     </div>
   </div>
@@ -76,45 +95,63 @@ import { listApi as listCanteenList } from '/@/api/index/canteen'
 import { listApi as listTagList } from '/@/api/index/tag'
 import { listApi as listThingList } from '/@/api/index/thing'
 import { BASE_URL } from "/@/store/constants";
-import { useUserStore } from "/@/store";
+import { useAppStore, useUserStore } from "/@/store";
 import { USER_ID, USER_NAME, USER_ACCESS, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN } from "/@/store/constants";
 import FoodIcon from '/@/assets/images/地道美食.svg';
-import PlayIcon from '/@/assets/images/Play.png'
+import { Button } from "view-ui-plus";
 
-
-const userStore = useUserStore()
+const appStore = useAppStore();
+const userStore = useUserStore();
 const router = useRouter();
 
 const contentData = reactive({
   selectX: 0,
   selectTagId: -1,
   cData: [],
+
   bData: [],
-  selectedKeys: [],
+  selectedKeyss: ['0-0-0', '0-0-1'],
+  checkedKeys: ['0-0-0', '0-0-1'],
   tagData: [],
   loading: false,
 
-  tabData: ['最新', '必吃', '推荐', '柜台', '食堂'],
+  tabData: ['最新', '推荐', '学院路校区', '沙河校区'],
   selectTabIndex: 0,
   tabUnderLeft: 12,
 
-  thingData: [],
+  thingData: [{
+    id: 1,
+    name: "杨昆亲笔签名",
+    price: 114514.1919810,
+    uploadTime: 1701435695000,
+    url: 'https://api.lolicon.app/assets/img/lx.jpg',
+    uploaderId: 114514,
+    uploaderName: '杨昆',
+  }, {}, {}, {}],
   pageData: [],
   value: [],
   page: 1,
   total: 0,
   pageSize: 6,
+
+  classifyData: [],
+  expandedKeys: [],
 })
 
+const defaultProps = {
+  children: 'children',
+  label: 'label',
+}
+
 onMounted(() => {
-  initSider()
-  getThingList({})
+  initSide()
+  // getThingList({})
 })
 
 
 const onLoadData = treeNode => {
   return new Promise(resolve => {
-    listClassificationList({ canteen: treeNode.dataRef.id }).then(res => {
+    listClassificationList({canteen: treeNode.dataRef.id}).then(res => {
       treeNode.dataRef.children = []
       res.data.forEach(item => {
         item.key = `${treeNode.eventKey}-${item.id}`
@@ -130,19 +167,10 @@ const onLoadData = treeNode => {
 };
 
 
-const initSider = () => {
-  console.log(contentData)
-  contentData.cData.push({ key: '10086', title: '全部', isLeaf: true })
-  listCanteenList().then(res => {
-    res.data.forEach(item => {
-      item.key = item.id.toString()
-      contentData.cData.push(item)
-      contentData.bData.push(item)
-    })
-  })
-  listTagList().then(res => {
-    contentData.tagData = res.data
-  })
+const initSide = async () => {
+  contentData.classifyData = await appStore.getCTree()
+  /* TODO: GET HOT-TAG by API */
+  contentData.tagData = ['111', '222', '333', '444', '111', '222', '333', '444'];
 }
 
 const getSelectedKey = () => {
@@ -156,75 +184,29 @@ const getUserName = () => {
   return userStore.user_name
 }
 
-const onSelect = (selectedKeys) => {
-  console.log(selectedKeys)
-  console.log(contentData)
-  if (selectedKeys.length == 0) {
-    if (contentData.selectedKeys[0] == '10086') {
-      getThingList()
-    } else {
-      getThingList({ canteen: getSelectedKey() })
-    }
-  }
-  else if (selectedKeys[0].includes("-")) {
-    contentData.selectedKeys[0] = [selectedKeys[0].split("-")[1]]
-    console.log("selectedKeys")
-    console.log(contentData.selectedKeys)
-    if (contentData.selectedKeys.length > 0) {
-      console.log(getSelectedKey())
-      getThingList({ c: getSelectedKey()[0] })
-    }
-  } else if (selectedKeys[0] == "10086") {
-    contentData.selectedKeys[0] = '10086'
-    console.log("10086")
-    getThingList()
-  } else {
-    contentData.selectedKeys[0] = selectedKeys[0]
-    getThingList({ canteen: getSelectedKey() })
-  }
-  contentData.selectTagId = -1
-}
-
 const clickTag = (index) => {
+  console.log(index)
   contentData.selectedKeys = []
   contentData.selectTagId = index
-  getThingList({ tag: contentData.selectTagId })
+  getThingList({tag: contentData.selectTagId})
 }
 
 // 最新|必吃|推荐
 const selectTab = (index) => {
   contentData.selectTabIndex = index
   contentData.tabUnderLeft = 12 + 70 * index
-  if (index === 4) {
-    getCanteenList()
-  } else if (index === 3) {
-    getClassificationList()
-  } else {
-    let sort = (index === 0 ? 'recent' : index === 1 ? 'hot' : index === 2 ? 'recommend' : index === 4 ? 'canteen' : 'classification')
-    const data = { sort: sort }
-    if (contentData.selectTagId !== -1) {
-      data['tag'] = contentData.selectTagId
-      console.log("tag")
-    } else {
-      console.log("c")
-      if (getSelectedKey() != '10086') {
-        data['c'] = getSelectedKey()
-      }
-    }
-    data['username'] = getUserName()
-    getThingList(data)
-  }
+  getThingList({tag: contentData.tabData[contentData.selectTabIndex]});
 }
 const handleDetail = (item, index) => {
   // 跳转新页面
   if (index < 3) {
-    let text = router.resolve({ name: 'detail', query: { id: item.id } })
+    let text = router.resolve({name: 'detail', query: {id: item.id}})
     window.open(text.href, '_blank')
   } else if (index === 4) {
-    let text = router.resolve({ name: 'detailCanteen', query: { id: item.id } })
+    let text = router.resolve({name: 'detailCanteen', query: {id: item.id}})
     window.open(text.href, '_blank')
   } else {
-    let text = router.resolve({ name: 'detailCounter', query: { id: item.id } })
+    let text = router.resolve({name: 'detailCounter', query: {id: item.id}})
     window.open(text.href, '_blank')
   }
 }
@@ -299,16 +281,19 @@ const getThingList = (data) => {
 <style scoped lang="less">
 .home {
   width: 100%;
+  height: auto;
   min-height: 100vh;
-  background: url("https://s1.ax1x.com/2023/07/29/pPSra9A.jpg") center center no-repeat;
+  max-height: 750px;
+  background: #dae6f9;
   background-size: 100% 100%;
-  position:absolute;//绝对定位
+  position: absolute; //绝对定位
 }
 
 .content {
   display: flex;
   flex-direction: row;
-  width: 1330px;
+  width: 80%;
+  height: auto;
   margin: 80px auto;
 }
 
@@ -689,4 +674,6 @@ li {
   color: #0F1111;
   font-size: 21px;
 }
+
+
 </style>

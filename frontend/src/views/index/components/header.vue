@@ -177,18 +177,9 @@ const hasAvatar = (avatar) => {
   return !(avatar === "null" || avatar === null || avatar === undefined);
 }
 
-const reNewClassification = () => {
-  console.log(appStore)
-  if (!appStore.classificationReNewed) {
-    console.log("刷新分类中")
-    return appStore.reNewClass();
-  } else {
-    return appStore.classification1;
-  }
-}
 
 onMounted(async () => {
-  search_index = await reNewClassification() as string[];
+  search_index = await appStore.getC1() as string[];
   console.log(search_index)
   // getMessageList()
   // console.log("avatar: ", userStore.user_avatar);
