@@ -1,7 +1,7 @@
 {
-  "name": "my-web-app",
+  "name": "buaa-database",
   "version": "0.1.2",
-  "author": "lengqin1024",
+  "author": "zyx syb fc",
   "scripts": {
     "dev": "vite --mode development",
     "build": "vite build",
