@@ -150,7 +150,7 @@ CORS_ALLOW_HEADERS = '*'
 AUTH_USER_MODEL = "myapp.User"
 
 # jwt配置
-REST_FRAMEWORK  = {
+REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
@@ -160,6 +160,8 @@ REST_FRAMEWORK  = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 36,  # 你可以根据需要调整每页的项目数
 }
 
 SIMPLE_JWT = {

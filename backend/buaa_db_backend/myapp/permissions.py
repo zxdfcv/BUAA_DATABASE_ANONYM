@@ -59,3 +59,21 @@ class CanViewClassificationPermission(BasePermission):
                 request.user.has_perm('myapp.view_classification1') and
                 request.user.has_perm('myapp.view_classification2'))
         return request.user.is_staff or has_permission
+
+
+class CanFollowPermission(BasePermission):
+    def has_permission(self, request, view):
+        has_permission = (
+            request.user.has_perm('myapp.view_user'))
+        return request.user.is_staff or has_permission
+
+
+class CanEditProductPermission(BasePermission):
+    def has_permission(self, request, view):
+        is_self = str(request.user.id) == request.data.get('merchant', '')
+        has_permission = (
+                request.user.has_perm('myapp.add_product') and
+                request.user.has_perm('myapp.change_product') and
+                request.user.has_perm('myapp.delete_product') and
+                request.user.has_perm('myapp.view_product'))
+        return (is_self and has_permission) or request.user.is_staff

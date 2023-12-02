@@ -84,6 +84,7 @@ class Product(models.Model):
     classification_2 = models.ForeignKey(Classification2, on_delete=models.CASCADE, related_name='c2_product')
     description = models.TextField(max_length=1000, blank=True, null=True)
     video = models.FileField(upload_to='product_videos/', null=True, blank=True)
+
     views = models.IntegerField(default=0)
     wants = models.IntegerField(default=0)
     is_sold = models.BooleanField(default=False)

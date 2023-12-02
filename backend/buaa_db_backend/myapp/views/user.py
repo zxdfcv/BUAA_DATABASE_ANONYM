@@ -10,7 +10,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from ..permissions import CanEditUserPermission
+from ..permissions import CanEditUserPermission, CanFollowPermission
 from ..serializers import MyTokenObtainPairSerializer, UserLoginSerializer, UserDetailSerializer
 from ..utils import APIResponse, make_login_log, make_error_log
 
@@ -122,3 +122,7 @@ class UserChangePasswordView(APIView):
             return APIResponse(code=0, msg='密码更新成功')
         make_error_log(request, '用户密码更新失败')
         return APIResponse(code=1, msg='密码更新失败', data=form.errors)
+
+# @permission_classes([CanFollowPermission])
+# class EditFollowView(APIView):
+#     def put(self, request):

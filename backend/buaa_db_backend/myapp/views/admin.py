@@ -1,3 +1,5 @@
+from rest_framework import generics
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 
@@ -35,14 +37,30 @@ class UserAllDetailView(APIView):
         return APIResponse(code=1, msg='更新失败', data=serializer.errors)
 
 
-class UserListView(APIView):
+class UserListView(generics.ListAPIView):
     permission_classes = [IsAdminUser]
+    pagination_class = LimitOffsetPagination
 
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
         keyword = request.GET.get("keyword", '')
         users = User.objects.filter(username__contains=keyword).order_by('-date_joined')
-        serializer = UserListSerializer(users, many=True)
+        page = self.paginate_queryset(users)
+        if page is not None:
+            serializer = UserAllDetailSerializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = UserAllDetailSerializer(users, many=True)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
+        # serializer = UserListSerializer(users, many=True)
+        # return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
     def delete(self, request):
         ids = request.GET.get('ids')

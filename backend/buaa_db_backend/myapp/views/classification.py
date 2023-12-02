@@ -1,4 +1,6 @@
+from rest_framework import generics
 from rest_framework.decorators import permission_classes
+from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAdminUser, AllowAny
 from rest_framework.views import APIView
 
@@ -9,23 +11,60 @@ from ..utils import APIResponse, make_error_log
 
 
 # @permission_classes([CanViewClassificationPermission])
-class Classification1ListView(APIView):
+class Classification1ListView(generics.ListAPIView):
     authentication_classes = []
     permission_classes = [AllowAny]
+    pagination_class = LimitOffsetPagination
 
-    def get(self, request):
+    # def get(self, request):
+    #     classifications = Classification1.objects.all().order_by('-create_time')
+    #     serializer = Classification1Serializer(classifications, many=True)
+    #     return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+    def get(self, request, *args, **kwargs):
         classifications = Classification1.objects.all().order_by('-create_time')
+        page = self.paginate_queryset(classifications)
+        if page is not None:
+            serializer = Classification1Serializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
         serializer = Classification1Serializer(classifications, many=True)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
 
 # @permission_classes([CanViewClassificationPermission])
-class Classification2ListView(APIView):
+class Classification2ListView(generics.ListAPIView):
     authentication_classes = []
     permission_classes = [AllowAny]
+    pagination_class = LimitOffsetPagination
 
-    def get(self, request):
+    # def get(self, request):
+    #     classifications = Classification2.objects.all().order_by('-create_time')
+    #     serializer = Classification2Serializer(classifications, many=True)
+    #     return APIResponse(code=0, msg='查询成功', data=serializer.data)
+    def get(self, request, *args, **kwargs):
         classifications = Classification2.objects.all().order_by('-create_time')
+        page = self.paginate_queryset(classifications)
+        if page is not None:
+            serializer = Classification2Serializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
         serializer = Classification2Serializer(classifications, many=True)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 

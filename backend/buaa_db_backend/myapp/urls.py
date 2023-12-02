@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import user, log, admin, classification
+from .views import user, log, admin, classification, product
 
 app_name = 'myapp'
 urlpatterns = [
@@ -27,7 +27,6 @@ urlpatterns = [
     path("admin/user/list", admin.UserListView.as_view(), name="user_list"),
     path("admin/user/delete", admin.UserListView.as_view(), name="user_allDelete"),
 
-
     path("classification/viewC_1", classification.Classification1ListView.as_view(), name="classification1_view"),
     path("classification/viewC_2", classification.Classification2ListView.as_view(), name="classification2_view"),
     path("classification/createC_1", classification.EditClassification1View.as_view(), name="classification1_create"),
@@ -37,7 +36,8 @@ urlpatterns = [
     path("classification/deleteC_1", classification.EditClassification1View.as_view(), name="classification1_delete"),
     path("classification/deleteC_2", classification.EditClassification2View.as_view(), name="classification2_delete"),
 
-
+    path("product/list", product.ProductWithImagesView.as_view(), name='product_list'),
+    path("product/create", product.EditProductView.as_view(), name='product_create'),
 
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

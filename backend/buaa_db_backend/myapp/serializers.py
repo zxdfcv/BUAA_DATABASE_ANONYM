@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group
 
-from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow
+from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product
 
 User = get_user_model()
 
@@ -25,7 +25,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         # 实现邮箱和手机号登入:待定
         username = attrs.get("username")
         password = attrs.get("password")
-        login_type = self.initial_data.get("type",0)
+        login_type = self.initial_data.get("type", 0)
 
         user = authenticate(username=username, password=password)
         if user is None:
@@ -153,10 +153,60 @@ class Classification2Serializer(serializers.ModelSerializer):
         model = Classification2
         fields = '__all__'
 
-class FollowSerializer(serializers.ModelSerializer):
-    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
-    follower_name=serializers.ReadOnlyField(source='follower.username')
-    following_name=serializers.ReadOnlyField(source='following.username')
+
+# class FollowSerializer(serializers.ModelSerializer):
+#     create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+#     follower_name = serializers.ReadOnlyField(source='follower.username')
+#     following_name = serializers.ReadOnlyField(source='following.username')
+#
+#     class Meta:
+#         model = Follow
+#         fields = ['follower', 'following', 'create_time']
+
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    product_name = serializers.ReadOnlyField(source='product.name')
+
     class Meta:
-        model = Follow
-        fields = ['follower', 'following', 'create_time']
+        model = ProductImage
+        fields = '__all__'
+
+
+class ProductListSerializer(serializers.ModelSerializer):
+    STATUS_CHOICES = [
+        ('A', '全新'),
+        ('B', '几乎全新'),
+        ('C', '轻微使用痕迹'),
+        ('D', '明显使用痕迹'),
+        ('E', '有一定问题'),
+    ]
+    ADDR_CHOICES = [
+        ('1', '学院路校区'),
+        ('2', '沙河校区'),
+        ('3', '两校区均可')
+    ]
+
+    status = serializers.ChoiceField(choices=STATUS_CHOICES, source='get_status_display')
+    addr = serializers.ChoiceField(choices=ADDR_CHOICES, source='get_addr_display')
+    # images = ProductImageSerializer(many=True, read_only=True)
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    merchant_name = serializers.ReadOnlyField(source='merchant.username')
+    classification_1_name = serializers.ReadOnlyField(source='classification_1.name')
+    classification_2_name = serializers.ReadOnlyField(source='classification_2.name')
+    collectors_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        exclude = ('collectors',)
+
+    def get_collectors_count(self, obj):
+        return obj.collectors.count()
+
+
+class ProductCreateSerializer(serializers.ModelSerializer):
+    # images = ProductImageSerializer(many=True, read_only=True)
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    class Meta:
+        model = Product
+        exclude = ('views', 'wants', 'is_sold', 'collectors')

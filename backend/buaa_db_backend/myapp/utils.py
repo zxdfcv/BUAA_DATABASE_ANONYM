@@ -1,3 +1,4 @@
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 from .serializers import ErrorLogSerializer, LoginLogSerializer
@@ -65,3 +66,21 @@ def make_error_log(request, content):
         serializer.save()
     else:
         print(serializer.errors)
+
+
+class MyPageNumberPagination(PageNumberPagination):
+    page_size = 36  # 设置每页显示的对象数量
+    page_size_query_param = 'page_size'  # 通过 ?page_size= 指定每页的对象数量
+    max_page_size = 100  # 设置最大允许的页面大小
+
+    def get_paginated_response(self, data):
+        return APIResponse(
+            code=0,
+            msg='查询成功',
+            data={
+                'count': self.page.paginator.count,
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link(),
+                'results': data,
+            }
+        )
