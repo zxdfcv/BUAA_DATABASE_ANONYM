@@ -51,7 +51,13 @@ class Classification2ListView(generics.ListAPIView):
     #     serializer = Classification2Serializer(classifications, many=True)
     #     return APIResponse(code=0, msg='查询成功', data=serializer.data)
     def get(self, request, *args, **kwargs):
+        c_1 = request.GET.get("classification1", None)
         classifications = Classification2.objects.all().order_by('-create_time')
+        if c_1:
+            if not Classification1.objects.filter(id=c_1).exists():
+                make_error_log(request, "查询二级分类时指定一级分类不存在")
+                return APIResponse(code=1, msg='一级分类不存在')
+            classifications = classifications.filter(classification_1_id=c_1)
         page = self.paginate_queryset(classifications)
         if page is not None:
             serializer = Classification2Serializer(page, many=True)

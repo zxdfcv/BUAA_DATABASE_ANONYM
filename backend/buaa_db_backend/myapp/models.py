@@ -85,6 +85,7 @@ class Product(models.Model):
     description = models.TextField(max_length=1000, blank=True, null=True)
     video = models.FileField(upload_to='product_videos/', null=True, blank=True)
 
+    off_shelve = models.BooleanField(default=False)
     views = models.IntegerField(default=0)
     wants = models.IntegerField(default=0)
     is_sold = models.BooleanField(default=False)
