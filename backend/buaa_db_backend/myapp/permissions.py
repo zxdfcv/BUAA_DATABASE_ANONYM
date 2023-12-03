@@ -27,12 +27,12 @@ class HasErrorLogVDPermission(BasePermission):
 
 class CanEditUserPermission(BasePermission):
     def has_permission(self, request, view):
-        is_admin_or_self = request.user.is_staff or str(request.user.id) == request.GET.get('user_id', '')
+        is_self = str(request.user.id) == request.GET.get('user_id', '')
         has_permission = (
                 request.user.has_perm('myapp.change_user') and
                 request.user.has_perm('myapp.delete_user') and
                 request.user.has_perm('myapp.view_user'))
-        return is_admin_or_self and has_permission
+        return (request.user.is_staff or has_permission) and is_self
 
     # username_param = view.kwargs.get('username')  # 假设用户名是从 URL 参数中获取的
     #
@@ -76,4 +76,4 @@ class CanEditProductPermission(BasePermission):
                 request.user.has_perm('myapp.change_product') and
                 request.user.has_perm('myapp.delete_product') and
                 request.user.has_perm('myapp.view_product'))
-        return (is_self and has_permission) or request.user.is_staff
+        return (request.user.is_staff or has_permission) and is_self

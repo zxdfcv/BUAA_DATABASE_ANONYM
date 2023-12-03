@@ -8,7 +8,8 @@ from rest_framework.views import APIView
 from django.db import models
 from ..models import Product, ProductImage, User, Classification1, Classification2
 from ..permissions import CanEditProductPermission
-from ..serializers import ProductListSerializer, ProductCreateSerializer, ProductImageSerializer
+from ..serializers import ProductListSerializer, ProductCreateSerializer, ProductImageSerializer, \
+    ProductUpdateSerializer
 from ..utils import APIResponse, make_error_log
 
 
@@ -190,6 +191,87 @@ class EditProductView(APIView):
             make_error_log(request, '创建商品失败')
             return APIResponse(code=1, msg='商品创建失败', data=product_serializer.errors)
 
+    def post(self, request):
+        product_id = request.GET.get('product_id')
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            make_error_log(request, '修改商品时商品不存在')
+            return APIResponse(code=1, msg='商品不存在')
+
+        if str(product.merchant.id) != str(request.data.get('merchant')):
+            make_error_log(request, '用户修改不是自己的商品')
+            return APIResponse(code=1, msg='不是你的商品请不要修改')
+
+        image_ids = request.data.getlist('remove_ids', [])
+        product_images = ProductImage.objects.filter(product=product, id__in=image_ids)
+        if len(product_images) != len(image_ids):
+            make_error_log(request, '修改商品时删除的图片不存在或不属于该商品')
+            return APIResponse(code=1, msg='删除的图片不存在或不属于该商品')
+
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+
+        if 'classification_1' in data and 'classification_2' in data:
+            classification_1_id = data['classification_1']
+            classification_2_id = data['classification_2']
+            try:
+                classification_1 = Classification1.objects.get(pk=classification_1_id)
+                classification_2 = Classification2.objects.get(pk=classification_2_id)
+                if classification_2.classification_1 != classification_1:
+                    make_error_log(request, "更新商品时二级分类不属于一级分类")
+                    return APIResponse(code=1, msg='二级分类不属于一级分类')
+            except Classification1.DoesNotExist:
+                make_error_log(request, "更新商品时指定一级分类不存在")
+                return APIResponse(code=1, msg='一级分类不存在')
+            except Classification2.DoesNotExist:
+                make_error_log(request, "更新商品时指定二级分类不存在")
+                return APIResponse(code=1, msg='二级分类不存在')
+
+        product_serializer = ProductUpdateSerializer(product, data=data, partial=True)
+        if product_serializer.is_valid():
+            product_serializer.save()
+        else:
+            make_error_log(request, '更新商品失败')
+            return APIResponse(code=1, msg='更新商品失败', data=product_serializer.errors)
+
+        for product_image in product_images:
+            product_image.image.delete()
+            product_image.delete()
+
+        images_data = request.data.getlist('images', [])
+        for image_data in images_data:
+            ProductImage.objects.create(product=product, image=image_data)
+
+        product_images = ProductImage.objects.filter(product=product)
+        product_images_serializer = ProductImageSerializer(product_images, many=True)
+        product_data = product_serializer.data
+        product_data['images'] = product_images_serializer.data
+
+        return APIResponse(code=0, msg='商品更新成功', data=product_data)
+
+    def delete(self, request):
+        product_id = request.GET.get('product_id')
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            make_error_log(request, '删除商品时商品不存在')
+            return APIResponse(code=1, msg='商品不存在')
+
+        if str(product.merchant.id) != str(request.data.get('merchant')):
+            make_error_log(request, '用户删除不是自己的商品')
+            return APIResponse(code=1, msg='不是你的商品请不要删除')
+
+        product_images = ProductImage.objects.filter(product=product)
+        for product_image in product_images:
+            product_image.image.delete()
+            product_image.delete()
+        product.delete()
+        return APIResponse(code=0, msg='商品删除成功')
+
+
 # class ProductImageView(APIView):
 #     def put(self, request, *args, **kwargs):
 #         image_serializer = ProductImageSerializer(data=request.data)
@@ -200,3 +282,23 @@ class EditProductView(APIView):
 #             return APIResponse(code=0, msg='图片创建成功', data=image_serializer.data)
 #         else:
 #             return APIResponse(code=1, msg='图片创建失败', errors=image_serializer.errors)
+class ProductDetailView(APIView):
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        product_id = request.GET.get('product_id')
+        try:
+            product = Product.objects.get(pk=product_id)
+            product.views = product.views + 1
+            product.save()
+        except Product.DoesNotExist:
+            make_error_log(request, '查询商品详细信息时商品不存在')
+            return APIResponse(code=1, msg='商品不存在')
+
+        product_images = ProductImage.objects.filter(product=product)
+        product_images_serializer = ProductImageSerializer(product_images, many=True)
+        product_data = ProductListSerializer(product).data
+        product_data['images'] = product_images_serializer.data
+
+        return APIResponse(code=0, msg='商品查询成功', data=product_data)

@@ -38,6 +38,9 @@ urlpatterns = [
 
     path("product/list", product.ProductWithImagesView.as_view(), name='product_list'),
     path("product/create", product.EditProductView.as_view(), name='product_create'),
+    path("product/update", product.EditProductView.as_view(), name='product_update'),
+    path("product/delete", product.EditProductView.as_view(), name='product_delete'),
+    path("product/detail", product.ProductDetailView.as_view(), name='product_detail'),
 
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

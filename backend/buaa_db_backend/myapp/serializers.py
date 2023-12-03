@@ -210,3 +210,12 @@ class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('views', 'wants', 'is_sold', 'off_shelve', 'collectors')
+
+
+class ProductUpdateSerializer(serializers.ModelSerializer):
+    # images = ProductImageSerializer(many=True, read_only=True)
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    class Meta:
+        model = Product
+        exclude = ('views', 'wants', 'collectors')
