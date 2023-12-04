@@ -59,12 +59,12 @@
           <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
             <a-row :gutter="24">
               <a-col span="24">
-                <a-form-item label="柜台名称" name="title">
+                <a-form-item label="二级分类名称" name="title">
                   <a-input placeholder="请输入" v-model:value="modal.form.title"></a-input>
                 </a-form-item>
               </a-col>
               <a-col span="12">
-                <a-form-item label="食堂" name="canteen">
+                <a-form-item label="一级分类" name="canteen">
                   <a-select placeholder="请选择"
                             allowClear
                             :options="modal.bData"
@@ -102,18 +102,6 @@
                 </a-form-item>
               </a-col>
             </a-row>
-            <!-- <a-row :gutter="24">
-              <a-col span="24">
-                <a-form-item label="食堂" name="canteen">
-                  <a-select placeholder="请选择"
-                            allowClear
-                            :options="modal.bData"
-                            :field-names="{ label: 'title', value: 'id',}"
-                            v-model:value="modal.form.canteen">
-                  </a-select>
-                </a-form-item>
-              </a-col>
-            </a-row>-->
           </a-form>
         </div>
       </a-modal>
@@ -137,12 +125,12 @@ const columns = reactive([
     width: 60
   },
 {
-    title: '柜台名称',
+    title: '二级分类名称',
     dataIndex: 'title',
     key: 'title',
   },
   {
-    title: '食堂',
+    title: '一级分类',
     dataIndex: 'canteen_title',
     key: 'canteen_title'
   },

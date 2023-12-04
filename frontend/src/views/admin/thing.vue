@@ -60,7 +60,7 @@
           <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
             <a-row :gutter="24">
               <a-col span="24">
-                <a-form-item label="菜肴名称" name="title">
+                <a-form-item label="商品名称" name="title">
                   <a-input placeholder="请输入" v-model:value="modal.form.title"></a-input>
                 </a-form-item>
               </a-col>
@@ -122,7 +122,7 @@
                 </a-form-item>
               </a-col>
               <a-col span="24">
-                <a-form-item label="菜肴文件">
+                <a-form-item label="商品文件">
                   <a-upload-dragger
                       name="file"
                       accept=".mp4"
@@ -178,7 +178,7 @@ const columns = reactive([
     width: 60
   },
   {
-    title: '菜肴名称',
+    title: '商品名称',
     dataIndex: 'title',
     key: 'title'
   },
@@ -220,7 +220,7 @@ const beforeUpload = (file: File) => {
 };
 
 const beforeUpload1 = (file: File) => {
-  // 改菜肴文件名
+  // 改商品文件名
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
   const copyFile = new File([file], fileName);
   console.log(copyFile);
