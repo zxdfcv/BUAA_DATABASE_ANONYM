@@ -63,7 +63,7 @@
 <script setup lang="ts">
 
 import router from '/@/router';
-import { defineProps, watch } from 'vue';
+import { watch } from 'vue';
 import { useUserStore } from '/@/store';
 import { openNotification } from '/@/utils/notice'
 

@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="content">
-      <Card style="width:100%">
+      <a-card style="width:100%; height: 100%">
         <Row>
           <Col span="5">
             <div class="content-left">
@@ -22,18 +22,32 @@
                 </Card>
               </div>
               <div>
-                <Card
-                    style="max-height: 200px; min-height: 150px;
+                <Card style="max-height: 360px; min-height: 150px;
                           margin: 24px 0 12px;">
                   <h3>热门标签</h3>
-                  <div>
-                    <Button
-                        v-for="item in contentData.tagData"
-                        :key="item.id"
-                        @click="clickTag(item)"
-                        style="margin: 5px" size="small" shape="circle">
-                      {{ item }}
-                    </Button>
+                  <div style="margin-top: 12px; margin-bottom: 12px">
+                    <!-- TODO: use a-tag to rewrite it -->
+                    <a-space :size="[0, 8]" wrap>
+                      <a-checkable-tag
+                          v-for="(tag, index) in contentData.tagData"
+                          :key="tag"
+                          v-model:checked="contentData.selectData[index]"
+                          @change="checked => handleChange(index, checked)"
+                      >
+                        {{ tag }}
+                      </a-checkable-tag>
+                    </a-space>
+<!--                    <Button-->
+<!--                        v-for="item in contentData.tagData"-->
+<!--                        :key="item.id"-->
+<!--                        @click="clickTag(item)"-->
+<!--                        style="margin: 5px" size="small" shape="circle">-->
+<!--                      {{ item }}-->
+<!--                    </Button>-->
+<!--                    <div>-->
+<!--                      <el-check-tag checked style="margin-right: 8px">Checked</el-check-tag>-->
+<!--                      <el-check-tag :checked="false" @change="onChange">Toggle me</el-check-tag>-->
+<!--                    </div>-->
                   </div>
                 </Card>
               </div>
@@ -42,39 +56,24 @@
           <div class="content-right">
             <div class="top-select-view flex-view">
               <div class="order-view">
-                <span class="title"></span>
-                <span class="tab" :class="contentData.selectTabIndex === index ? 'tab-select' : ''"
-                      v-for="(item, index) in contentData.tabData" :key="index" @click="selectTab(index)">
-                <img :src="FoodIcon">
-                {{ item }}
-              </span>
-                <span :style="{ left: contentData.tabUnderLeft + 'px' }" class="tab-underline"></span>
+                <span class="title" style="top: -20px;"></span>
+                <a-tabs
+                  v-model:activeKey="contentData.selectTabIndex"
+                  >
+                  <a-tab-pane v-for="(item, index) in contentData.tabData" :key="index" :tab=item @click="" />
+                </a-tabs>
               </div>
             </div>
             <a-spin :spinning="contentData.loading" style="min-height: 200px;">
               <div class="pc-thing-list flex-view">
-                <div v-for="item in contentData.pageData" :key="item.id"
-                     @click="handleDetail(item, contentData.selectTabIndex)" class="thing-item item-column-3"><!---->
-                  <div class="img-view">
-                    <img :src="item.cover">
-                    <!-- <div style="position: absolute; left: 10px; bottom: 10px;">
-                    <img :src="PlayIcon" style="width: 30px;height: 30px;">
-                  </div> -->
-                  </div>
-                  <Card>
-                    <div class="info-view">
-                      <h3 class="thing-name">{{ item.title.substring(0, 12) }}</h3>
-                      <h4 v-if="item.price !== undefined" class="price">{{ item.price }}元</h4>
-                      <span style="color: #444; font-size: 11px;height: 11px;">{{
-                          item.create_time.substring(0, 16)
-                        }}</span>
-                      <br/>
-                      <span style="color: #444; font-size: 11px;height: 11px;">{{ item.pv }}次浏览</span>
-                    </div>
-                  </Card>
-                </div>
-                <div v-if="contentData.pageData.length <= 0 && !contentData.loading" class="no-data" style="">暂无数据
-                </div>
+                <ShopItemCard
+                  v-for="item in contentData.pageData"
+                  :key="item.id"
+                  :shop-card="item"
+                  :loading="contentData.loading"
+                  style="width: 30%; height: 400%; margin: 1%;" />
+
+                <div v-if="contentData.pageData.length <= 0 && !contentData.loading" class="no-data" style="">暂无数据</div>
               </div>
             </a-spin>
             <div class="page-view" style="">
@@ -84,7 +83,7 @@
             </div>
           </div>
         </Row>
-      </Card>
+      </a-card>
     </div>
   </div>
 </template>
@@ -99,6 +98,8 @@ import { useAppStore, useUserStore } from "/@/store";
 import { USER_ID, USER_NAME, USER_ACCESS, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN } from "/@/store/constants";
 import FoodIcon from '/@/assets/images/地道美食.svg';
 import { Button } from "view-ui-plus";
+import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
+import {getProductList} from "/@/api/index/product";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -113,21 +114,14 @@ const contentData = reactive({
   selectedKeyss: ['0-0-0', '0-0-1'],
   checkedKeys: ['0-0-0', '0-0-1'],
   tagData: [],
+  selectData: [],
   loading: false,
 
-  tabData: ['最新', '推荐', '学院路校区', '沙河校区'],
+  tabData: ['最新', '推荐', '学院路校区', '沙河校区', '两校区均可'],
   selectTabIndex: 0,
   tabUnderLeft: 12,
 
-  thingData: [{
-    id: 1,
-    name: "杨昆亲笔签名",
-    price: 114514.1919810,
-    uploadTime: 1701435695000,
-    url: 'https://api.lolicon.app/assets/img/lx.jpg',
-    uploaderId: 114514,
-    uploaderName: '杨昆',
-  }, {}, {}, {}],
+  thingData: [],
   pageData: [],
   value: [],
   page: 1,
@@ -149,28 +143,80 @@ onMounted(() => {
 })
 
 
-const onLoadData = treeNode => {
-  return new Promise(resolve => {
-    listClassificationList({canteen: treeNode.dataRef.id}).then(res => {
-      treeNode.dataRef.children = []
-      res.data.forEach(item => {
-        item.key = `${treeNode.eventKey}-${item.id}`
-        item.isLeaf = true
-        treeNode.dataRef.children.push(item)
-      })
-      contentData.cData = [...contentData.cData]
-      console.log(contentData.cData)
-      resolve();
-      return;
-    })
-  });
+const searchParams = reactive({
+  keyword: "",
+  C_1: "",
+  C_2: "",
+  status: "",
+  addr: "",
+  price: "",
+  sort: "",
+});
+
+const fillData = (list) => {
+  var res = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    console.log(item)
+    var data = {};
+    data['name'] = item.name;
+    data["id"] = item.id;
+    data["price"] = item.price;
+    data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
+    data["avatarUrl"] = 'https://api.lolicon.app/assets/img/lx.jpg'; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["uploaderId"] = item.merchant;
+    data["uploaderName"] = item.merchant_name;
+    data["pv"] = item.views;
+    res.push(data);
+  }
+  return [res, res.length];
+}
+
+const handleChange = (index, checked) => {
+  if (index <= 4) {
+    if (checked) {
+      for (var i = 0; i <= 4; i++) {
+        contentData.selectData[i] = false;
+      }
+      contentData.selectData[index] = true; /* 确保单选 */
+      switch (index) {
+        case 0: searchParams.status = 'A'; break;
+        case 1: searchParams.status = 'B'; break;
+        case 2: searchParams.status = 'C'; break;
+        case 3: searchParams.status = 'D'; break;
+        case 4: searchParams.status = 'E'; break;
+      }
+    } else {
+      searchParams.status = '';
+    }
+  } else {
+    if (checked) {
+      for (var i = 5; i <= 10; i++) {
+        contentData.selectData[i] = false;
+      }
+      contentData.selectData[index] = true; /* 确保单选 */
+      searchParams.price = String(index - 4);
+    } else {
+      searchParams.price = '';
+    }
+  }
+  searchData();
 };
-
-
+const searchData = async () => {
+  const lister = await getProductList(searchParams);
+  [ contentData.thingData, contentData.total ] = fillData(lister.data);
+  changePage(1);
+}
 const initSide = async () => {
   contentData.classifyData = await appStore.getCTree()
-  /* TODO: GET HOT-TAG by API */
-  contentData.tagData = ['111', '222', '333', '444', '111', '222', '333', '444'];
+  /* TODO: SET HOT-TAG by HAND */
+  contentData.tagData = ['全新', '几乎全新', '轻微使用痕迹', '明显使用痕迹', '有一定问题',
+                          '0~49元', '50~99元', '100~199元', '200~499元', '500~999元', '1000~元'];
+  contentData.selectData = [false, false, false, false, false, false, false, false, false, false];
+  /* TODO: 从接口返回的数据数量尚未控制，需要调整 params */
+  await searchData();
+
+  console.log(contentData.total);
 }
 
 const getSelectedKey = () => {
@@ -185,17 +231,30 @@ const getUserName = () => {
 }
 
 const clickTag = (index) => {
-  console.log(index)
+  console.log(index.key.split('-'))
   contentData.selectedKeys = []
   contentData.selectTagId = index
-  getThingList({tag: contentData.selectTagId})
+  if (index.key.split('-').length === 2) {
+    /* 一级搜索类 */
+    searchParams.C_1 = index.label;
+    searchParams.C_2 = ""
+  } else {
+    searchParams.C_1 = ""
+    searchParams.C_2 = index.label;
+  }
+  searchData()
 }
 
-// 最新|必吃|推荐
-const selectTab = (index) => {
-  contentData.selectTabIndex = index
-  contentData.tabUnderLeft = 12 + 70 * index
+const selectTab = () => {
   getThingList({tag: contentData.tabData[contentData.selectTabIndex]});
+  switch (contentData.selectTabIndex) {
+    case 0: searchParams.sort = "create_time"; searchParams.addr = ""; break;
+    case 1: searchParams.sort = "hot"; searchParams.addr = ""; break;
+    case 2: searchParams.addr = "1"; break;
+    case 3: searchParams.addr = "2"; break;
+    case 4: searchParams.addr = "3"; break;
+  }
+  searchData();
 }
 const handleDetail = (item, index) => {
   // 跳转新页面
@@ -275,7 +334,13 @@ const getThingList = (data) => {
   })
 }
 
-
+watch(
+    () => contentData.selectTabIndex,
+    () => {
+      console.log(contentData.selectTabIndex);
+      selectTab();
+    }
+);
 </script>
 
 <style scoped lang="less">
@@ -290,10 +355,8 @@ const getThingList = (data) => {
 }
 
 .content {
-  display: flex;
-  flex-direction: row;
   width: 80%;
-  height: auto;
+  height: 750px;
   margin: 80px auto;
 }
 
@@ -578,6 +641,9 @@ li {
   .pc-thing-list {
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
+    margin-top: 30px;
+    margin-left: -10px;
+
 
     .thing-item {
       min-width: 300px;
@@ -661,7 +727,7 @@ li {
   .page-view {
     width: 100%;
     text-align: center;
-    margin-top: 48px;
+    margin-top: 8px;
   }
 }
 
