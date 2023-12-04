@@ -100,6 +100,7 @@ import FoodIcon from '/@/assets/images/地道美食.svg';
 import { Button } from "view-ui-plus";
 import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
 import {getProductList} from "/@/api/index/product";
+import {openNotification} from "/@/utils/notice";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -203,9 +204,27 @@ const handleChange = (index, checked) => {
   searchData();
 };
 const searchData = async () => {
-  const lister = await getProductList(searchParams);
-  [ contentData.thingData, contentData.total ] = fillData(lister.data);
-  changePage(1);
+  contentData.loading = true;
+  getProductList(searchParams).then(res => {
+    if (res.code === 0) {
+      [ contentData.thingData, contentData.total ] = fillData(res.data);
+      changePage(1);
+    } else {
+      openNotification({
+        type: 'error',
+        message: 'Oops!',
+        description: res.msg
+      })
+    }
+    contentData.loading = false;
+  }).catch(err => {
+    contentData.loading = false;
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: err.msg
+    })
+  });
 }
 const initSide = async () => {
   contentData.classifyData = await appStore.getCTree()
@@ -246,7 +265,6 @@ const clickTag = (index) => {
 }
 
 const selectTab = () => {
-  getThingList({tag: contentData.tabData[contentData.selectTabIndex]});
   switch (contentData.selectTabIndex) {
     case 0: searchParams.sort = "create_time"; searchParams.addr = ""; break;
     case 1: searchParams.sort = "hot"; searchParams.addr = ""; break;

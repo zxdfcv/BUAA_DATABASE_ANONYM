@@ -39,6 +39,9 @@ const toDetail = () => {
   router.push({name: 'detail', query: {id: props.shopCard.id}})
 }
 
+watch(useRoute(), (to, from) => {
+    router.go(0); // 相当于刷新当前页面
+})
 </script>
 
 
