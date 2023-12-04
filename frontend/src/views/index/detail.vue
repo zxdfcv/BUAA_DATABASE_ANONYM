@@ -18,36 +18,45 @@
                       radius-dot="false"
                       trigger="hover"
                       arrow="hover"
-                      style="width: 1000px">
-                    <CarouselItem v-for="(item, index) in detailData.cover" :key="index">
-                      <div :style="{backgroundImage: 'url(' + item + ')', backgroundSize:'contain' ,backgroundSize:'100%'}"
-                           style="width: 1000px; height: 600px"></div>
+                      style="width: 100%">
+                    <CarouselItem v-for="(item, index) in detailData.cover" :key="index"
+                    style="height: 600px">
+                      <div :style="{
+                        backgroundImage: 'url(' + item + ')',
+                        backgroundPosition: 'center center',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: 'contain',
+                        width: '100%',
+                        height: '100%'
+                      }"></div>
                     </CarouselItem>
                   </Carousel></el-col>
                     <el-col :span="6">
-                      <div class="thing-counts hidden-sm">
-                        <div class="count-item flex-view pointer" @click="collect()">
+                      <div class="">
+                        <div class="count-item flex-view pointer" @click="addCollect()">
                           <div class="count-img">
-                            <img :src="RecommendIcon">
+                            <img :src="Collect_on" v-if="detailData.isCollected === true">
+                            <img :src="Collect_off" v-else>
                           </div>
                           <div class="count-box flex-view">
                             <div class="count-text-box">
                               <span class="count-title">收藏</span>
                             </div>
-                            <div class="count-num-box">
+                            <div class="count-num-box" style="margin-right: 35px">
                               <span class="num-text">{{ detailData.collect_count }}</span>
                             </div>
                           </div>
                         </div>
-                        <div class="count-item flex-view pointer" @click="addToWish()">
+                        <div class="count-item flex-view pointer" @click="addWanted">
                           <div class="count-img">
-                            <img :src="WantIcon">
+                            <img :src="Like_on" v-if="detailData.isWanted === true">
+                            <img :src="Like_off" v-else>
                           </div>
                           <div class="count-box flex-view">
                             <div class="count-text-box">
-                              <span class="count-title">吃过</span>
+                              <span class="count-title">我想要</span> <!-- TODO: 添加按钮跳转到 socket 聊天室 -->
                             </div>
-                            <div class="count-num-box">
+                            <div class="count-num-box" style="margin-right: 35px">
                               <span class="num-text">{{ detailData.wish_count }}</span>
                             </div>
                           </div>
@@ -62,7 +71,7 @@
                             </div>
                             <div class="count-num-box">
                               <span class="num-text"></span>
-                              <img :src="WeixinShareIcon" class="mg-l">
+                              <img :src="WeixinShareIcon" class="mg-l" style="margin-right: 35px">
                             </div>
                           </div>
                           <!-- <div class="count-item flex-view" @click="share()">
@@ -79,6 +88,31 @@
                           </div>
                         </div> -->
                         </div>
+                        <a-card style="margin: 15px" hoverable>
+                          <a-descriptions title="商品信息" :column="1" style="vertical-align: center; font-size: large; overflow-y: auto; max-height: 400px">
+                            <a-descriptions-item label="商品名称">
+                              <div>{{ detailData.title }}</div>
+                            </a-descriptions-item>
+                            <a-descriptions-item label="发布者">
+                              <a-avatar :src="posterAvatar" size="small" @click="router.push({ path: '/welcome'})" style="left: 5px"/> <!-- TODO: 跳转到指定用户的用户中心 -->
+                              <a-button type="text" @click="router.push({ path: '/welcome'})" style="top: -7px; left: 15px">{{ detailData.uploaderName }}</a-button>
+                            </a-descriptions-item>
+
+                            <a-descriptions-item label="分类所属">
+                              <a-space wrap>
+                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class1}});">{{ detailData.Class1 }}</a-button>
+                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class2}});">{{ detailData.Class2 }}</a-button>
+                              </a-space>
+                            </a-descriptions-item>
+                            <a-descriptions-item label="浏览量">
+                              <div>{{ detailData.pv }}</div>
+                            </a-descriptions-item>
+                            <a-descriptions-item label="发布时间">
+                              <div>{{ detailData.createTime }}</div>
+                            </a-descriptions-item>
+
+                          </a-descriptions>
+                        </a-card>
                         <div style="margin-top: 24px;" v-if="adData">
                           <!--广告区域-->
                           <img style="width: 250px;height: 100px;background-size: cover;object-fit: cover;" src="" />
@@ -88,9 +122,8 @@
                   </el-row>
 
                 </div>
-                <div class="title">{{ detailData.title }}</div>
-                <div class="meta">{{ detailData.pv }}次浏览</div>
-                <div class="desc">简介：{{ detailData.description }}</div>
+                <div class="desc">商品简介：</div>
+                <div class="desc" style="font-size: 18px">{{ detailData.description }}</div>
               </div>
             </div>
           </div>
@@ -106,104 +139,34 @@
               </div>
 
 
+<!-- TODO: 考虑用 a-comment 重写评论部分-->
 
-              <div class="thing-comment">
-                <div class="title">发表新的评论</div>
-                <div class="publish flex-view">
-                  <img v-if="SelfAvatar(userStore.user_avatar)" :src="BASE_URL + userStore.user_avatar" class="mine-img">
-                  <img v-else :src="AvatarIcon" class="mine-img">
-                  <textarea placeholder="说点什么..." class="content-input" ref="commentRef"></textarea>
-                  <button class="send-btn" @click="sendComment()">发送</button>
-                </div>
-                <div class="tab-view flex-view">
-                  <div class="count-text">共有{{ commentData.length }}条评论</div>
-                  <div class="tab-box flex-view" v-if="commentData.length > 0">
-                    <span :class="sortIndex === 0 ? 'tab-select' : ''" @click="sortCommentList('recent')">最新</span>
-                    <div class="line"></div>
-                    <span :class="sortIndex === 1 ? 'tab-select' : ''" @click="sortCommentList('hot')">热门</span>
-                  </div>
-                </div>
-                <div class="comments-list">
-                  <div class="comment-item" v-for="item in commentData">
-                    <div class="flex-item flex-view">
-                      <img v-if="SelfAvatar(item.user_avatar.avatar)" :src="BASE_URL + item.user_avatar.avatar"
-                        class="avator" @click="toggleIsShow(item.id, item.id)">
-                      <img v-else :src="AvatarIcon" class="avator" @click="toggleIsShow(item.id, item.id)">
-                      <div class="person">
-                        <div class="name">{{ item.username }}</div>
-                        <div class="time">{{ item.comment_time }}</div>
-                      </div>
-                      <div class="float-right">
-                        <span @click="toggleIsShow(item.id, item.id)">回复</span>
-                        <span @click="like(item.id)">点赞</span>
-                        <span class="num">{{ item.like_count }}</span>
-                      </div>
-
-                    </div>
-                    <p class="comment-content">{{ item.content }}</p>
-                    <div v-if="item.reply_count > 0">
-                      <div class="publish flex-view">
-                        <div class="count-text">
-                          <span>共有{{ item.reply_count }}条回复，</span>
-                          <span class="more-btn-sub" @click="toggleShowReply(item.id)">点击查看</span>
-                        </div>
-                      </div>
-                      <div v-if=showReplies.get(item.id)>
-                        <div class="comment-item-sub" v-for="reply in item.replies.data">
-                          <div class="flex-item flex-view">
-                            <img v-if=SelfAvatar(reply.user_avatar.avatar) :src="BASE_URL + reply.user_avatar.avatar"
-                              class="avator" @click="toggleIsShow(item.id, reply.id)">
-                            <img v-else :src="AvatarIcon" class="avator" @click="toggleIsShow(item.id, reply.id)">
-                            <div class="person">
-                              <div class="name">{{ reply.username }}</div>
-                              <div class="time">{{ reply.comment_time }}</div>
-                            </div>
-                            <div class="float-right">
-                              <span @click="toggleIsShow(item.id, reply.id)">回复</span>
-                              <span @click="like(reply.id)">推荐</span>
-                              <span class="num">{{ reply.like_count }}</span>
-                            </div>
-                          </div>
-                          <p class="comment-content-sub">{{ reply.content }}</p>
-                        </div>
-                      </div>
-                    </div>
-                    <!-- <button class="float-right send-btn" @click="toggleReplies(item)">回复</button> -->
-                    <div v-if="isShow.get(item.id)" class="publish flex-view">
-                      <textarea :placeholder="showTarget" class="content-input-sub" v-model="replyText"></textarea>
-                      <button class="send-btn-sub" @click="sendReply(item.id)">发送</button>
-                    </div>
-                  </div>
-                  <div class="infinite-loading-container">
-                    <div class="infinite-status-prompt" style="">
-                      <div slot="no-results" class="no-results">
-                        <div></div>
-                        <p>没有更多了</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
             </div>
             <div class="recommend" style="">
               <div class="title">热门推荐</div>
+              <ShopItemCard
+                  v-for="(item, index) in recommendData.value"
+                  :key="index"
+                  :shop-card="item"
+                  :loading="false"
+                  style="margin: 5%;" />
               <div class="things">
-                <div v-for="item in recommendData" :key="item.id" @click="handleDetail(item)"
-                  class="thing-item item-column-3"><!---->
-                  <div class="img-view">
-                    <img :src="item.cover">
-                    <!-- <div style="position: absolute; left: 10px; bottom: 10px;">
-                    <img :src="PlayIcon" style="width: 30px;height: 30px;">
-                  </div> -->
-                  </div>
-                  <div class="info-view">
-                    <h3 class="thing-name">{{ item.title.substring(0, 12) }}</h3>
-                    <span style="color: #444; font-size: 11px;height: 11px;">{{ item.create_time.substring(0, 16) }}</span>
-                    <br />
-                    <span style="color: #444; font-size: 11px;height: 11px;">{{ item.pv }}次浏览</span>
-                  </div>
-                </div>
+<!--                <div v-for="item in recommendData" :key="item.id" @click="handleDetail(item)"-->
+<!--                  class="thing-item item-column-3">&lt;!&ndash;&ndash;&gt;-->
+<!--                  <div class="img-view">-->
+<!--                    <img :src="item.cover">-->
+<!--                    &lt;!&ndash; <div style="position: absolute; left: 10px; bottom: 10px;">-->
+<!--                    <img :src="PlayIcon" style="width: 30px;height: 30px;">-->
+<!--                  </div> &ndash;&gt;-->
+<!--                  </div>-->
+<!--                  <div class="info-view">-->
+<!--                    <h3 class="thing-name">{{ item.title.substring(0, 12) }}</h3>-->
+<!--                    <span style="color: #444; font-size: 11px;height: 11px;">{{ item.create_time.substring(0, 16) }}</span>-->
+<!--                    <br />-->
+<!--                    <span style="color: #444; font-size: 11px;height: 11px;">{{ item.pv }}次浏览</span>-->
+<!--                  </div>-->
+<!--                </div>-->
               </div>
             </div>
           </div>
@@ -226,6 +189,10 @@ import ShareIcon from '/@/assets/images/share-icon.svg';
 import WeiboShareIcon from '/@/assets/images/wb-share.svg';
 import AvatarIcon from '/@/assets/images/avatar.jpg';
 import PlayIcon from '/@/assets/images/Play.png'
+import Collect_on from '/@/assets/images/collect_on.png'
+import Collect_off from '/@/assets/images/collect_off.png'
+import Like_on from '/@/assets/images/like_on.png'
+import Like_off from '/@/assets/images/like_off.png'
 
 import {
   detailApi as thingDetailApi,
@@ -242,6 +209,10 @@ import emoji from '/@/assets/emoji'
 import { VueElement, reactive } from 'vue'
 import { UToast, createObjectURL } from 'undraw-ui'
 import { addCollectCounter, detailApi as counterDetailApi } from '/@/api/index/classification'
+import {getProductDetail, deleteFromCollect, addToCollect, getProductList} from "/@/api/index/product";
+import { openNotification } from "/@/utils/notice";
+import {getCollectList} from "/@/api/index/user";
+import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
 
 const router = useRouter()
 const route = useRoute()
@@ -256,7 +227,7 @@ let tabData = ref(['评论'])
 let selectTabIndex = ref(0)
 
 let commentData = ref([])
-let recommendData = ref([])
+const recommendData = reactive([])
 let sortIndex = ref(0)
 let order = ref('recent') // 默认排序最新
 
@@ -280,7 +251,7 @@ let showTarget = ref('')
 let showReplies = ref(new Map())
 
 const SelfAvatar = (avatar) => {
-  console.log(avatar)
+  // console.log(avatar)
   if (avatar === "null" || avatar === null) {
     return false
   } else {
@@ -331,25 +302,100 @@ const toggleShowReply = (index) => {
   showReplies.value.set(index, !showReplies.value.get(index))
 }
 
-onMounted(() => {
+const getPostDetail = async () => {
+  await getProductDetail({product_id: thingId.value}).then(async res => {
+    detailData.value['id'] = res.data.id;
+    detailData.value['cover'] = res.data.images;
+    detailData.value['title'] = res.data.name;
+    detailData.value['pv'] = res.data.views;
+    detailData.value['description'] = res.data.description;
+    detailData.value['collect_count'] = res.data.collectors_count;
+    detailData.value['wish_count'] = res.data.wants; /* TODO: 没有发布者信息、是否卖出/下架、分类 & 校区信息在前端的展示点 */
+    for (var i = 0; i < res.data.images.length; i++) {
+      detailData.value['cover'][i] = BASE_URL + detailData.value['cover'][i].image;
+    }
+    let collecter = [];
+    getCollectList({}).then(res2 => {
+      const collect = res2.data;
+      if (res2.code === 0) {
+        for (var i = 0; i < collect.length; i++) {
+          collecter.push(collect[i].id);
+        }
+      }
+      detailData.value['isCollected'] = (userStore.user_access) ? (collecter.includes(Number(res.data.id))) : false;
+    })
+    detailData.value['isWanted'] = (userStore.user_access) ? false : false;
+    detailData.value['onSale'] = true;
+    detailData.value["uploaderId"] = res.data.merchant;
+    detailData.value["uploaderName"] = res.data.merchant_name;
+    detailData.value["Class1"] = res.data.classification_1_name;
+    detailData.value["Class2"] = res.data.classification_2_name;
+    detailData.value["createTime"] = res.data.create_time;
+  }).catch(err => {
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: err.msg
+    })
+  });
+}
+
+const fillData = (list) => {
+  var res = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var data = {};
+    data['name'] = item.name;
+    data["id"] = item.id;
+    data["price"] = item.price;
+    data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
+    data["avatarUrl"] = 'https://api.lolicon.app/assets/img/lx.jpg'; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["uploaderId"] = item.merchant;
+    data["uploaderName"] = item.merchant_name;
+    data["pv"] = item.views;
+    res.push(data);
+  }
+  return [res, res.length];
+}
+
+const getRecommendPost = async () => {
+    getProductList({limit: 5}).then(res => {
+      if (res.code === 0) {
+        [ recommendData.value, length ] = fillData(res.data.results);
+      } else {
+        openNotification({
+          type: 'error',
+          message: 'Oops!',
+          description: res.msg
+        })
+      }
+      console.log(recommendData.value)
+    }).catch(err => {
+      openNotification({
+        type: 'error',
+        message: 'Oops!',
+        description: err.msg
+      })
+    });
+}
+
+const push2User = () => {
+  router.push({ path: '/welcome'})
+}
+
+const posterAvatar = AvatarIcon;
+
+onMounted(async () => {
   thingId.value = route.query.id.trim()
-  detailData = {
-    id: 1,
-    cover: ['https://api.lolicon.app/assets/img/lx.jpg', 'https://api.lolicon.app/assets/img/lx.jpg', 'https://api.lolicon.app/assets/img/lx.jpg'],
-    title: 'yk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signature',
-    pv: 10000,
-    description: 'yk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signatureyk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signatureyk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signatureyk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signatureyk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signatureyk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signatureyk personal signature, yk personal signature, yk personal signature, yk personal signature\n yk personal signature\n yk personal signature',
-    collect_count: 114,
-    wish_count: 514,
-  };
-  // TODO: GET DETAIL INFORMATION BY API: getThingDetail()
+  await getPostDetail();
+  await getRecommendPost();
+  console.log("mounted")
   // getRecommendThing()
   // getCommentList()
   // for (const idx in commentData.value) {
   //   isShow.value.set(idx, false)
   //   showReplies.value.set(idx, false)
   // }
-
   // nextTick(() => {
   //   for (myElementRef in replyRef) {
   //     const myElementRef = myElementRef.value;
@@ -376,21 +422,35 @@ const getThingDetail = () => { /* 收藏、Like 后均需要刷新数据详情�
     message.error('获取详情失败')
   })
 }
-const addToWish = () => {
-  let username = userStore.user_name
-  if (username) {
-    addWishUserApi({ thingId: thingId.value, username: username }).then(res => {
-      message.success(res.msg)
-      // getThingDetail()
-    }).catch(err => {
-      console.log('操作失败')
-    })
+const addWanted = () => {
+  if (userStore.user_access) {
+    /* TODO: addWantedProductApi here userId/name, productId, state(ONLY ADD) */
+    detailData.value.isWanted = true;
+    getPostDetail();
   } else {
-    message.warn('请先登录')
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: "请先登录！",
+    })
   }
 }
-const collect = () => {
-  console.log(detailData)
+const addCollect = async () => {
+  if (userStore.user_access) {
+    if (detailData.value.isCollected === true) {
+      await deleteFromCollect({ids: detailData.value.id}).catch();
+    } else {
+      await addToCollect({product_id: detailData.value.id}).catch();
+    }
+    await getPostDetail().catch();
+  } else {
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: "请先登录！",
+    })
+  }
+
 //   let username = userStore.user_name
 //   if (username) {
 //     console.log(thingId.value)
@@ -405,7 +465,7 @@ const collect = () => {
 //   }
 }
 const type = 'thing'
-const share = () => {
+const share = () => { /* TODO: 重写 share 方法，或者直接去了*/
   let text = router.resolve({ name: 'share', query: { type: type, id: thingId.value } })
   console.log(text)
   window.open(text.href, '_blank')
@@ -542,6 +602,7 @@ const sortCommentList = (sortType) => {
 }
 
 </script>
+
 <style scoped lang="less">
 .home {
   z-index: 0;
@@ -560,7 +621,7 @@ const sortCommentList = (sortType) => {
 .detail-content {
   display: flex;
   flex-direction: column;
-  width: 1400px;
+  width: 80%;
   margin: 4px auto;
 }
 
@@ -908,8 +969,8 @@ const sortCommentList = (sortType) => {
 
 .recommend {
   -webkit-box-flex: 0;
-  -ms-flex: 0 0 235px;
-  flex: 0 0 235px;
+  -ms-flex: 0 0 360px;
+  flex: 0 0 360px;
   margin-left: 20px;
 
   .title {
@@ -920,73 +981,6 @@ const sortCommentList = (sortType) => {
     margin-bottom: 12px;
   }
 
-  .things {
-    border-top: 1px solid #cedce4;
-
-
-    .thing-item {
-      min-width: 250px;
-      max-width: 250px;
-      position: relative;
-      flex: 1;
-      margin-right: 20px;
-      height: fit-content;
-      overflow: hidden;
-      margin-top: 26px;
-      margin-bottom: 36px;
-      cursor: pointer;
-      box-shadow: 4px 4px 4px rgba(200, 200, 200, 0.3), -4px 4px 4px rgba(200, 200, 200, 0.3);
-
-
-      .img-view {
-        //text-align: center;
-        position: relative;
-        height: 160px;
-        width: 250px;
-
-        img {
-          height: 160px;
-          width: 250px;
-          margin: 0 auto;
-          background-size: cover;
-          object-fit: cover;
-        }
-      }
-
-      .info-view {
-        //background: #f6f9fb;
-        overflow: hidden;
-        padding: 16px 16px;
-
-        .thing-name {
-          line-height: 32px;
-          color: #0F1111;
-          font-size: 20px;
-        }
-
-        .price {
-          color: #ff7b31;
-          font-size: 20px;
-          line-height: 20px;
-          margin-top: 4px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-
-        .translators {
-          color: #6f6f6f;
-          font-size: 12px;
-          line-height: 14px;
-          margin-top: 4px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-      }
-    }
-
-  }
 }
 
 .flex-view {

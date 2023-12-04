@@ -38,6 +38,15 @@ export function get<T = any>(config: AxiosRequestConfig): Promise<T> {
 export function post<T = any>(config: AxiosRequestConfig): Promise<T> {
   return request({ ...config, method: 'POST' });
 }
+
+export function put<T = any>(config: AxiosRequestConfig): Promise<T> {
+  return request({ ...config, method: 'PUT' });
+}
+
+export function deletes<T = any>(config: AxiosRequestConfig): Promise<T> {
+  return request({ ...config, method: 'DELETE' });
+}
+
 const retryRequest = () => {
   console.log("Retry failed request");
   waiting.forEach(config => request(config));

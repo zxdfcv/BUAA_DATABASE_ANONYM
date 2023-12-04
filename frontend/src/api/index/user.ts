@@ -3,6 +3,7 @@ import { get, post } from '/@/utils/http/axios';
 enum URL {
     userLogin = '/myapp/login/',
     userRegister = '/myapp/register/',
+    getCollectList = '/myapp/product/collector/list',
 
     /* TODO: 以下 UserApi 未实现 */
     detail = '/myapp/index/user/info',
@@ -21,11 +22,13 @@ export interface LoginData {
 const userLoginApi = async (data: any) => post<any>({ url: URL.userLogin, data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
 
 const detailApi = async (params: any) => get<any>({ url: URL.detail, params: params, data: {}, headers: {} });
+const getCollectList = async (params: any) => get<any>({ url: URL.getCollectList, params: params, data: {}, headers: {} });
 const userRegisterApi = async (data: any) => post<any>({ url: URL.userRegister, params: {}, data: data });
 const updateUserPwdApi = async (params: any, data:any) => post<any>({ url: URL.updateUserPwd, params: params, data:data });
 const updateUserInfoApi = async (params: any,data: any) => post<any>({ url: URL.updateUserInfo, params:params, data: data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
 
 export { 
     userRegisterApi, userLoginApi, /* 不直接调用 */
+    getCollectList,
     detailApi, updateUserPwdApi, updateUserInfoApi, /* 未实现 Api */
 };
