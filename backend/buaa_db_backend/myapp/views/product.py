@@ -354,7 +354,9 @@ class EditProductCollectorView(generics.ListAPIView):
         if product.collectors.filter(id=user.id).exists():
             make_error_log(request, '重复收藏该商品')
             return APIResponse(code=1, msg='你已经收藏过该商品')
+
         product.collectors.add(user)
+        product.wants = product.wants + 1
         product.save()
         serializer = ProductListSerializer(product)
         return APIResponse(code=0, msg='操作成功', data=serializer.data)
@@ -368,6 +370,8 @@ class EditProductCollectorView(generics.ListAPIView):
             make_error_log(request, '取消收藏的商品不存在')
             return APIResponse(code=1, msg='商品不存在')
         for product in products:
-            product.collectors.remove(user)
-            product.save()
+            if product.collectors.filter(id=user.id).exists():
+                product.collectors.remove(user)
+                product.wants = product.wants - 1
+                product.save()
         return APIResponse(code=0, msg='收藏取消成功')
