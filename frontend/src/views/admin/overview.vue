@@ -9,12 +9,51 @@
 
       <a-row :gutter="[20,20]">
         <a-col :sm="24" :md="24" :lg="12">
-          <a-card title="热门菜肴排名" style="flex:1;">
+          <a-card title="热门商品排名" style="flex:1;">
             <div style="height: 300px;" ref="barChartDiv"></div>
           </a-card>
         </a-col>
         <a-col :sm="24" :md="24" :lg="12">
           <a-card title="热门分类比例" style="flex:1;">
+            <div style="height: 300px;" ref="pieChartDiv"></div>
+          </a-card>
+        </a-col>
+      </a-row>
+
+      <a-row :gutter="[20,20]">
+        <a-col :sm="24" :md="24" :lg="12">
+          <a-card title="热门评论排名" style="flex:1;">
+            <div style="height: 300px;" ref="barChartDiv"></div>
+          </a-card>
+        </a-col>
+        <a-col :sm="24" :md="24" :lg="12">
+          <a-card title="热门分类比例" style="flex:1;">
+            <div style="height: 300px;" ref="pieChartDiv"></div>
+          </a-card>
+        </a-col>
+      </a-row>
+
+      <a-row :gutter="[20,20]">
+      <a-col :sm="24" :md="24" :lg="12">
+        <a-card title="购买数量排名" style="flex:1;">
+          <div style="height: 300px;" ref="barChartDiv"></div>
+        </a-card>
+      </a-col>
+      <a-col :sm="24" :md="24" :lg="12">
+        <a-card title="消费金额排名" style="flex:1;">
+          <div style="height: 300px;" ref="pieChartDiv"></div>
+        </a-card>
+      </a-col>
+      </a-row>
+
+      <a-row :gutter="[20,20]">
+        <a-col :sm="24" :md="24" :lg="12">
+          <a-card title="销售数量排名" style="flex:1;">
+            <div style="height: 300px;" ref="barChartDiv"></div>
+          </a-card>
+        </a-col>
+        <a-col :sm="24" :md="24" :lg="12">
+          <a-card title="销售金额排名" style="flex:1;">
             <div style="height: 300px;" ref="pieChartDiv"></div>
           </a-card>
         </a-col>

@@ -3,7 +3,7 @@
     <a-layout-header style="background: #fff; padding: 0">
       <div class="header">
         <img class="header-logo" :src="logo">
-        <span class="header-title">菜肴后台管理系统</span>
+        <span class="header-title">北航闲鱼商城后台管理系统</span>
         <div class="empty"></div>
         <a-button style="margin-right: 24px;" @click="handlePreview">前台预览</a-button>
         <span>管理员[{{ userStore.admin_user_name }}]</span>
@@ -16,13 +16,13 @@
 
           <a-menu-item key="thing">
             <database-outlined/>
-            <span>菜肴管理</span>
+            <span>商品管理</span>
           </a-menu-item>
-          <a-menu-item key="classification">
+          <a-menu-item key="canteen">
             <layout-outlined/>
             <span>一级分类管理</span>
           </a-menu-item>
-          <a-menu-item key="canteen">
+          <a-menu-item key="classification">
             <layout-outlined/>
             <span>二级分类管理</span>
           </a-menu-item>
@@ -214,8 +214,4 @@ const handleLogout = () => {
   height: 100%;
 }
 
-//:deep(.ant-layout-sider-trigger) {
-//  background-color: #fff;
-//  height: 0px; // 设置0 隐藏
-//}
 </style>
