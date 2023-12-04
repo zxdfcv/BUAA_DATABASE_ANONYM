@@ -91,7 +91,7 @@ class Product(models.Model):
     is_sold = models.BooleanField(default=False)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
-    collectors = models.ManyToManyField(User, blank=True, related_name='商品收藏')
+    collectors = models.ManyToManyField(User, blank=True, related_name='collect_products')
 
     def __str__(self):
         return self.name
@@ -143,7 +143,7 @@ class Reply(models.Model):
     like_count = models.IntegerField(default=0)
     is_read = models.BooleanField(default=False)
 
-    mentioned_users = models.ManyToManyField(User, blank=True, related_name='被回复')
+    mentioned_users = models.ManyToManyField(User, blank=True, related_name='mentioned_reply')
 
     def __str__(self):
         return f'{self.user} - {self.comment.product} - {self.create_time}'

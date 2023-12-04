@@ -219,3 +219,31 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('views', 'wants', 'collectors')
+
+
+class ProductAllDetailSerializer(serializers.ModelSerializer):
+    # STATUS_CHOICES = [
+    #     ('A', '全新'),
+    #     ('B', '几乎全新'),
+    #     ('C', '轻微使用痕迹'),
+    #     ('D', '明显使用痕迹'),
+    #     ('E', '有一定问题'),
+    # ]
+    # ADDR_CHOICES = [
+    #     ('1', '学院路校区'),
+    #     ('2', '沙河校区'),
+    #     ('3', '两校区均可')
+    # ]
+    # status = serializers.ChoiceField(choices=STATUS_CHOICES, source='get_status_display')
+    # addr = serializers.ChoiceField(choices=ADDR_CHOICES, source='get_addr_display')
+    # images = ProductImageSerializer(many=True, read_only=True)
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    merchant_name = serializers.ReadOnlyField(source='merchant.username')
+    classification_1_name = serializers.ReadOnlyField(source='classification_1.name')
+    classification_2_name = serializers.ReadOnlyField(source='classification_2.name')
+
+    # collectors_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = '__all__'

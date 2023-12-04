@@ -1,5 +1,5 @@
 from django.db.models import Q, ExpressionWrapper, F
-from rest_framework import generics, fields
+from rest_framework import generics
 from rest_framework.decorators import permission_classes
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny
@@ -93,9 +93,11 @@ class ProductWithImagesView(generics.ListAPIView):
                 '3': (100, 199),
                 '4': (200, 499),
                 '5': (500, 999),
-                '6': (1000, float('inf')),  # float('inf') 表示无穷大，即大于1000
+                # '6': (1000, DecimalInfinity),  # float('inf') 表示无穷大，即大于1000
             }
-            if price not in price_ranges:
+            if price == '6':
+                queryset = queryset.filter(Q(price__gte=1000))
+            elif price not in price_ranges:
                 make_error_log(request, "查询商品时指定价格区间不存在")
                 return APIResponse(code=1,
                                    msg='价格区间不正确,请确保值为以下之一:1(<50),2(<100),3(<200),4(<500),5(<1000),6(>=1000)')
@@ -172,7 +174,9 @@ class EditProductView(APIView):
                 make_error_log(request, "创建商品时指定二级分类不存在")
                 return APIResponse(code=1, msg='二级分类不存在')
 
-        product_serializer = ProductCreateSerializer(data=data, partial=True)
+        product_serializer = ProductCreateSerializer(data=data,
+                                                     # partial=True
+                                                     )
         if product_serializer.is_valid():
             product_serializer.save()
             product_instance = product_serializer.instance
@@ -230,7 +234,9 @@ class EditProductView(APIView):
                 make_error_log(request, "更新商品时指定二级分类不存在")
                 return APIResponse(code=1, msg='二级分类不存在')
 
-        product_serializer = ProductUpdateSerializer(product, data=data, partial=True)
+        product_serializer = ProductUpdateSerializer(product, data=data,
+                                                     # partial=True
+                                                     )
         if product_serializer.is_valid():
             product_serializer.save()
         else:
@@ -302,3 +308,66 @@ class ProductDetailView(APIView):
         product_data['images'] = product_images_serializer.data
 
         return APIResponse(code=0, msg='商品查询成功', data=product_data)
+
+
+class EditProductCollectorView(generics.ListAPIView):
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        products = user.collect_products.all().order_by('-create_time')
+        page = self.paginate_queryset(products)
+
+        if page is not None:
+            product_images_data = []
+            for product in page:
+                images = ProductImageSerializer(product.product_image.all(), many=True).data
+                product_data = ProductListSerializer(product).data
+                product_data['images'] = images
+                product_images_data.append(product_data)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': product_images_data,
+                }
+            )
+        product_images_data = []
+        for product in products:
+            images = ProductImageSerializer(product.product_image.all(), many=True).data
+            product_data = ProductListSerializer(product).data
+            product_data['images'] = images
+            product_images_data.append(product_data)
+        return APIResponse(code=0, msg='查询成功', data=product_images_data)
+
+    def post(self, request):
+        user = request.user
+        product_id = request.GET.get('product_id')
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            make_error_log(request, '添加收藏时商品不存在')
+            return APIResponse(code=1, msg='商品不存在')
+        if product.collectors.filter(id=user.id).exists():
+            make_error_log(request, '重复收藏该商品')
+            return APIResponse(code=1, msg='你已经收藏过该商品')
+        product.collectors.add(user)
+        product.save()
+        serializer = ProductListSerializer(product)
+        return APIResponse(code=0, msg='操作成功', data=serializer.data)
+
+    def delete(self, request):
+        user = request.user
+        ids = request.GET.get('ids')
+        ids_arr = ids.split(',')
+        products = Product.objects.filter(id__in=ids_arr)
+        if products.count() != len(ids_arr):
+            make_error_log(request, '取消收藏的商品不存在')
+            return APIResponse(code=1, msg='商品不存在')
+        for product in products:
+            product.collectors.remove(user)
+            product.save()
+        return APIResponse(code=0, msg='收藏取消成功')

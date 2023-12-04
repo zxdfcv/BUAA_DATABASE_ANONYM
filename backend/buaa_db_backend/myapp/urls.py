@@ -26,6 +26,11 @@ urlpatterns = [
     path("admin/user/update", admin.UserAllDetailView.as_view(), name="user_allUpdate"),
     path("admin/user/list", admin.UserListView.as_view(), name="user_list"),
     path("admin/user/delete", admin.UserListView.as_view(), name="user_allDelete"),
+    path("admin/product/list", admin.ProductDetailListView.as_view(), name="product_allList"),
+    path("admin/product/create", admin.EditProductDetailView.as_view(), name="product_allCreate"),
+    path("admin/product/update", admin.EditProductDetailView.as_view(), name="product_allUpdate"),
+    path("admin/product/delete", admin.EditProductDetailView.as_view(), name="product_allDelete"),
+
 
     path("classification/viewC_1", classification.Classification1ListView.as_view(), name="classification1_view"),
     path("classification/viewC_2", classification.Classification2ListView.as_view(), name="classification2_view"),
@@ -41,6 +46,9 @@ urlpatterns = [
     path("product/update", product.EditProductView.as_view(), name='product_update'),
     path("product/delete", product.EditProductView.as_view(), name='product_delete'),
     path("product/detail", product.ProductDetailView.as_view(), name='product_detail'),
+    path("product/collector/list", product.EditProductCollectorView.as_view(), name='collector_list'),
+    path("product/collector/add", product.EditProductCollectorView.as_view(), name='collector_add'),
+    path("product/collector/remove", product.EditProductCollectorView.as_view(), name='collector_remove'),
 
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

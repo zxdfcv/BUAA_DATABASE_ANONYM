@@ -97,7 +97,9 @@ class EditClassification1View(APIView):
         except Classification1.DoesNotExist:
             make_error_log(request, '更新的一级分类不存在')
             return APIResponse(code=1, msg='一级分类对象不存在')
-        serializer = Classification1Serializer(classification1, data=request.data, partial=True)
+        serializer = Classification1Serializer(classification1, data=request.data,
+                                               # partial=True
+                                               )
         if serializer.is_valid():
             serializer.save()
             return APIResponse(code=0, msg='更新成功', data=serializer.data)
@@ -137,7 +139,9 @@ class EditClassification2View(APIView):
         except Classification2.DoesNotExist:
             make_error_log(request, '更新的二级分类不存在')
             return APIResponse(code=1, msg='二级分类对象不存在')
-        serializer = Classification2Serializer(classification2, data=request.data, partial=True)
+        serializer = Classification2Serializer(classification2, data=request.data,
+                                               # partial=True
+                                               )
         if serializer.is_valid():
             serializer.save()
             return APIResponse(code=0, msg='更新成功', data=serializer.data)
