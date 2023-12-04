@@ -82,7 +82,7 @@ class RegistrationView(APIView):
 @permission_classes([CanEditUserPermission])
 class EditUserView(APIView):
     # 必能找到该用户，不然的话过不了权限验证（？）
-    def put(self, request):
+    def post(self, request):
         user_id = request.GET.get('user_id')
         user = User.objects.get(pk=user_id)
         data = request.data.copy()
@@ -90,7 +90,9 @@ class EditUserView(APIView):
         # excluded_fields = ['username', ]
         # for field in excluded_fields:
         #     data.pop(field, None)
-        serializer = UserDetailSerializer(user, data=data, partial=True)
+        serializer = UserDetailSerializer(user, data=data,
+                                          # partial=True
+                                          )
         if serializer.is_valid():
             serializer.save()
             return APIResponse(code=0, msg='更新成功', data=serializer.data)
@@ -113,7 +115,7 @@ class EditUserView(APIView):
 
 @permission_classes([CanEditUserPermission])
 class UserChangePasswordView(APIView):
-    def put(self, request):
+    def post(self, request):
         user_id = request.GET.get('user_id')
         user = User.objects.get(pk=user_id)
         form = PasswordChangeForm(user, request.data)
