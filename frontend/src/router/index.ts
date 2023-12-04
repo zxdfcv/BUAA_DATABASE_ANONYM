@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { ADMIN_USER_TOKEN, USER_ACCESS } from '/@/store/constants'
+import {ADMIN_USER_TOKEN, EXPIRE_FRESH_HOUR, USER_ACCESS} from '/@/store/constants'
 import { useUserStore } from '/@/store'
 import { loadingOption } from '/@/utils/loading'
 import { ElLoading } from 'element-plus'
@@ -50,7 +50,7 @@ router.beforeEach(async (to, from, next) => {
 
     // next()
   } else {
-    if (Number(userStore.token_expire_time) + 1000 * 60 * 24 * 21 > Date.now()) { /* 写假了，用 Access Token 过期后 3 周的时间用来表示 Refresh 的过期时间 */
+    if (Number(userStore.token_expire_time) + 1000 * 60 * EXPIRE_FRESH_HOUR > Date.now()) { /* 写假了，用 Access Token 过期后 3 周的时间用来表示 Refresh 的过期时间 */
       console.log("refresh not expired")
     if (to.name === 'login') {
         next({ path: '/' })
