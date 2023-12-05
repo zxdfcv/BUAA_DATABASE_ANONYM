@@ -91,12 +91,29 @@ export const useUserStore = defineStore('user', {
         state.user_access       = undefined
         state.user_refresh      = undefined
         state.token_expire_time = undefined
+        state.user_avatar       = undefined
         if (state.remember_me !== true) {
           state.user_name         = undefined
           state.user_password     = undefined
           state.remember_me       = undefined
         }
       })
+      localStorage.removeItem("user_avatar")
+    },
+
+    delete() {
+      // await userLogout();
+      this.$patch((state) => {
+        state.user_id           = undefined
+        state.user_access       = undefined
+        state.user_refresh      = undefined
+        state.token_expire_time = undefined
+        state.user_name         = undefined
+        state.user_password     = undefined
+        state.remember_me       = undefined
+        state.user_avatar       = undefined
+      })
+      localStorage.removeItem("user_avatar")
     },
 
     /* TODO: 管理员登录/退出未操作 Pinia */

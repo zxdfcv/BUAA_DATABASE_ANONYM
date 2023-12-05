@@ -50,6 +50,30 @@
           </div>
         </div>
         <button class="save mg" @click="submit()">保存</button>
+
+        <div class="item flex-view" style="max-width: 400px; min-width: 250px;">
+          <div class="label">当前密码</div>
+          <div class="right-box">
+            <a-input-password placeholder="输入当前密码" v-model:value="password.old"/>
+          </div>
+        </div>
+        <div class="item flex-view" style="max-width: 400px; min-width: 250px;">
+          <div class="label">新密码</div>
+          <div class="right-box">
+            <a-input-password placeholder="输入新密码" v-model:value="password.new1"/>
+          </div>
+        </div>
+        <div class="item flex-view" style="max-width: 400px; min-width: 250px;">
+          <div class="label">确认新密码</div>
+          <div class="right-box">
+            <a-input-password placeholder="重复输入密码" v-model:value="password.new2"/>
+          </div>
+        </div>
+        <button class="save mg" @click="modifyPassword">修改密码</button>
+        <button class="save mg" @click="showDelete=true" style="background: red">注销账号</button>
+        <a-modal v-model:open="showDelete" title="确认操作" :confirm-loading="confirmLoading" @ok="handleDelete">
+          <p>确定要注销账号吗，这个操作不可撤销！您的数据将从数据库中永久删除！</p>
+        </a-modal>
       </div>
     </div>
     </a-spin>
@@ -58,13 +82,23 @@
 
 <script setup>
 import {message} from "ant-design-vue";
-import {detailApi, updateUserInfoApi} from '/@/api/index/user'
+import {
+  userDetailApi,
+  userUpdateApi,
+  userPasswordApi,
+  userDeleteApi
+} from '/@/api/index/user'
 import {BASE_URL, USER_AVATAR} from "/@/store/constants";
 import {useUserStore} from "/@/store";
 import AvatarIcon from '/@/assets/images/avatar.jpg'
+import {openNotification} from "/@/utils/notice";
 
 const router = useRouter();
 const userStore = useUserStore();
+
+const confirmLoading = ref(false);
+const open = ref(false);
+const showDelete = ref(false)
 
 let loading = ref(false)
 let tData = reactive({
@@ -77,11 +111,34 @@ let tData = reactive({
     description: undefined,
   }
 })
+const password = reactive({})
 
 onMounted(()=>{
   getUserInfo()
 })
 
+const handleDelete = async () => {
+  confirmLoading.value = true;
+  await userDeleteApi({user_id: userStore.user_id}).then(res => {
+    openNotification({
+      type: 'success',
+      message: '您已成功注销!',
+      description: ''
+    })
+    userStore.delete()
+  }).catch(err => {
+    console.log(err)
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: err.response.data.msg
+    });
+    confirmLoading.value = false;
+    showDelete.value = false;
+  })
+  confirmLoading.value = false;
+  showDelete.value = false;
+};
 const beforeUpload =(file)=> {
   // 改文件名
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6)
@@ -94,8 +151,9 @@ const beforeUpload =(file)=> {
 const getUserInfo =()=> {
   loading.value = true
   let userId = userStore.user_id
-  detailApi({id: userId}).then(res => {
+  userDetailApi({user_id: userId}).then(res => {
     tData.form = res.data
+    console.log(tData.form)
     if (tData.form.avatar) {
       userStore.user_avatar = tData.form.avatar
       tData.form.avatar = BASE_URL  + tData.form.avatar
@@ -120,22 +178,73 @@ const submit =()=> {
     formData.append('email', tData.form.email)
   }
   if (tData.form.mobile) {
-    formData.append('mobile', tData.form.mobile)
+    formData.append('phone', tData.form.mobile)
   }
   if (tData.form.description) {
     formData.append('description', tData.form.description)
   }
-  updateUserInfoApi({
-    id: userId
-  },formData).then(res => {
-    message.success('保存成功')
+  formData.append('username', userStore.user_name)
+  console.log(formData)
+  userUpdateApi({user_id: userId}, formData).then(res => {
+    openNotification({
+      type: 'success',
+      message: '用户信息修改成功！',
+      description: ''
+    })
     getUserInfo()
   }).catch(err => {
-    console.log("err")
+    openNotification({
+      type: 'error',
+      message: '用户信息修改失败',
+      description: '请检查输入项！'
+    })
     console.log(err)
   })
 }
 
+const modifyPassword = () => {
+  if (!(password.old) || !(password.new1) || !(password.new2)) {
+    openNotification({
+      type: 'error',
+      message: '修改密码失败',
+      description: '请输入字段！'
+    })
+  } else if (password.new1 !== password.new2) {
+    openNotification({
+      type: 'error',
+      message: '修改密码失败',
+      description: '两次输入的密码不一致！'
+    })
+  } else {
+    userPasswordApi({user_id: userStore.user_id}, {old_password: password.old, new_password1: password.new1, new_password2: password.new2}).then(res => {
+      console.log(res)
+      openNotification({
+        type: 'success',
+        message: '修改密码成功！',
+        description: res.msg
+      });
+      userStore.setPassword(password.new1);
+        }
+    ).catch(err => {
+      console.log(err)
+      let loger = '';
+      if (err.response.data.data.old_password) {
+        loger = err.response.data.data.old_password[0];
+      } else if (err.response.data.data.new_password1) {
+        loger = err.response.data.data.new_password1[0];
+      } else if (err.response.data.data.new_password2) {
+        loger = err.response.data.data.new_password2[0];
+      } else {
+        loger = err.response.data.msg;
+      }
+      openNotification({
+        type: 'error',
+        message: '修改密码失败',
+        description: loger
+      });
+    })
+  }
+}
 </script>
 
 <style scoped lang="less">
