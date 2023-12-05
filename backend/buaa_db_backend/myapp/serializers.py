@@ -93,11 +93,21 @@ class ErrorLogSerializer(serializers.ModelSerializer):
 
 class UserDetailSerializer(serializers.ModelSerializer):
     date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    following_count = serializers.SerializerMethodField()
+    follower_count = serializers.SerializerMethodField()
+
+    def get_following_count(self, obj):
+        # 返回该用户关注的人数
+        return obj.following.count()
+
+    def get_follower_count(self, obj):
+        # 返回关注该用户的人数
+        return obj.follower.count()
 
     class Meta:
         model = get_user_model()
-        fields = ['username', 'first_name', 'last_name', 'email', 'phone', 'nickname', 'gender', 'avatar',
-                  'description', 'date_joined']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'nickname', 'gender', 'avatar',
+                  'description', 'date_joined', 'following_count', 'follower_count', 'is_active']
 
     # def update(self, instance, validated_data):
     #     # 自定义 update 方法，处理更新逻辑
@@ -154,14 +164,24 @@ class Classification2Serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class FollowSerializer(serializers.ModelSerializer):
-#     create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
-#     follower_name = serializers.ReadOnlyField(source='follower.username')
-#     following_name = serializers.ReadOnlyField(source='following.username')
-#
-#     class Meta:
-#         model = Follow
-#         fields = ['follower', 'following', 'create_time']
+class FollowSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    follower_name = serializers.ReadOnlyField(source='follower.username')
+    following_name = serializers.ReadOnlyField(source='following.username')
+    follower_nickname = serializers.ReadOnlyField(source='follower.nickname')
+    following_nickname = serializers.ReadOnlyField(source='following.nickname')
+    follower_avatar = serializers.SerializerMethodField()
+    following_avatar = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Follow
+        fields = '__all__'
+
+    def get_follower_avatar(self, obj):
+        return str(obj.follower.avatar) if obj.follower.avatar else ''
+
+    def get_following_avatar(self, obj):
+        return str(obj.following.avatar) if obj.following.avatar else ''
 
 
 class ProductImageSerializer(serializers.ModelSerializer):

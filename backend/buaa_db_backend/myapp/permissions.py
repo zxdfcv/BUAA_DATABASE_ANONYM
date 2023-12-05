@@ -64,7 +64,8 @@ class CanViewClassificationPermission(BasePermission):
 class CanFollowPermission(BasePermission):
     def has_permission(self, request, view):
         has_permission = (
-            request.user.has_perm('myapp.view_user'))
+                request.user.has_perm('myapp.add_follow') and
+                request.user.has_perm('myapp.delete_follow'))
         return request.user.is_staff or has_permission
 
 

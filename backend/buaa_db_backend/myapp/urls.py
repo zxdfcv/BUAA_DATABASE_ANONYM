@@ -17,10 +17,14 @@ urlpatterns = [
     path("log/error/", log.ErrorLogView.as_view(), name="errorLog_list"),
     path("log/error/delete", log.ErrorLogView.as_view(), name="errorLog_delete"),
 
-    path("user/detail", user.EditUserView.as_view(), name="user_information"),
+    path("user/detail", user.UserDetailView.as_view(), name="user_information"),
     path("user/update", user.EditUserView.as_view(), name="user_update"),
     path("user/delete", user.EditUserView.as_view(), name="user_delete"),
     path("user/update/pwd", user.UserChangePasswordView.as_view(), name="user_changePwd"),
+    path("user/follow/followers", user.FollowerListView.as_view(), name="follower_list"),
+    path("user/follow/add", user.EditFollowerView.as_view(), name="follower_add"),
+    path("user/follow/delete", user.EditFollowerView.as_view(), name="follower_delete"),
+    path("user/follow/followings", user.FollowingListView.as_view(), name="following_list"),
 
     path("admin/user/detail", admin.UserAllDetailView.as_view(), name="user_allInformation"),
     path("admin/user/update", admin.UserAllDetailView.as_view(), name="user_allUpdate"),

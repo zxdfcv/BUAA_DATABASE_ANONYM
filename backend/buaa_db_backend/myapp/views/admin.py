@@ -170,6 +170,7 @@ class UserListView(generics.ListAPIView):
         # return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
     def delete(self, request):
+        # 要不要真的删掉？删一个就要动好多外键(好麻烦
         ids = request.GET.get('ids')
         ids_arr = ids.split(',')
         users = User.objects.filter(id__in=ids_arr)
