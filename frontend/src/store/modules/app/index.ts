@@ -14,6 +14,8 @@ export const useAppStore = defineStore(
         classification1: [],
         classification2: [],
         classificationTree: [],
+        checkC_1: {},
+        checkC_2: {},
     }),
     getters: {},
     actions: {
@@ -29,9 +31,9 @@ export const useAppStore = defineStore(
                         for (var i = 0; i < res1.length; i++) {
                             // @ts-ignore
                             state.classification1.push(res1[i].name);
+                            state.checkC_1[res1[i].name] = res1[i].id;
                         }
 
-                        console.log('Storage state ==> ', this)
                     })
                 } else {
                     this.classificationReNewed = false;
@@ -64,6 +66,7 @@ export const useAppStore = defineStore(
                                     });
                                 }
                             }
+                            state.checkC_2[res2[k].name] = res2[k].id;
                         }
                         console.log('Storage state ==> ', this)
                     })
