@@ -1,12 +1,116 @@
+from datetime import datetime
+from random import random
+from django.db import connection
+from django.db.models import When, Count
+from django.forms import IntegerField
 from rest_framework import generics
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
+from sqlparse.sql import Case
 
 from ..models import User, Product, Classification1, Classification2, ProductImage
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
     ProductImageSerializer, ProductCreateSerializer
-from ..utils import APIResponse, make_error_log
+from ..utils import APIResponse, make_error_log, dict_fetchall, getWeekDays
+
+
+class StatisticsView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        # now = datetime.datetime.now()
+
+        sql_str = "select id, name, views as count from buaa_db_product  order by views desc limit 10 "
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
+            product_rank_data = dict_fetchall(cursor)
+
+        sql_str = "select B.name, count(B.name) as count from buaa_db_product A join buaa_db_classification_1 B on " \
+                  "A.classification_1_id = B.id group by B.name order by count desc limit 5; "
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
+            classification1_rank_data = dict_fetchall(cursor)
+
+        sql_str = "select B.name, count(B.name) as count from buaa_db_product A join buaa_db_classification_2 B on " \
+                  "A.classification_2_id = B.id group by B.name order by count desc limit 5; "
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
+            classification2_rank_data = dict_fetchall(cursor)
+
+        sql_str = "select gender, count(gender) as count from buaa_db_user group by gender order by " \
+                  "count desc;"
+
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
+            user_gender_rank_data = dict_fetchall(cursor)
+
+        sql_str = "select addr, count(addr) as count from buaa_db_product group by addr order by count " \
+                  "desc;"
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
+            product_addr_rank_data = dict_fetchall(cursor)
+
+        # price_statistics = Product.objects.annotate(
+        #     price_range=Case(
+        #         When(price__lt=50, then=Value(1)),
+        #         When(price__gte=50, price__lt=100, then=Value(2)),
+        #         When(price__gte=100, price__lt=200, then=Value(3)),
+        #         When(price__gte=200, price__lt=500, then=Value(4)),
+        #         When(price__gte=500, price__lt=1000, then=Value(5)),
+        #         When(price__gte=1000, then=Value(6)),
+        #         output_field=IntegerField(),
+        #     )
+        # ).values('price_range').annotate(product_count=Count('id')).order_by('price_range')
+        #
+        # # 将 QuerySet 转换为列表，构造包含字典的列表
+        # statistics_list = [{item['price_range']: item['product_count']} for item in price_statistics]
+
+        sql_str = "SELECT " \
+                  "CASE " \
+                  "WHEN price < 50 THEN 1 " \
+                  "WHEN price >= 50 AND price < 100 THEN 2 " \
+                  "WHEN price >= 100 AND price < 200 THEN 3 " \
+                  "WHEN price >= 200 AND price < 500 THEN 4 " \
+                  "WHEN price >= 500 AND price < 1000 THEN 5 " \
+                  "WHEN price >= 1000 THEN 6 " \
+                  "END AS price_range, " \
+                  "COUNT(*) AS count " \
+                  "FROM buaa_db_product " \
+                  "GROUP BY price_range " \
+                  "ORDER BY price_range;"
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
+            product_price_rank_data = dict_fetchall(cursor)
+
+        # 统计最近一周访问量(sql语句)
+        visit_data = []
+        week_days = getWeekDays()
+        for day in week_days:
+            sql_str = "select re_ip, count(re_ip) as count from buaa_db_op_log where re_time like '" + day + "%' group by re_ip"
+            with connection.cursor() as cursor:
+                cursor.execute(sql_str)
+                ip_data = dict_fetchall(cursor)
+                uv = len(ip_data)
+                pv = 0
+                for item in ip_data:
+                    pv = pv + item['count']
+                visit_data.append({
+                    "day": day,
+                    "uv": uv,
+                    "pv": pv
+                })
+
+        data = {
+            'product_rank_data': product_rank_data,
+            'classification1_rank_data': classification1_rank_data,
+            'classification2_rank_data': classification2_rank_data,
+            'user_gender_rank_data': user_gender_rank_data,
+            'product_addr_rank_data': product_addr_rank_data,
+            'product_price_rank_data': product_price_rank_data,
+            'visit_data': visit_data
+        }
+        return APIResponse(code=0, msg='查询成功', data=data)
 
 
 class UserAllDetailView(APIView):
