@@ -37,11 +37,10 @@ watch(() => props.dataSource, () => {
   deep: true
 })
 
-const convertData = (data, keyName, valueName) => {
-  return data.map(obj11 => ({
-    obj11.= obj[oldPropertyName]
-    item.value = obj[oldPropertyName];
-    delete obj[oldPropertyName];
+const convertData = (data, oldKeyName, oldValueName, newKeyName, newValueName) => {
+  return data.map((item) => ({
+    [newKeyName]: item[oldKeyName],
+    [newValueName]: item[oldValueName]
   }))
 }
 
@@ -53,12 +52,12 @@ const initPieChart = () => {
   const oldData = JSON.parse(JSON.stringify(props.dataSource))
   if (oldData.length > 0) {
     console.log(oldData)
-    const nowData = convertData(oldData, props.key, props.value)
+    const nowData = convertData(oldData, props.key, props.value, 'key', 'value')
     console.log(nowData)
+    nowData.map((item) => {
+      pieData.push({name: item.key, value: item.value})
+    })
   }
-  // newMap.map((item) => {
-  //   pieData.push({name: item.key, value: item.value})
-  // })
   console.log(pieData)
   pieChart.value = echarts.init(chartContainer.value)
   const option = {
