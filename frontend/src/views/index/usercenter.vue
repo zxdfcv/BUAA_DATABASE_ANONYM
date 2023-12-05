@@ -44,7 +44,7 @@ export default {
   display: flex;
   flex-direction: row;
   //background-color: #2a9a44;
-  max-width: 1200px;
+  max-width: 1400px;
   min-width: 800px;
   margin: 80px auto;
   .user-content-left {

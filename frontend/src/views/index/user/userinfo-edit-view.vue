@@ -51,27 +51,28 @@
         </div>
         <button class="save mg" @click="submit()">保存</button>
 
-        <div class="item flex-view" style="max-width: 400px; min-width: 250px;">
+        <form><div class="item flex-view" style="max-width: 400px; min-width: 250px;">
           <div class="label">当前密码</div>
           <div class="right-box">
-            <a-input-password placeholder="输入当前密码" v-model:value="password.old"/>
+            <a-input-password placeholder="输入当前密码" v-model:value="password.old" autocomplete="off"/>
           </div>
         </div>
         <div class="item flex-view" style="max-width: 400px; min-width: 250px;">
           <div class="label">新密码</div>
           <div class="right-box">
-            <a-input-password placeholder="输入新密码" v-model:value="password.new1"/>
+            <a-input-password placeholder="输入新密码" v-model:value="password.new1" autocomplete="off"/>
           </div>
         </div>
         <div class="item flex-view" style="max-width: 400px; min-width: 250px;">
           <div class="label">确认新密码</div>
           <div class="right-box">
-            <a-input-password placeholder="重复输入密码" v-model:value="password.new2"/>
+            <a-input-password placeholder="重复输入密码" v-model:value="password.new2" autocomplete="off"/>
           </div>
         </div>
+        </form>
         <button class="save mg" @click="modifyPassword">修改密码</button>
         <button class="save mg" @click="showDelete=true" style="background: red">注销账号</button>
-        <a-modal v-model:open="showDelete" title="确认操作" :confirm-loading="confirmLoading" @ok="handleDelete">
+        <a-modal v-model:open="showDelete" title="确认操作" :confirm-loading="confirmLoading" :closable='false' @ok="handleDelete">
           <p>确定要注销账号吗，这个操作不可撤销！您的数据将从数据库中永久删除！</p>
         </a-modal>
       </div>
@@ -131,7 +132,7 @@ const handleDelete = async () => {
     openNotification({
       type: 'error',
       message: 'Oops!',
-      description: err.response.data.msg
+      description: err.response.data.detail
     });
     confirmLoading.value = false;
     showDelete.value = false;
@@ -196,7 +197,7 @@ const submit =()=> {
     openNotification({
       type: 'error',
       message: '用户信息修改失败',
-      description: '请检查输入项！'
+      description: err.response.data.detail
     })
     console.log(err)
   })
@@ -234,8 +235,9 @@ const modifyPassword = () => {
         loger = err.response.data.data.new_password1[0];
       } else if (err.response.data.data.new_password2) {
         loger = err.response.data.data.new_password2[0];
+        console.log(loger)
       } else {
-        loger = err.response.data.msg;
+        loger = err.response.data.detail;
       }
       openNotification({
         type: 'error',
