@@ -1,14 +1,14 @@
 <template>
   <div class="mine-infos-view">
     <div class="info-box flex-view">
-      <img v-if = "SelfAvatar(userStore.user_avatar)" :src="BASE_URL+userStore.user_avatar" class="avatar-img">
+      <img v-if = "!(userStore.user_avatar === null || userStore.user_avatar === undefined)" :src="BASE_URL+userStore.user_avatar" class="avatar-img">
       <img v-else :src="AvatarImg" class="avatar-img">
       <div class="name-box">
         <h2 class="nick">{{ userStore.user_name }}</h2>
-        <div class="age">
-          <span>活跃1天</span>
-          <span class="give-point"></span>
-        </div>
+<!--        <div class="age">-->
+<!--          <span>活跃1天</span>-->
+<!--          <span class="give-point"></span>-->
+<!--        </div>-->
       </div>
     </div>
 <!--    <div class="counts-view">-->
@@ -28,21 +28,21 @@
     <div class="order-box">
       <div class="title">交互中心</div>
       <div class="list">
-        <div class="mine-item flex-view" @click="clickMenu('collectThingView')">
-          <img :src="MyOrderImg">
-          <span>菜肴收藏</span>
-        </div>
+<!--        <div class="mine-item flex-view" @click="clickMenu('collectThingView')">-->
+<!--          <img :src="MyOrderImg">-->
+<!--          <span>菜肴收藏</span>-->
+<!--        </div>-->
         <div class="mine-item flex-view" @click="clickMenu('scoreView')">
           <img :src="PointIconImage">
-          <span>柜台收藏</span>
+          <span>商品收藏</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('wishThingView')">
           <img :src="PushIconImage">
-          <span>食堂收藏</span>
+          <span>我的发布</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('thingHistory')">
           <img :src="AddressIconImage">
-          <span>吃过记录</span>
+          <span>我买到的</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('commentView')">
           <img :src="CommentIconImg">
@@ -56,10 +56,6 @@
         <div class="mine-item flex-view" @click="clickMenu('userInfoEditView')">
           <img :src="SettingIconImage" alt="编辑资料">
           <span>编辑资料</span>
-        </div>
-        <div class="mine-item flex-view" @click="clickMenu('securityView')">
-          <img :src="SafeIconImage" alt="账号安全">
-          <span>账号安全</span>
         </div>
         <!-- <div class="mine-item flex-view" @click="clickMenu('pushView')">
           <img :src="PushIconImage" alt="推送设置">
@@ -104,11 +100,7 @@ onMounted(()=>{
 })
 
 const SelfAvatar = (avatar) => {
-  if (avatar === "null" || avatar===null) {
-    return false
-  } else {
-    return true
-  }
+  return !(avatar === "null" || avatar === null);
 }
 
 const clickMenu =(name)=> {
