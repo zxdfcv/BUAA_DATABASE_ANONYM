@@ -1,3 +1,4 @@
+// @ts-ignore
 import { notification } from 'ant-design-vue';
 
 const openNotification = ({ type, message, description }) => {

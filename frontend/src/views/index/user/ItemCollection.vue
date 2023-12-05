@@ -1,21 +1,21 @@
 <template>
   <div class="content-list">
-    <div class="list-title">柜台收藏</div>
+    <div class="list-title">商品收藏</div>
     <div role="tablist" class="list-tabs-view flex-view">
     </div>
     <div class="list-content">
       <div class="collect-thing-view">
         <a-spin :spinning="loading" style="min-height: 200px;">
           <div class="thing-list flex-view">
-          <div class="thing-item item-column-3" v-for="(item,index) in pageData.collectData" :key="index">
-            <div class="remove" @click="handleRemove(item)">移出</div>
-            <div class="img-view" @click="handleClickItem(item)">
-              <img :src="item.cover">
-            </div>
-            <div class="info-view">
-              <h3 class="thing-name">{{item.title}}</h3>
-            </div>
-          </div>
+          <ShopItemCard
+              v-for="(item,index) in pageData.collectData"
+              :key="index"
+              :shop-card="item"
+              :loading="false"
+              :deletable="true"
+              @deleteCollecter="refreshDelete"
+              style="width: 30%; margin: 1%;"
+          />
           <template v-if="!pageData.collectData || pageData.collectData.length <= 0">
             <a-empty style="width: 100%;margin-top: 200px;"/>
           </template>
@@ -26,13 +26,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import {message} from 'ant-design-vue';
+<script setup>
 import {getCollectThingListApi, removeCollectUserApi} from '/@/api/index/thing'
 import {getCollectCounterListApi, removeCollectCounter} from '/@/api/index/classification'
 import {getCollectCanteenListApi, removeCollectCanteen} from '/@/api/index/canteen'
 import {BASE_URL} from "/@/store/constants";
 import {useUserStore} from "/@/store";
+import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
+import {getCollectList} from "/@/api/index/user";
+import {openNotification} from "/@/utils/notice";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -43,6 +45,9 @@ const pageData = reactive({
 
 const loading = ref(false)
 
+const refreshDelete = () => {
+  getCollectCounterList()
+}
 onMounted(()=>{
   //getCollectThingList()
   getCollectCounterList()
@@ -62,20 +67,54 @@ const handleRemove =(record)=> {
     console.log(err)
   })
 }
-const getCollectCounterList =()=> {
+
+const fillData = (list) => {
+  var res = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    console.log(item)
+    var data = {};
+    data['name'] = item.name;
+    data["id"] = item.id;
+    data["price"] = item.price;
+    data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
+    data["avatarUrl"] = 'https://api.lolicon.app/assets/img/lx.jpg'; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["uploaderId"] = item.merchant;
+    data["uploaderName"] = item.merchant_name;
+    data["pv"] = item.views;
+    res.push(data);
+  }
+  return res;
+}
+
+const getCollectCounterList = async () => {
   loading.value = true
-  let username = userStore.user_name
-  getCollectCounterListApi({username: username}).then(res => {
-    res.data.forEach(item => {
-      item.cover = BASE_URL + item.cover
-    })
-    console.log(res.data)
-    pageData.collectData = res.data
-    loading.value = false
+  getCollectList({}).then(res => {
+    const data = res.data;
+    if (res.code === 0) {
+      pageData.collectData = fillData(data);
+      console.log(pageData.collectData)
+    }
+    loading.value = false;
   }).catch(err => {
-    console.log(err.msg)
-    loading.value = false
-  })
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: err.response.data.detail
+    })
+    loading.value = false;
+  });
+  // getCollectCounterListApi({username: username}).then(res => {
+  //   res.data.forEach(item => {
+  //     item.cover = BASE_URL + item.cover
+  //   })
+  //   console.log(res.data)
+  //   pageData.collectData = res.data
+  //   loading.value = false
+  // }).catch(err => {
+  //   console.log(err.msg)
+  //   loading.value = false
+  // })
 }
 // const getCollectCounterList =()=> {
 //   console.log("test")
@@ -125,7 +164,7 @@ const getCollectCounterList =()=> {
   .list-title {
     color: #152844;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 20px;
     line-height: 24px;
     height: 24px;
     margin-bottom: 4px;

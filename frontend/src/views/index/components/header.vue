@@ -38,7 +38,8 @@
           <template #overlay >
             <a-menu style="width: 120px">
               <a-menu-item>
-                <a @click="router.push({name: 'collectThingView'})">菜肴收藏</a>
+                <template #icon><WalletOutlined /></template>
+                <a @click="router.push({name: 'createProductView'})">我要发布</a>
               </a-menu-item>
               <a-menu-item>
                 <template #icon><UserOutlined /></template>
@@ -149,7 +150,7 @@
 </template>
 
 <script setup lang="ts">
-import { UserOutlined, DownOutlined, LogoutOutlined } from '@ant-design/icons-vue';
+import { UserOutlined, WalletOutlined, LogoutOutlined } from '@ant-design/icons-vue';
 
 import {listReceiveCommentsApi, SetStateToReadedApi} from '/@/api/index/comment'
 import { useUserStore, useAppStore } from "/@/store";

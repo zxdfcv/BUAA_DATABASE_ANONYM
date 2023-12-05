@@ -89,7 +89,7 @@ const constantRouterMap = [
       {
         path: 'scoreView',
         name: 'scoreView',
-        component: () => import('/@/views/index/user/score-view.vue')
+        component: () => import('/src/views/index/user/ItemCollection.vue')
       },
       {
         path: 'commentView',
@@ -112,6 +112,11 @@ const constantRouterMap = [
         component: () => import('/@/views/index/user/message-view.vue')
       },
     ]
+  },
+  {
+    path: '/createProductView',
+    name: 'createProductView',
+    component: () => import('/@/views/index/createProductView.vue')
   },
   {
     path: '/adminLogin',

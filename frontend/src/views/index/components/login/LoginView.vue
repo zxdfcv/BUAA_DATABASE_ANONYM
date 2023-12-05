@@ -120,7 +120,7 @@ const doLogin = () => {
     openNotification({
       type: 'error',
       message: 'Oops!',
-      description: err.msg
+      description: err.response.data.msg
     })
   });
 }
