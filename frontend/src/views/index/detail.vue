@@ -100,8 +100,8 @@
 
                             <a-descriptions-item label="分类所属">
                               <a-space wrap>
-                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class1}});">{{ detailData.Class1 }}</a-button>
-                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class2}});">{{ detailData.Class2 }}</a-button>
+                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class1, type:'C_1'}});">{{ detailData.Class1 }}</a-button>
+                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class2, type:'C_2'}});">{{ detailData.Class2 }}</a-button>
                               </a-space>
                             </a-descriptions-item>
                             <a-descriptions-item label="浏览量">
@@ -330,6 +330,8 @@ const getPostDetail = async () => {
     detailData.value["uploaderName"] = res.data.merchant_name;
     detailData.value["Class1"] = res.data.classification_1_name;
     detailData.value["Class2"] = res.data.classification_2_name;
+    detailData.value["C_1"] = res.data.classification_1;
+    detailData.value["C_2"] = res.data.classification_2;
     detailData.value["createTime"] = res.data.create_time;
   }).catch(err => {
     openNotification({

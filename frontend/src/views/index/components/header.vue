@@ -17,8 +17,8 @@
       <template #overlay>
         <a-menu>
           <!-- TODO: 可以修改成大分类栏 -->
-          <a-menu-item v-for="item in search_index">
-            <a @click="router.push({name: 'search', query: {keyword: item}});">{{ item }}</a>
+          <a-menu-item v-for="(item) in search_index">
+            <a @click="router.push({name: 'search', query: {keyword: item,type: 'C_1'}});">{{ item }}</a>
           </a-menu-item>
         </a-menu>
       </template>

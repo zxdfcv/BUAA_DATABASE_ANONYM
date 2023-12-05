@@ -1,6 +1,7 @@
 <template>
   <div class="content-margin">
     <h1 class="search-name-box">{{ tData.keyword }}</h1>
+    <div style="background: #ffffff;">
     <div class="search-tab-nav clearfix">
       <div class="tab-text">
         <span>与</span>
@@ -13,21 +14,14 @@
 
         <a-spin :spinning="tData.loading" style="min-height: 200px;">
           <div class="pc-thing-list">
-            <div v-for="item in tData.pageData" :key="item.id" @click="handleDetail(item)"
-                 class="thing-item item-column-3"><!---->
-              <div class="img-view">
-                <img :src="item.cover">
-                <!-- <div style="position: absolute; left: 10px; bottom: 10px;">
-                  <img :src="PlayIcon" style="width: 30px;height: 30px;">
-                </div> -->
-              </div>
-              <div class="info-view">
-                <h3 class="thing-name">{{ item.title.substring(0, 12) }}</h3>
-                <span style="color: #444; font-size: 11px;height: 11px;">{{item.create_time.substring(0,16)}}</span>
-                <br />
-                <span style="color: #444; font-size: 11px;height: 11px;">{{item.pv}}次浏览</span>
-              </div>
-            </div>
+            <ShopItemCard
+                v-for="(item, index) in tData.pageData"
+                :key="index"
+                :shop-card="item"
+                :loading="tData.loading"
+                style="width: 30%; margin: 1%;"
+            />
+
             <div v-if="tData.pageData.length <= 0 && !tData.loading" class="no-data" style="">暂无数据</div>
           </div>
         </a-spin>
@@ -38,14 +32,17 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 
 <script setup>
 import {listApi as listThingList} from '/@/api/index/thing'
 import {BASE_URL} from "/@/store/constants";
-import {useUserStore} from "/@/store";
+import {useAppStore, useUserStore} from "/@/store";
 import PlayIcon from '/@/assets/images/Play.png'
+import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
+import {getProductList} from "/@/api/index/product";
 
 const userStore = useUserStore()
 const router = useRouter();
@@ -67,14 +64,52 @@ onMounted(() => {
 })
 
 // 监听query参数
-watch(() => route.query, (newPath, oldPath) => {
-  search()
-}, {immediate: false});
+watch(useRoute(), (to, from) => {
+  router.go(0); // 相当于刷新当前页面
+})
 
+const fillData = (list) => {
+  var res = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    console.log(item)
+    var data = {};
+    data['name'] = item.name;
+    data["id"] = item.id;
+    data["price"] = item.price;
+    data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
+    data["avatarUrl"] = 'https://api.lolicon.app/assets/img/lx.jpg'; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["uploaderId"] = item.merchant;
+    data["uploaderName"] = item.merchant_name;
+    data["pv"] = item.views;
+    res.push(data);
+  }
+  return [res, res.length];
+}
 
 const search = () => {
   tData.keyword = route.query.keyword?.trim()
-  getThingList({'keyword': tData.keyword})
+  tData.loading = true
+  const params = {
+  };
+  if (route.query.type === 'C_1') {
+    params['classification1'] = useAppStore().checkC_1[tData.keyword];
+  } else if (route.query.type === 'C_2') {
+    params['classification2'] = useAppStore().checkC_2[tData.keyword];
+  } else {
+    params['keyword'] = tData.keyword;
+  }
+  getProductList(params).then(res => {
+    if (res.code === 0) {
+      [ tData.thingData, tData.total ] = fillData(res.data);
+    }
+    console.log(tData.thingData)
+    changePage(1)
+    tData.loading = false
+  }).catch(err => {
+    console.log(err)
+    tData.loading = false
+  })
 }
 
 // 分页事件
@@ -114,7 +149,7 @@ const getThingList = (data) => {
 }
 
 .page-view {
-  width: 100%;
+  width: 85%;
   text-align: center;
   margin-top: 48px;
 }

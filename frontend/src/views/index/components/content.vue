@@ -146,8 +146,8 @@ onMounted(() => {
 
 const searchParams = reactive({
   keyword: "",
-  C_1: "",
-  C_2: "",
+  classification1: "",
+  classification2: "",
   status: "",
   addr: "",
   price: "",
@@ -228,7 +228,7 @@ const searchData = async () => {
 }
 const initSide = async () => {
   contentData.classifyData = await appStore.getCTree()
-  /* TODO: SET HOT-TAG by HAND */
+  /* SET HOT-TAG by HAND */
   contentData.tagData = ['全新', '几乎全新', '轻微使用痕迹', '明显使用痕迹', '有一定问题',
                           '0~49元', '50~99元', '100~199元', '200~499元', '500~999元', '1000~元'];
   contentData.selectData = [false, false, false, false, false, false, false, false, false, false];
@@ -255,11 +255,11 @@ const clickTag = (index) => {
   contentData.selectTagId = index
   if (index.key.split('-').length === 2) {
     /* 一级搜索类 */
-    searchParams.C_1 = index.label;
-    searchParams.C_2 = ""
+    searchParams.classification1 = appStore.checkC_1[index.label];
+    searchParams.classification2 = ""
   } else {
-    searchParams.C_1 = ""
-    searchParams.C_2 = index.label;
+    searchParams.classification1 = ""
+    searchParams.classification2 = appStore.checkC_2[index.label];
   }
   searchData()
 }
