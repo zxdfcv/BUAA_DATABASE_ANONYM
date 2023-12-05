@@ -31,6 +31,7 @@ urlpatterns = [
     path("admin/product/update", admin.EditProductDetailView.as_view(), name="product_allUpdate"),
     path("admin/product/delete", admin.EditProductDetailView.as_view(), name="product_allDelete"),
 
+    path("admin/statistics", admin.StatisticsView.as_view(), name="statistics"),
 
     path("classification/viewC_1", classification.Classification1ListView.as_view(), name="classification1_view"),
     path("classification/viewC_2", classification.Classification2ListView.as_view(), name="classification2_view"),

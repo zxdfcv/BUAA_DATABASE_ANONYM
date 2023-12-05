@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
@@ -84,3 +86,32 @@ class MyPageNumberPagination(PageNumberPagination):
                 'results': data,
             }
         )
+
+
+def dict_fetchall(cursor):  # cursor是执行sql_str后的记录，作入参
+    columns = [col[0] for col in cursor.description]  # 得到域的名字col[0]，组成List
+    return [
+        dict(zip(columns, row)) for row in cursor.fetchall()
+    ]
+
+
+def getWeekDays():
+    """
+    获取近一周的日期
+    """
+    week_days = []
+    now = datetime.datetime.now()
+    for i in range(7):
+        day = now - datetime.timedelta(days=i)
+        week_days.append(day.strftime('%Y-%m-%d %H:%M:%S.%f')[:10])
+    week_days.reverse()  # 逆序
+    return week_days
+
+
+def get_monday():
+    """
+    获取本周周一日期
+    """
+    now = datetime.datetime.now()
+    monday = now - datetime.timedelta(now.weekday())
+    return monday.strftime('%Y-%m-%d %H:%M:%S.%f')[:10]
