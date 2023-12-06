@@ -34,6 +34,7 @@ console.log(props.dataSource)
 watch(() => props.dataSource, () => {
   barChart.value.clear()
   initBarChart()
+  barChart.value.series.type = 'bar'
   // window.onresize = function () { // resize
   //   barChart.value.resize()
   // }
@@ -100,9 +101,7 @@ const initBarChart = () => {
       type: 'category',
       axisLabel: {
         rotate: 30, // 倾斜30度,
-        textStyle: {
-          color: '#2F4F4F'
-        }
+        color: '#2F4F4F'
       },
       axisLine: {
         lineStyle: {
@@ -116,11 +115,9 @@ const initBarChart = () => {
       axisTick: {show: false},
       splitLine: {
         show: true, // 网格线
-        lineStyle: {
-          color: 'rgba(10, 10, 10, 0.1)',
-          width: 1,
-          type: 'solid'
-        }
+        color: 'rgba(10, 10, 10, 0.1)',
+        width: 1,
+        type: 'solid'
       }
     },
     toolbox: {
@@ -128,7 +125,13 @@ const initBarChart = () => {
       feature: {
         mark: {show: true},
         dataView: {show: true, readOnly: false},
-        magicType: {show: true, type: ['line', 'bar']},
+        // magicType: {
+        //   type: ['line', 'bar'],
+        //   option: {
+        //     line: {},
+        //     bar: {},
+        //   }
+        // },
         restore: {show: true},
         saveAsImage: {show: true}
       }
@@ -138,11 +141,9 @@ const initBarChart = () => {
         data: yData,
         type: 'bar',
         itemStyle: {
-          normal: {
-            color: function (params) {
-              // 柱图颜色
-              return '#70B0EA'
-            }
+          color: function (params) {
+            // 柱图颜色
+            return '#70B0EA'
           }
         }
       }
