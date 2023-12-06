@@ -101,7 +101,7 @@
   
   <script setup lang="ts">
   import { FormInstance, message, SelectProps } from 'ant-design-vue';
-  import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/canteen';
+  import { createApi, listApi, updateApi, deleteApi } from '/src/api/admin/classification2';
   import {BASE_URL} from "/@/store/constants";
   import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
   const columns = reactive([

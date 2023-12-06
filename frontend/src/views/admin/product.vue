@@ -61,16 +61,16 @@
             <a-row :gutter="24">
               <a-col span="24">
                 <a-form-item label="商品名称" name="title">
-                  <a-input placeholder="请输入" v-model:value="modal.form.title"></a-input>
+                  <a-input placeholder="请输入" v-model:value="modal.form.name"></a-input>
                 </a-form-item>
               </a-col>
               <a-col span="12">
-                <a-form-item label="柜台" name="classification">
+                <a-form-item label="二级分类" name="classification">
                   <a-select placeholder="请选择"
                             allowClear
                             :options="modal.cData"
-                            :field-names="{ label: 'title', value: 'id',}"
-                            v-model:value="modal.form.classification">
+                            :field-names="{ label: 'name', value: 'id',}"
+                            v-model:value="modal.form.classification1">
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -162,9 +162,9 @@
 
 <script setup lang="ts">
 import { FormInstance, message, SelectProps } from 'ant-design-vue';
-import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/thing';
-import {listApi as listClassificationApi} from '/@/api/admin/classification'
-import {listApi as listCanteenApi} from '/@/api/admin/canteen'
+import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/product';
+import {listApi as listClassification1Api} from '/@/api/admin/classification1'
+import {listApi as listClassification2Api} from '/src/api/admin/classification2'
 import {listApi as listTagApi} from '/@/api/admin/tag'
 import {BASE_URL} from "/@/store/constants";
 import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
@@ -179,8 +179,8 @@ const columns = reactive([
   },
   {
     title: '商品名称',
-    dataIndex: 'title',
-    key: 'title'
+    dataIndex: 'name',
+    key: 'name'
   },
   {
     title: '状态',
@@ -189,9 +189,14 @@ const columns = reactive([
     customRender: ({ text, record, index, column }) => text === '0' ? '上架' : '下架'
   },
   {
-    title: '柜台',
-    dataIndex: 'classification_title',
-    key: 'classification_title'
+    title: '所属一级分类',
+    dataIndex: 'classification_1_name',
+    key: 'classification_1'
+  },
+  {
+    title: '所属二级分类',
+    dataIndex: 'classification_2_name',
+    key: 'classification_2'
   },
   {
     title: '简介',
@@ -250,13 +255,13 @@ const modal = reactive({
   editFlag: false,
   title: '',
   cData: [],
-  //bData: [],
+  bData: [],
   tagData: [{}],
   form: {
     id: undefined,
-    title: undefined,
-    classification: undefined,
-    //canteen: undefined,
+    name: undefined,
+    classification1: undefined,
+    classification2: undefined,
     tag: [],
     repertory: undefined,
     price: undefined,
@@ -267,13 +272,12 @@ const modal = reactive({
     rawFile: undefined,
   },
   rules: {
-    title: [{ required: true, message: '请输入名称', trigger: 'change' }],
-    classification: [{ required: true, message: '请选择柜台', trigger: 'change' }],
-    // cateen: [{ required: true, message: '请选择食堂', trigger: 'change' }],
+    name: [{ required: true, message: '请输入名称', trigger: 'change' }],
+    classification1: [{ required: true, message: '请选择一级分类', trigger: 'change' }],
+    classification2: [{ required: true, message: '请选择二级级分类', trigger: 'change' }],
     repertory: [{ required: true, message: '请输入库存', trigger: 'change' }],
     price: [{ required: true, message: '请输入定价', trigger: 'change' }],
     status: [{ required: true, message: '请选择状态', trigger: 'change' }],
-    canteen: [{ required: true, message: '请输入所在柜台', trigger: 'change' }]
   },
 });
 
@@ -282,7 +286,7 @@ const myform = ref<FormInstance>();
 onMounted(() => {
   getDataList();
   getCDataList();
-  // getBDataList();
+  getBDataList();
   getTagDataList();
 });
 
@@ -306,15 +310,17 @@ const getDataList = () => {
 }
 
 const getCDataList = () => {
-  listClassificationApi({}).then(res => {
+  listClassification1Api({}).then(res => {
     modal.cData = res.data
+    console.log(res.data)
+  })
+  console.log(modal.cData)
+}
+const getBDataList = () => {
+  listClassification2Api({}).then(res => {
+    modal.bData = res.data
   })
 }
-// const getBDataList = () => {
-//   listCanteenApi({}).then(res => {
-//     modal.bData = res.data
-//   })
-// }
 const getTagDataList = ()=> {
   listTagApi({}).then(res => {
     res.data.forEach((item, index) => {
@@ -410,13 +416,13 @@ const handleOk = () => {
         if(modal.editFlag) {
           formData.append('id', modal.form.id)
         }
-        formData.append('title', modal.form.title)
-        if (modal.form.classification) {
-          formData.append('classification', modal.form.classification)
+        formData.append('title', modal.form.name)
+        if (modal.form.classification1) {
+          formData.append('classification1', modal.form.classification1)
         }
-        // if (modal.form.canteen) {
-        //   formData.append('canteen', modal.form.canteen)
-        // }
+        if (modal.form.classification2) {
+          formData.append('canteen', modal.form.classification2)
+        }
         if (modal.form.tag) {
           modal.form.tag.forEach(function (value) {
             if(value){

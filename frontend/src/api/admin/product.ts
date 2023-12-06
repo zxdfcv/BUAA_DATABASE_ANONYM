@@ -3,11 +3,11 @@ import { get, post } from '/@/utils/http/axios';
 import { UserState } from '/@/store/modules/user/types';
 // import axios from 'axios';
 enum URL {
-    list = '/myapp/admin/thing/list',
-    create = '/myapp/admin/thing/create',
-    update = '/myapp/admin/thing/update',
-    delete = '/myapp/admin/thing/delete',
-    detail = '/api/thing/detail',
+    list = '/myapp/admin/product/list',
+    create = '/myapp/admin/product/create',
+    update = '/myapp/admin/product/update',
+    delete = '/myapp/admin/product/delete',
+    detail = '/api/product/detail',
 }
 
 const listApi = async (params: any) => get<any>({ url: URL.list, params: params, data: {}, headers: {} });
