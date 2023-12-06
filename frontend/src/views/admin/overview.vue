@@ -10,8 +10,6 @@
       <a-row :gutter="[20,20]">
         <a-col :sm="24" :md="24" :lg="12">
           <a-card title="热门商品排名" style="flex:1;">
-            <div style="height: 300px;" ref="barChartDiv"></div>
-          <a-card title="热门商品排名" style="flex:1;">
             <BarChartComponent :dataSource="tdata.data.classification_rank_data" :title="'热门商品排名'" :keyName="'title'" :valueName="'count'" :id="'1'"/>
           </a-card>
         </a-col>

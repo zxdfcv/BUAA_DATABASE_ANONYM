@@ -34,7 +34,7 @@ console.log(props.dataSource)
 watch(() => props.dataSource, () => {
   barChart.value.clear()
   initBarChart()
-  barChart.value.series.type = 'bar'
+  // barChart.value.series.type = 'bar'
   // window.onresize = function () { // resize
   //   barChart.value.resize()
   // }
@@ -101,7 +101,9 @@ const initBarChart = () => {
       type: 'category',
       axisLabel: {
         rotate: 30, // 倾斜30度,
-        color: '#2F4F4F'
+        textStyle: {
+          color: '#2F4F4F'
+        }
       },
       axisLine: {
         lineStyle: {
@@ -132,16 +134,6 @@ const initBarChart = () => {
         //     bar: {},
         //   }
         // },
-        restore: {show: true},
-        saveAsImage: {show: true}
-      }
-    },
-    toolbox: {
-      show: true,
-      feature: {
-        mark: {show: true},
-        dataView: {show: true, readOnly: false},
-        magicType: {show: true, type: ['line', 'bar']},
         restore: {show: true},
         saveAsImage: {show: true}
       }
