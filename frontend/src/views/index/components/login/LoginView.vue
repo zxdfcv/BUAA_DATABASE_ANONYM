@@ -109,7 +109,7 @@ const doLogin = () => {
     openNotification({
       type: 'success',
       message: '登录成功！',
-      description: '你好，用户 ' + res.data.username + '！'
+      description: '你好，' + ((userStore.is_admin) ? '管理员' : '用户') + ' ' + res.data.username + '！'
     })
     userStore.remember_me = formState.remember;
     userStore.user_password = formState.password;
