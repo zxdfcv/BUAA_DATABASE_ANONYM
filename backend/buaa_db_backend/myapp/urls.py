@@ -34,6 +34,10 @@ urlpatterns = [
     path("admin/product/create", admin.EditProductDetailView.as_view(), name="product_allCreate"),
     path("admin/product/update", admin.EditProductDetailView.as_view(), name="product_allUpdate"),
     path("admin/product/delete", admin.EditProductDetailView.as_view(), name="product_allDelete"),
+    path("admin/comment/list", admin.CommentView.as_view(), name="comment_allList"),
+    path("admin/comment/create", admin.CommentView.as_view(), name="comment_allCreate"),
+    path("admin/comment/update", admin.CommentView.as_view(), name="comment_allUpdate"),
+    path("admin/comment/delete", admin.CommentView.as_view(), name="comment_allDelete"),
 
     path("admin/statistics", admin.StatisticsView.as_view(), name="statistics"),
 
@@ -55,7 +59,7 @@ urlpatterns = [
     path("product/collector/add", product.EditProductCollectorView.as_view(), name='collector_add'),
     path("product/collector/remove", product.EditProductCollectorView.as_view(), name='collector_remove'),
 
-    path("comment/list",comment.CommentListView.as_view(),name='comment_list'),
+    path("comment/list", comment.CommentListView.as_view(), name='comment_list'),
     path("comment/my_list", comment.MyCommentsView.as_view(), name='comment_my_list'),
     path("comment/create", comment.MyCommentsView.as_view(), name='comment_create'),
     path("comment/delete", comment.MyCommentsView.as_view(), name='comment_delete'),
