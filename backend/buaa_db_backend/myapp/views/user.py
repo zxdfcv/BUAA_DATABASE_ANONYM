@@ -199,8 +199,9 @@ class FollowingListView(generics.ListAPIView):
             return APIResponse(code=1, msg='用户不存在')
         followings = Follow.objects.filter(following=user).order_by('-create_time')
         page = self.paginate_queryset(followings)
-        serializer = FollowSerializer(followings, many=True)
+
         if page is not None:
+            serializer = FollowSerializer(page, many=True)
             return APIResponse(
                 code=0,
                 msg='查询成功',
@@ -211,6 +212,7 @@ class FollowingListView(generics.ListAPIView):
                     'results': serializer.data,
                 }
             )
+        serializer = FollowSerializer(followings, many=True)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
 
@@ -228,8 +230,9 @@ class FollowerListView(generics.ListAPIView):
             return APIResponse(code=1, msg='用户不存在')
         followers = Follow.objects.filter(follower=user).order_by('-create_time')
         page = self.paginate_queryset(followers)
-        serializer = FollowSerializer(followers, many=True)
+
         if page is not None:
+            serializer = FollowSerializer(page, many=True)
             return APIResponse(
                 code=0,
                 msg='查询成功',
@@ -240,4 +243,5 @@ class FollowerListView(generics.ListAPIView):
                     'results': serializer.data,
                 }
             )
+        serializer = FollowSerializer(followers, many=True)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)

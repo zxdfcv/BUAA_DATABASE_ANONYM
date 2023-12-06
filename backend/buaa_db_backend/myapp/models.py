@@ -40,6 +40,7 @@ class Follow(models.Model):
 
 class Classification1(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    image = models.FileField(upload_to='c1_images/', null=True, blank=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -52,6 +53,7 @@ class Classification1(models.Model):
 
 class Classification2(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    image = models.FileField(upload_to='c2_images/', null=True, blank=True)
     classification_1 = models.ForeignKey(Classification1, on_delete=models.CASCADE, related_name='c1_c2')
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
@@ -115,18 +117,19 @@ class ProductImage(models.Model):
 
 
 class Comment(models.Model):
-    TYPE_CHOICES = [
-        ('0', '评论区留言'),
-        ('1', '私聊'),
-    ]
+    # TYPE_CHOICES = [
+    #     ('0', '评论区留言'),
+    #     ('1', '私聊'),
+    # ]
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comment')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_comment')
-    type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=0)
+    # type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=0)
     content = models.CharField(max_length=255)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
-    like_count = models.IntegerField(default=0)
-
+    # like_count = models.IntegerField(default=0)
+    reply_count = models.IntegerField(default=0)
     is_read = models.BooleanField(default=False)
+    likes = models.ManyToManyField(User, blank=True, related_name='like_reply')
 
     def __str__(self):
         return f'{self.user} - {self.product} - {self.create_time}'
@@ -141,10 +144,11 @@ class Reply(models.Model):
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='comment_reply')
     content = models.CharField(max_length=255)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
-    like_count = models.IntegerField(default=0)
+    # like_count = models.IntegerField(default=0)
     is_read = models.BooleanField(default=False)
 
     mentioned_users = models.ManyToManyField(User, blank=True, related_name='mentioned_reply')
+    likes = models.ManyToManyField(User, blank=True, related_name='like_comment')
 
     def __str__(self):
         return f'{self.user} - {self.comment.product} - {self.create_time}'

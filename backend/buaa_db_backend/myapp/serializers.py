@@ -6,7 +6,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group
 
-from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product
+from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment
 
 User = get_user_model()
 
@@ -267,3 +267,37 @@ class ProductAllDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+
+
+class CommentListSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        exclude = ('is_read', 'likes',)
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+
+class CommentNoticeSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        exclude = ('likes',)
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''

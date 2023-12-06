@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import user, log, admin, classification, product
+from .views import user, log, admin, classification, product, comment
 
 app_name = 'myapp'
 urlpatterns = [
@@ -54,6 +54,15 @@ urlpatterns = [
     path("product/collector/list", product.EditProductCollectorView.as_view(), name='collector_list'),
     path("product/collector/add", product.EditProductCollectorView.as_view(), name='collector_add'),
     path("product/collector/remove", product.EditProductCollectorView.as_view(), name='collector_remove'),
+
+    path("comment/list",comment.CommentListView.as_view(),name='comment_list'),
+    path("comment/my_list", comment.MyCommentsView.as_view(), name='comment_my_list'),
+    path("comment/create", comment.MyCommentsView.as_view(), name='comment_create'),
+    path("comment/delete", comment.MyCommentsView.as_view(), name='comment_delete'),
+    path("comment/notice", comment.CommentNoticeView.as_view(), name='comment_notice'),
+    path("comment/read", comment.CommentNoticeView.as_view(), name='comment_read'),
+    path("comment/like", comment.EditLikesView.as_view(), name='comment_like'),
+    path("comment/dislike", comment.EditLikesView.as_view(), name='comment_dislike'),
 
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

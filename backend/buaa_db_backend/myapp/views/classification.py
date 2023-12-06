@@ -22,7 +22,10 @@ class Classification1ListView(generics.ListAPIView):
     #     return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
     def get(self, request, *args, **kwargs):
+        keyword = request.GET.get("keyword", None)
         classifications = Classification1.objects.all().order_by('-create_time')
+        if keyword:
+            classifications = classifications.filter(name__contains=keyword)
         page = self.paginate_queryset(classifications)
         if page is not None:
             serializer = Classification1Serializer(page, many=True)
@@ -51,6 +54,7 @@ class Classification2ListView(generics.ListAPIView):
     #     serializer = Classification2Serializer(classifications, many=True)
     #     return APIResponse(code=0, msg='查询成功', data=serializer.data)
     def get(self, request, *args, **kwargs):
+        keyword = request.GET.get("keyword", None)
         c_1 = request.GET.get("classification1", None)
         classifications = Classification2.objects.all().order_by('-create_time')
         if c_1:
@@ -58,6 +62,8 @@ class Classification2ListView(generics.ListAPIView):
                 make_error_log(request, "查询二级分类时指定一级分类不存在")
                 return APIResponse(code=1, msg='一级分类不存在')
             classifications = classifications.filter(classification_1_id=c_1)
+        if keyword:
+            classifications = classifications.filter(name__contains=keyword)
         page = self.paginate_queryset(classifications)
         if page is not None:
             serializer = Classification2Serializer(page, many=True)

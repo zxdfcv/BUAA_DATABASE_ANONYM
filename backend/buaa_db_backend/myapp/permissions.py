@@ -78,3 +78,13 @@ class CanEditProductPermission(BasePermission):
                 request.user.has_perm('myapp.delete_product') and
                 request.user.has_perm('myapp.view_product'))
         return (request.user.is_staff or has_permission) and is_self
+
+
+class CanEditCommentPermission(BasePermission):
+    def has_permission(self, request, view):
+        has_permission = (
+                request.user.has_perm('myapp.add_comment') and
+                request.user.has_perm('myapp.delete_comment')
+                and request.user.has_perm('myapp.view_comment')
+        )
+        return request.user.is_staff or has_permission
