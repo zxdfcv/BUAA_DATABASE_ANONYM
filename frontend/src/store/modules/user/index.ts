@@ -33,6 +33,7 @@ export const useUserStore = defineStore('user', {
     admin_user_avatar: undefined,
 
     remember_me: undefined,
+    is_admin: undefined,
   }),
   getters: {},
   actions: {
@@ -56,29 +57,48 @@ export const useUserStore = defineStore('user', {
 
     /* 登录操作 */
     async login(loginForm) {
-      const result = await userLoginApi(loginForm);
-      console.log('Login results ==> ', result)
+      var admin = loginForm;
+      var result;
+      admin['type'] = 1;
+try {
+  const res1 = await userLoginApi(admin);
+  console.log(res1);
+  if (res1.code === 0) {
+    const res = res1.data
+    this.$patch((state) => {
+      this.user_refresh = res.refresh
+      this.user_access = res.token
+      this.user_id = res.id
+      this.user_name = res.username
+      this.token_expire_time = Date.parse(new Date(res.expire).toString())
+      this.is_admin = true;
+      /* TODO: email, phone 待处理 */
+      console.log('Storage state ==> ', this)
+    });
+    result = res1;
+  }
+} catch (e) {
+  delete admin.type;
+  const res2 = await userLoginApi(admin);
+  console.log(res2);
+  if (res2.code === 0) {
+    const res = res2.data
+    this.$patch((state) => {
+      this.user_refresh = res.refresh
+      this.user_access = res.token
+      this.user_id = res.id
+      this.user_name = res.username
+      this.token_expire_time = Date.parse(new Date(res.expire).toString())
+      this.is_admin = false;
+      /* TODO: email, phone 待处理 */
+      console.log('Storage state ==> ', this)
+    });
+    result = res2;
+  }
+}
 
-      if(result.code === 0) {
-        /* Login successfully */
-        var res = result.data
-        this.$patch((state)=>{
-          this.user_refresh      = res.refresh
-          this.user_access       = res.token
-          this.user_id           = res.id
-          this.user_name         = res.username
-          this.token_expire_time = Date.parse(new Date(res.expire).toString())
-          /* TODO: email, phone 待处理 */
-          console.log('Storage state ==> ', this)
-        })
 
-        // localStorage.setItem(USER_REFRESH, res.refresh)
-        // localStorage.setItem(USER_ACCESS, res.token)
-        // localStorage.setItem(USER_ID, res.id)
-        // localStorage.setItem(USER_NAME, res.username)
-        // localStorage.setItem(TOKEN_EXPIRE_TIME, res.expire)
-        // localStorage.setItem(USER_AVATAR, res.avatar)
-      }
+
 
       return result;
     },
@@ -92,6 +112,7 @@ export const useUserStore = defineStore('user', {
         state.user_refresh      = undefined
         state.token_expire_time = undefined
         state.user_avatar       = undefined
+        state.is_admin          = undefined
         if (state.remember_me !== true) {
           state.user_name         = undefined
           state.user_password     = undefined
@@ -112,6 +133,7 @@ export const useUserStore = defineStore('user', {
         state.user_password     = undefined
         state.remember_me       = undefined
         state.user_avatar       = undefined
+        state.is_admin          = undefined
       })
       localStorage.removeItem("user_avatar")
     },

@@ -29,7 +29,7 @@
       
       <template v-if="userStore.user_access">
         <!-- 确认有登陆权限 -->
-        <Button type="primary" @click="router.push({name: 'admin'})">后台入口</Button>
+        <Button v-if="userStore.is_admin" type="primary" @click="router.push({name: 'admin'})">后台入口</Button>
         <a-dropdown>
           <a class="ant-dropdown-link" @click="e => e.preventDefault()"> <!-- TODO: 头像的 url 格式需确定 -->
             <img v-if = "hasAvatar(userStore.user_avatar)" :src="BASE_URL + userStore.user_avatar" class="self-img">
