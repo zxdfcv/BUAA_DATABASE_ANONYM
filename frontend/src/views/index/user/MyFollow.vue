@@ -22,7 +22,7 @@
               </template>
               <template #renderItem="{ item }">
                 <a-list-item key="item.title">
-                  <template #extra>
+                  <template #extra v-if="appStore.view_user_id === userStore.user_id">
                     <a-button type="primary" shape="round" danger @click="deleteFollow(item.id)">取消关注</a-button>
                   </template>
                   <a-list-item-meta>
