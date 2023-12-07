@@ -9,9 +9,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from sqlparse.sql import Case
 
-from ..models import User, Product, Classification1, Classification2, ProductImage, Comment
+from ..models import User, Product, Classification1, Classification2, ProductImage, Comment, Reply
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
-    ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer
+    ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer, ReplyAllDetailSerializer
 from ..utils import APIResponse, make_error_log, dict_fetchall, getWeekDays
 
 
@@ -142,6 +142,16 @@ class UserAllDetailView(APIView):
             return APIResponse(code=0, msg='更新成功', data=serializer.data)
         make_error_log(request, '用户更新失败')
         return APIResponse(code=1, msg='更新失败', data=serializer.errors)
+
+    # def put(self, request, *args, **kwargs):
+    #
+    #     serializer = UserAllDetailSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return APIResponse(code=0, msg='创建成功', data=serializer.data)
+    #     else:
+    #         # print(serializer.errors)
+    #         return APIResponse(code=1, msg='创建失败', data=serializer.errors)
 
 
 class UserListView(generics.ListAPIView):
@@ -466,3 +476,77 @@ class CommentView(generics.ListAPIView):
             return APIResponse(code=1, msg='删除的评论不存在')
         comments.delete()
         return APIResponse(code=0, msg='评论删除成功')
+
+
+class ReplyView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        keyword = request.GET.get("keyword", None)
+        replies = Reply.objects.all().order_by('-create_time')
+        if keyword:
+            users = User.objects.filter(username__contains=keyword)
+            replies = replies.filter(user__in=users)
+        page = self.paginate_queryset(replies)
+        if page is not None:
+            serializer = ReplyAllDetailSerializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = ReplyAllDetailSerializer(replies, many=True)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+    def put(self, request):
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+        user_ids = data.getlist('likes', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('likes', None)
+        serializer = ReplyAllDetailSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='回复创建成功', data=serializer.data)
+        make_error_log(request, '创建回复失败')
+        return APIResponse(code=1, msg='回复创建失败', data=serializer.errors)
+
+    def post(self, request):
+        try:
+            reply_id = request.GET.get('reply_id')
+            reply = Reply.objects.get(pk=reply_id)
+        except Reply.DoesNotExist:
+            make_error_log(request, '修改的回复不存在')
+            return APIResponse(code=1, msg='回复不存在')
+
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+        user_ids = data.getlist('likes', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('likes', None)
+        serializer = ReplyAllDetailSerializer(reply, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='回复更新成功', data=serializer.data)
+        make_error_log(request, '更新回复失败')
+        return APIResponse(code=1, msg='回复更新失败', data=serializer.errors)
+
+    def delete(self, request):
+        ids = request.GET.get('ids')
+        ids_arr = ids.split(',')
+        replies = Reply.objects.filter(id__in=ids_arr)
+        if replies.count() != len(ids_arr):
+            make_error_log(request, '删除的回复不存在')
+            return APIResponse(code=1, msg='删除的回复不存在')
+        replies.delete()
+        return APIResponse(code=0, msg='回复删除成功')

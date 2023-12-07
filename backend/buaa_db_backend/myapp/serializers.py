@@ -6,7 +6,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group
 
-from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment
+from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment, \
+    Reply
 
 User = get_user_model()
 
@@ -310,4 +311,93 @@ class CommentAllDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        fields = '__all__'
+
+
+# class MentionedUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('username', 'nickname')
+
+
+class ReplyListSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+    mentioned_nickname = serializers.ReadOnlyField(source="mentioned_user.nickname")
+    likes_count = serializers.SerializerMethodField()
+
+    # mentioned_users_detail = MentionedUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reply
+        exclude = ('is_read', 'likes', 'comment_read')
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+
+class ReplyNoticeSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+    mentioned_nickname = serializers.ReadOnlyField(source="mentioned_user.nickname")
+
+    # mentioned_users = MentionedUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reply
+        exclude = ('likes', 'comment_read')
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+
+class MentionNoticeSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+    mentioned_nickname = serializers.ReadOnlyField(source="mentioned_user.nickname")
+
+    # mentioned_users = MentionedUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reply
+        exclude = ('likes', 'is_read')
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+
+class ReplyAllDetailSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+
+    class Meta:
+        model = Reply
         fields = '__all__'
