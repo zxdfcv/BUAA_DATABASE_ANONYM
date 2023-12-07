@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import piniaStore from '/@/store/index';
 import {viewC1Api, viewC2Api} from "/@/api/index/classification";
+import {userDetailApi} from "/@/api/index/user";
 
 /**
  * 应用状态信息留存
@@ -16,9 +17,23 @@ export const useAppStore = defineStore(
         classificationTree: [],
         checkC_1: {},
         checkC_2: {},
+        view_user_id: undefined,
+        view_user_username: undefined,
+        view_user_avatar: undefined,
     }),
     getters: {},
     actions: {
+        async setViewId(view_id) {
+            // @ts-ignore
+            this.view_user_id = Number(view_id);
+            userDetailApi({user_id: view_id}).then(res => {
+                this.view_user_username = res.data.username;
+                this.view_user_avatar = res.data.avatar;
+            }).catch(err => {
+                console.log("网络错误！")
+            })
+        },
+
         async reNewClass() {
             if (this.classificationReNewed !== true) {
                 this.classificationReNewed = true;

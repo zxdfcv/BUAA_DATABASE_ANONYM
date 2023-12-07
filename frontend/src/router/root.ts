@@ -58,7 +58,7 @@ const constantRouterMap = [
   {
     path: '/usercenter',
     name: 'usercenter',
-    redirect: '/index/usercenter/addressView',
+    redirect: '/usercenter/wishThingView',
     component: () => import('/@/views/index/usercenter.vue'),
     children: [
       {
@@ -110,6 +110,16 @@ const constantRouterMap = [
         path: 'messageView',
         name: 'messageView',
         component: () => import('/@/views/index/user/message-view.vue')
+      },
+      {
+        path: 'myFollow',
+        name: 'myFollow',
+        component: () => import('/@/views/index/user/MyFollow.vue')
+      },
+      {
+        path: 'myFans',
+        name: 'myFans',
+        component: () => import('/@/views/index/user/MyFans.vue')
       },
     ]
   },

@@ -1,25 +1,48 @@
 <template>
   <div class="content-list">
-    <div class="list-title">商品收藏</div>
+    <div class="list-title" v-if="appStore.view_user_id === userStore.user_id">我的关注</div>
+    <div class="list-title" v-else>Ta的关注</div>
     <div role="tablist" class="list-tabs-view flex-view">
     </div>
     <div class="list-content">
       <div class="collect-thing-view">
         <a-spin :spinning="loading" style="min-height: 200px;">
-          <div class="thing-list flex-view">
-          <ShopItemCard
-              v-for="(item,index) in pageData.collectData"
-              :key="index"
-              :shop-card="item"
-              :loading="false"
-              :deletable="true"
-              @deleteCollecter="refreshDelete"
-              style="width: 30%; margin: 1%;"
-          />
-          <template v-if="!pageData.collectData || pageData.collectData.length <= 0">
+          <div class="">
+            <a-list
+                item-layout="vertical"
+                size="large"
+                :pagination="pagination"
+                :data-source="listData"
+                style="width: 90%; align-content: center">
+              <template #footer>
+                <div>
+                  Built by
+                  <b>BUAA DataBase</b>
+                </div>
+              </template>
+              <template #renderItem="{ item }">
+                <a-list-item key="item.title">
+                  <template #extra>
+                    <a-button type="primary" shape="round" danger @click="deleteFollow(item.id)">取消关注</a-button>
+                  </template>
+                  <a-list-item-meta>
+                    <template #title>
+                      <a @click="router.push({name: 'wishThingView', query: {id: item.following}})">{{ item.following_name }}</a>
+                    </template>
+                    <template #avatar>
+                      <a-avatar v-if="!(item.following_avatar === '' || item.following_avatar === null || item.following_avatar === undefined)" :src="BASE_URL + '/upload/'+ item.following_avatar"/>
+                      <a-avatar v-else :src="AvatarIcon" />
+                    </template>
+
+                  </a-list-item-meta>
+                  关注时间：{{ item.create_time }}
+                </a-list-item>
+              </template>
+            </a-list>
+            <template v-if="!listData || listData.length <= 0">
             <a-empty style="width: 100%;margin-top: 200px;"/>
           </template>
-        </div>
+          </div>
         </a-spin>
       </div>
     </div>
@@ -32,9 +55,11 @@ import {getCollectCounterListApi, removeCollectCounter} from '/@/api/index/class
 import {getCollectCanteenListApi, removeCollectCanteen} from '/@/api/index/canteen'
 import {BASE_URL} from "/@/store/constants";
 import {useAppStore, useUserStore} from "/@/store";
-import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
-import {getCollectList} from "/@/api/index/user";
+import { StarOutlined, ShoppingCartOutlined, MessageOutlined } from '@ant-design/icons-vue';
+import {getCollectList, userDeleteFollowApi, userFollowersApi} from "/@/api/index/user";
 import {openNotification} from "/@/utils/notice";
+import AvatarIcon from "/@/assets/images/avatar.jpg";
+import {Button} from "view-ui-plus";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -43,23 +68,42 @@ const appStore = useAppStore();
 const pageData = reactive({
   collectData: []
 })
+let listData = reactive([]);
+
+const pagination = {
+  pageSize: 5,
+};
 
 const loading = ref(false)
+
+const queryFollow = async () => {
+  const res = await userFollowersApi({user_id: appStore.view_user_id});
+  listData.length = 0;
+  for (let i = 0; i < res.data.length; i++) {
+    listData.push(res.data[i]);
+  }
+}
+
+const deleteFollow = async (targetId) => {
+  userDeleteFollowApi({ids: targetId}).then(async res => {
+    console.log(res.data);
+    await queryFollow();
+  }).catch(err => {
+    console.log(err);
+  });
+}
 
 const refreshDelete = () => {
   getCollectCounterList()
 }
-onMounted(()=>{
+onMounted(async () => {
   //getCollectThingList()
-  if (useRoute().query.id) {
-    if (useRoute().query.id.trim() !== String(userStore.user_id)) {
-      router.push({name: 'wishThingView', query: {id: useRoute().query.id.trim()}});
-    }
+  if (useRoute().query.id) { /* TODO: 用戶不存在时会出现问题，需要判断跳转后用户不存在的逻辑，in wishThingView，可能需要 go(-1) */
   } else {
     router.push({name: 'scoreView', query: {id: userStore.user_id}});
   }
-  appStore.setViewId(userStore.user_id);
-  getCollectCounterList()
+  await appStore.setViewId(useRoute().query.id.trim());
+  await queryFollow();
   //getCollectCanteenList()
 })
 
