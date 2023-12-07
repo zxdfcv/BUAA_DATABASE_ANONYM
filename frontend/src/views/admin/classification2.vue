@@ -6,7 +6,6 @@
         <a-space>
           <a-button type="primary" @click="handleAdd">新增</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
-          <a-input-search addon-before="名称" enter-button @search="onSearch" @change="onSearchChange" />
         </a-space>
       </div>
       <a-table
@@ -14,7 +13,7 @@
           rowKey="id"
           :loading="data.loading"
           :columns="columns"
-          :data-source="data.dataList"
+          :data-source="data.userList"
           :scroll="{ x: 'max-content' }"
           :row-selection="rowSelection"
           :pagination="{
@@ -52,7 +51,7 @@
           @cancel="handleCancel"
           @ok="handleOk"
       >
-        <template #footer>
+      <template #footer>
           <a-button key="back" @click="handleCancel">取消</a-button>
           <a-button key="submit" type="primary" :loading="submitting" @click="handleOk">确认</a-button>
         </template>
@@ -60,42 +59,18 @@
           <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
             <a-row :gutter="24">
               <a-col span="24">
-                <a-form-item label="商品名称" name="title">
+                <a-form-item label="二级分类名称" name="name">
                   <a-input placeholder="请输入" v-model:value="modal.form.name"></a-input>
                 </a-form-item>
               </a-col>
               <a-col span="12">
-                <a-form-item label="二级分类" name="classification">
-                  <a-select placeholder="请选择"
-                            allowClear
-                            :options="modal.cData"
-                            :field-names="{ label: 'name', value: 'id',}"
-                            v-model:value="modal.form.classification1">
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <a-col span="12">
-                <a-form-item label="标签">
-                  <a-select mode="multiple" placeholder="请选择" allowClear v-model:value="modal.form.tag">
-                    <template v-for="item in modal.tagData">
-                      <a-select-option :value="item.id">{{item.title}}</a-select-option>
-                    </template>
-                  </a-select>
-                </a-form-item>
-              </a-col>
-              <!-- <a-col span="12">
-                <a-form-item label="食堂" name="canteen">
+                <a-form-item label="一级分类" name="classification_1_name">
                   <a-select placeholder="请选择"
                             allowClear
                             :options="modal.bData"
-                            :field-names="{ label: 'title', value: 'id',}"
-                            v-model:value="modal.form.canteen">
+                            :field-names="{ label: 'name', value: 'id',}"
+                            v-model:value="modal.form.classification_1">
                   </a-select>
-                </a-form-item>
-              </a-col> -->
-              <a-col span="12">
-                <a-form-item label="价格">
-                  <a-input placeholder="请输入" v-model:value="modal.form.price"></a-input>
                 </a-form-item>
               </a-col>
               <a-col span="24">
@@ -121,35 +96,9 @@
                   </a-upload-dragger>
                 </a-form-item>
               </a-col>
-              <a-col span="24">
-                <a-form-item label="商品文件">
-                  <a-upload-dragger
-                      name="file"
-                      accept=".mp4"
-                      :multiple="false"
-                      :before-upload="beforeUpload1"
-                      v-model:file-list="fileList1"
-                  >
-                    <p class="ant-upload-drag-icon">
-                      <video-camera-outlined />
-                    </p>
-                    <p class="ant-upload-text">
-                      请选择要上传的文件（mp4格式）
-                    </p>
-                  </a-upload-dragger>
-                </a-form-item>
-              </a-col>
-              <a-col span="24">
+			        <a-col span="24">
                 <a-form-item label="内容简介">
                   <a-textarea placeholder="请输入" v-model:value="modal.form.description"></a-textarea>
-                </a-form-item>
-              </a-col>
-              <a-col span="12">
-                <a-form-item label="状态" name="status">
-                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.status">
-                    <a-select-option key="0" value="0">上架</a-select-option>
-                    <a-select-option key="1" value="1">下架</a-select-option>
-                  </a-select>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -162,41 +111,28 @@
 
 <script setup lang="ts">
 import { FormInstance, message, SelectProps } from 'ant-design-vue';
-import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/product';
+import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/classification2';
 import {listApi as listClassification1Api} from '/@/api/admin/classification1'
-import {listApi as listClassification2Api} from '/@/api/admin/classification2'
-import {listApi as listTagApi} from '/@/api/admin/tag'
 import {BASE_URL} from "/@/store/constants";
-import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
+  import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
+
 
 const columns = reactive([
-
-  {
+{
     title: '序号',
     dataIndex: 'id',
     key: 'id',
     width: 60
   },
-  {
-    title: '商品名称',
+{
+    title: '二级分类名称',
     dataIndex: 'name',
-    key: 'name'
+    key: 'name',
   },
   {
-    title: '状态',
-    dataIndex: 'status',
-    key: 'status',
-    customRender: ({ text, record, index, column }) => text === '0' ? '上架' : '下架'
-  },
-  {
-    title: '所属一级分类',
+    title: '一级分类名称',
     dataIndex: 'classification_1_name',
-    key: 'classification_1'
-  },
-  {
-    title: '所属二级分类',
-    dataIndex: 'classification_2_name',
-    key: 'classification_2'
+    key: 'classification_1_name'
   },
   {
     title: '简介',
@@ -214,7 +150,6 @@ const columns = reactive([
     width: 140,
   },
 ]);
-
 const beforeUpload = (file: File) => {
   // 改封面文件名
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
@@ -223,16 +158,6 @@ const beforeUpload = (file: File) => {
   modal.form.imageFile = copyFile;
   return false;
 };
-
-const beforeUpload1 = (file: File) => {
-  // 改商品文件名
-  const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
-  const copyFile = new File([file], fileName);
-  console.log(copyFile);
-  modal.form.rawFile = copyFile;
-  return false;
-};
-
 // 文件列表
 const fileList = ref<any[]>([]);
 const fileList1 = ref<any[]>([]);
@@ -241,8 +166,9 @@ const submitting = ref<boolean>(false);
 
 // 页面数据
 const data = reactive({
-  dataList: [],
+  userList: [],
   loading: false,
+  currentAdminUserName: '',
   keyword: '',
   selectedRowKeys: [] as any[],
   pageSize: 10,
@@ -253,31 +179,20 @@ const data = reactive({
 const modal = reactive({
   visile: false,
   editFlag: false,
-  title: '',
-  cData: [],
   bData: [],
-  tagData: [{}],
+  title: '',
   form: {
     id: undefined,
     name: undefined,
-    classification1: undefined,
-    classification2: undefined,
-    tag: [],
-    repertory: undefined,
-    price: undefined,
-    status: undefined,
+    description: '',
+    classification_1: undefined,
     cover: undefined,
-    coverUrl: undefined,
+    coverUrl: '',
     imageFile: undefined,
-    rawFile: undefined,
   },
   rules: {
-    name: [{ required: true, message: '请输入名称', trigger: 'change' }],
+    name: [{ required: true, message: '请输入', trigger: 'change' }],
     classification1: [{ required: true, message: '请选择一级分类', trigger: 'change' }],
-    classification2: [{ required: true, message: '请选择二级级分类', trigger: 'change' }],
-    repertory: [{ required: true, message: '请输入库存', trigger: 'change' }],
-    price: [{ required: true, message: '请输入定价', trigger: 'change' }],
-    status: [{ required: true, message: '请选择状态', trigger: 'change' }],
   },
 });
 
@@ -285,9 +200,7 @@ const myform = ref<FormInstance>();
 
 onMounted(() => {
   getDataList();
-  getCDataList();
   getBDataList();
-  getTagDataList();
 });
 
 const getDataList = () => {
@@ -297,47 +210,23 @@ const getDataList = () => {
   })
       .then((res) => {
         data.loading = false;
-        console.log(res);
         res.data.forEach((item: any, index: any) => {
           item.index = index + 1;
         });
-        data.dataList = res.data;
+        data.userList = res.data;
+        console.log(res)
       })
       .catch((err) => {
         data.loading = false;
         console.log(err);
       });
-}
+};
 
-const getCDataList = () => {
-  listClassification1Api({}).then(res => {
-    modal.cData = res.data
-    console.log(res.data)
-  })
-  console.log(modal.cData)
-}
 const getBDataList = () => {
-  listClassification2Api({}).then(res => {
+  listClassification1Api({}).then(res => {
     modal.bData = res.data
   })
 }
-const getTagDataList = ()=> {
-  listTagApi({}).then(res => {
-    res.data.forEach((item, index) => {
-      item.index = index + 1
-    })
-    modal.tagData = res.data
-  })
-}
-
-const onSearchChange = (e: Event) => {
-  data.keyword = e?.target?.value;
-  console.log(data.keyword);
-};
-
-const onSearch = () => {
-  getDataList();
-};
 
 const rowSelection = ref({
   onChange: (selectedRowKeys: (string | number)[], selectedRows: DataItem[]) => {
@@ -351,7 +240,6 @@ const handleAdd = () => {
   modal.visile = true;
   modal.editFlag = false;
   modal.title = '新增';
-  // modal.form.canteen = '新增';
   // 重置
   for (const key in modal.form) {
     modal.form[key] = undefined;
@@ -363,15 +251,12 @@ const handleEdit = (record: any) => {
   modal.visile = true;
   modal.editFlag = true;
   modal.title = '编辑';
-  // modal.canteen = '新增';
   // 重置
   for (const key in modal.form) {
     modal.form[key] = undefined;
   }
   for (const key in record) {
-    if(record[key]) {
-      modal.form[key] = record[key];
-    }
+    modal.form[key] = record[key];
   }
   if(modal.form.cover) {
     modal.form.coverUrl = BASE_URL + modal.form.cover
@@ -386,7 +271,7 @@ const confirmDelete = (record: any) => {
         getDataList();
       })
       .catch((err) => {
-        message.error(err.msg || '操作失败');
+        message.error(err.msg || '删除失败');
       });
 };
 
@@ -404,7 +289,7 @@ const handleBatchDelete = () => {
         getDataList();
       })
       .catch((err) => {
-        message.error(err.msg || '操作失败');
+        message.error(err.msg || '删除失败');
       });
 };
 
@@ -414,41 +299,22 @@ const handleOk = () => {
       .then(() => {
         const formData = new FormData();
         if(modal.editFlag) {
-          formData.append('id', modal.form.id)
+          formData.append('id', modal.form.id  || '')
         }
-        formData.append('title', modal.form.name)
-        if (modal.form.classification1) {
-          formData.append('classification1', modal.form.classification1)
-        }
-        if (modal.form.classification2) {
-          formData.append('canteen', modal.form.classification2)
-        }
-        if (modal.form.tag) {
-          modal.form.tag.forEach(function (value) {
-            if(value){
-              formData.append('tag', value)
-            }
-          })
+        formData.append('name', modal.form.name || '')
+        if (modal.form.classification_1) {
+          console.log('here')
+          formData.append('classification_1', modal.form.classification_1)
         }
         if (modal.form.imageFile) {
           formData.append('cover', modal.form.imageFile)
         }
-        if(modal.form.rawFile) {
-          formData.append('raw', modal.form.rawFile)
-        }
         formData.append('description', modal.form.description || '')
-        formData.append('price', modal.form.price || '')
-        formData.append('canteen', modal.form.canteen || '')
-        if (modal.form.repertory >= 0) {
-          formData.append('repertory', modal.form.repertory)
-        }
-        if (modal.form.status) {
-          formData.append('status', modal.form.status)
-        }
+        console.log(modal.form)
         if (modal.editFlag) {
           submitting.value = true
           updateApi({
-            id: modal.form.id
+            id: modal.form.id,
           },formData)
               .then((res) => {
                 submitting.value = false
@@ -459,6 +325,7 @@ const handleOk = () => {
                 submitting.value = false
                 console.log(err);
                 message.error(err.msg || '操作失败');
+
               });
         } else {
           submitting.value = true
@@ -472,6 +339,7 @@ const handleOk = () => {
                 submitting.value = false
                 console.log(err);
                 message.error(err.msg || '操作失败');
+                
               });
         }
       })
@@ -514,6 +382,4 @@ const hideModal = () => {
 .table-operations > button {
   margin-right: 8px;
 }
-
-
 </style>
