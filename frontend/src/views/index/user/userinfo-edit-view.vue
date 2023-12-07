@@ -90,12 +90,14 @@ import {
   userDeleteApi
 } from '/@/api/index/user'
 import {BASE_URL, USER_AVATAR} from "/@/store/constants";
-import {useUserStore} from "/@/store";
+import {useAppStore, useUserStore} from "/@/store";
 import AvatarIcon from '/@/assets/images/avatar.jpg'
 import {openNotification} from "/@/utils/notice";
+// console.log("visit id=", useRoute().query.id.trim())
 
 const router = useRouter();
 const userStore = useUserStore();
+const appStore = useAppStore();
 
 const confirmLoading = ref(false);
 const open = ref(false);
@@ -114,7 +116,16 @@ let tData = reactive({
 })
 const password = reactive({})
 
-onMounted(()=>{
+onMounted(() => {
+  /* 判断当前浏览的用户是谁，无 query 默认跳自己，query 不是自己会转到该用户的公开界面 */
+  if (useRoute().query.id) {
+    if (useRoute().query.id.trim() !== String(userStore.user_id)) {
+      router.push({name: 'wishThingView', query: {id: useRoute().query.id.trim()}}); /* TODO: router.go(-1) 时有 bug，回不到上一页 */
+    }
+  } else {
+    router.push({name: 'userInfoEditView', query: {id: userStore.user_id}});
+  }
+  appStore.setViewId(userStore.user_id);
   getUserInfo()
 })
 
@@ -149,7 +160,7 @@ const beforeUpload =(file)=> {
   return false
 }
 
-const getUserInfo =()=> {
+const getUserInfo = () => {
   loading.value = true
   let userId = userStore.user_id
   userDetailApi({user_id: userId}).then(res => {
@@ -158,6 +169,7 @@ const getUserInfo =()=> {
     if (tData.form.avatar) {
       userStore.user_avatar = tData.form.avatar
       tData.form.avatar = BASE_URL  + tData.form.avatar
+      appStore.view_user_avatar = BASE_URL  + tData.form.avatar
       localStorage.setItem(USER_AVATAR, userStore.user_avatar)
     }
     loading.value = false

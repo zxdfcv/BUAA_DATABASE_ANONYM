@@ -43,7 +43,7 @@
               </a-menu-item>
               <a-menu-item>
                 <template #icon><UserOutlined /></template>
-                <a @click="router.push({name: 'userInfoEditView'})">账号设置</a>
+                <a @click="router.push({name: 'userInfoEditView', query: {id: userStore.user_id}})">账号设置</a>
               </a-menu-item>
               <a-menu-item>
                 <template #icon><LogoutOutlined /></template>

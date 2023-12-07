@@ -94,8 +94,8 @@
                               <div>{{ detailData.title }}</div>
                             </a-descriptions-item>
                             <a-descriptions-item label="发布者">
-                              <a-avatar :src="posterAvatar" size="small" @click="router.push({ path: '/welcome'})" style="left: 5px"/> <!-- TODO: 跳转到指定用户的用户中心 -->
-                              <a-button type="text" @click="router.push({ path: '/welcome'})" style="top: -7px; left: 15px">{{ detailData.uploaderName }}</a-button>
+                              <a-avatar :src="posterAvatar" size="small" @click="router.push({ name: 'usercenter', query:{id: detailData.uploaderId}})" style="left: 5px"/> <!-- TODO: 跳转到指定用户的用户中心 -->
+                              <a-button type="link" @click="router.push({ name: 'usercenter', query:{id: detailData.uploaderId}})" style="top: -7px; left: -2px">{{ detailData.uploaderName }}</a-button>
                             </a-descriptions-item>
 
                             <a-descriptions-item label="分类所属">

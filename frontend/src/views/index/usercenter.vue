@@ -1,8 +1,6 @@
 <template>
   <div class="user">
-
     <Header />
-
     <div class="user-content">
       <div class="user-content-left">
         <MineInfosView />
@@ -11,9 +9,6 @@
         <router-view />
       </div>
     </div>
-
-    <Footer />
-
   </div>
 </template>
 <script>

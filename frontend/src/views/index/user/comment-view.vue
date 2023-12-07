@@ -31,10 +31,11 @@
 <script setup>
 import AvatarImg from '/@/assets/images/avatar.jpg'
 
-import {useUserStore} from "/@/store";
+import {useAppStore, useUserStore} from "/@/store";
 
 const router = useRouter();
 const userStore = useUserStore();
+const appStore = useAppStore();
 
 import {listUserCommentsApi} from '/@/api/index/comment'
 import {BASE_URL} from "/@/store/constants";
@@ -45,7 +46,15 @@ const loading = ref(false)
 const commentData = ref([])
 
 onMounted(()=>{
-  getCommentList()
+  if (useRoute().query.id) {
+    if (useRoute().query.id.trim() !== String(userStore.user_id)) {
+      router.push({name: 'wishThingView', query: {id: useRoute().query.id.trim()}});
+    }
+  } else {
+    router.push({name: 'scoreView', query: {id: userStore.user_id}});
+  }
+  appStore.setViewId(userStore.user_id);
+  // getCommentList()
 })
 
 const handleClickTitle =(record)=> {

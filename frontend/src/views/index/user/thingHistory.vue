@@ -30,15 +30,24 @@
   import {message} from 'ant-design-vue';
   import {getWishThingListApi, removeWishUserApi} from '/@/api/index/thing'
   import {BASE_URL} from "/@/store/constants";
-  import {useUserStore} from "/@/store";
+  import {useAppStore, useUserStore} from "/@/store";
   
   const router = useRouter();
   const route = useRoute();
   const userStore = useUserStore();
+  const appStore = useAppStore();
   
   let wishData = ref([])
   
   onMounted(()=>{
+    if (useRoute().query.id) {
+      if (useRoute().query.id.trim() !== String(userStore.user_id)) {
+        router.push({name: 'wishThingView', query: {id: useRoute().query.id.trim()}});
+      }
+    } else {
+      router.push({name: 'scoreView', query: {id: userStore.user_id}});
+    }
+    appStore.setViewId(userStore.user_id);
     getWishThingList()
   })
   

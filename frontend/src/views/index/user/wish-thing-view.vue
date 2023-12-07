@@ -1,6 +1,7 @@
 <template>
   <div class="content-list">
-    <div class="list-title">食堂收藏</div>
+    <div class="list-title" v-if="appStore.view_user_id === userStore.user_id">我的发布</div>
+    <div class="list-title" v-else>Ta的发布</div>
     <div role="tablist" class="list-tabs-view flex-view">
     </div>
     <div class="list-content">
@@ -26,16 +27,17 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import {message} from 'ant-design-vue';
 import {getCollectThingListApi, removeCollectUserApi} from '/@/api/index/thing'
 import {getCollectCounterListApi, removeCollectCounter} from '/@/api/index/classification'
 import {getCollectCanteenListApi, removeCollectCanteen} from '/@/api/index/canteen'
 import {BASE_URL} from "/@/store/constants";
-import {useUserStore} from "/@/store";
+import {useAppStore, useUserStore} from "/@/store";
 
 const router = useRouter();
 const userStore = useUserStore();
+const appStore = useAppStore();
 
 const pageData = reactive({
   collectData: []
@@ -43,10 +45,15 @@ const pageData = reactive({
 
 const loading = ref(false)
 
-onMounted(()=>{
+onMounted(() => {
+  if (useRoute().query.id) {
+  } else {
+    router.push({name: 'wishThingView', query: {id: userStore.user_id}});
+  }
+  appStore.setViewId(useRoute().query.id.trim());
   //getCollectThingList()
   //getCollectCounterList()
-  getCollectCanteenList()
+  // getCollectCanteenList()
 })
 
 const handleClickItem =(record) =>{
@@ -125,7 +132,7 @@ const getCollectCanteenList =()=> {
   .list-title {
     color: #152844;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 20px;
     line-height: 24px;
     height: 24px;
     margin-bottom: 4px;

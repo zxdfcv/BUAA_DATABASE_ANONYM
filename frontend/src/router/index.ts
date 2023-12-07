@@ -7,7 +7,7 @@ import { ElLoading } from 'element-plus'
 import root from './root'
 
 /* 可直接访问的 page name WhiteList */
-const whiteList = ['welcome', 'adminLogin', 'login', /* 'register' */, 'portal', 'search', 'detail', '403', '404', 'detailCanteen', 'detailCounter']
+const whiteList = ['welcome', 'adminLogin', 'login', /* 'register' */, 'portal', 'search', 'detail', '403', '404', 'wishThingView', 'myFollow', 'myFans', 'detailCounter']
 // 前台登录地址
 const loginRoutePath = '/login'
 // 后台登录地址
@@ -51,7 +51,6 @@ router.beforeEach(async (to, from, next) => {
     // next()
   } else {
     if (Number(userStore.token_expire_time) + 1000 * 60 * EXPIRE_FRESH_HOUR > Date.now()) { /* 写假了，用 Access Token 过期后 3 周的时间用来表示 Refresh 的过期时间 */
-      console.log("refresh not expired")
     if (to.name === 'login') {
         next({ path: '/' })
       } else {
