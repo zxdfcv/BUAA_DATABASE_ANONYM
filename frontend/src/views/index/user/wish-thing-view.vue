@@ -8,15 +8,15 @@
       <div class="collect-thing-view">
         <a-spin :spinning="loading" style="min-height: 200px;">
           <div class="thing-list flex-view">
-          <div class="thing-item item-column-3" v-for="(item,index) in pageData.collectData" :key="index">
-            <div class="remove" @click="handleRemove(item)">移出</div>
-            <div class="img-view" @click="handleClickItem(item)">
-              <img :src="item.cover">
-            </div>
-            <div class="info-view">
-              <h3 class="thing-name">{{item.title}}</h3>
-            </div>
-          </div>
+          <ShopItemCard
+              v-for="(item,index) in pageData.collectData"
+              :key="index"
+              :shop-card="item"
+              :loading="false"
+              :editable="appStore.view_user_id === userStore.user_id"
+              @deleteCollecter="getProduct"
+              style="width: 30%; margin: 1%;"
+          />
           <template v-if="!pageData.collectData || pageData.collectData.length <= 0">
             <a-empty style="width: 100%;margin-top: 200px;"/>
           </template>
@@ -34,6 +34,9 @@ import {getCollectCounterListApi, removeCollectCounter} from '/@/api/index/class
 import {getCollectCanteenListApi, removeCollectCanteen} from '/@/api/index/canteen'
 import {BASE_URL} from "/@/store/constants";
 import {useAppStore, useUserStore} from "/@/store";
+import {openNotification} from "/@/utils/notice";
+import {getProductList} from "/@/api/index/product";
+import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -45,17 +48,55 @@ const pageData = reactive({
 
 const loading = ref(false)
 
+const fillData = (list) => {
+  const res = [];
+  for (var i = 0; i < list.length; i++) {
+    const item = list[i];
+    console.log(item)
+    const data = {};
+    data['name'] = item.name;
+    data["id"] = item.id;
+    data["price"] = item.price;
+    data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
+    data["avatarUrl"] = userStore.user_avatar; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["uploaderId"] = item.merchant;
+    data["uploaderName"] = item.merchant_name;
+    data["pv"] = item.views;
+    res.push(data);
+  }
+  return res;
+}
+
 onMounted(() => {
   if (useRoute().query.id) {
   } else {
     router.push({name: 'wishThingView', query: {id: userStore.user_id}});
   }
   appStore.setViewId(useRoute().query.id.trim());
+  getProduct();
   //getCollectThingList()
   //getCollectCounterList()
   // getCollectCanteenList()
 })
 
+const getProduct = async () => {
+  loading.value = true;
+  getProductList({user: appStore.view_user_id}).then(res => {
+    const data = res.data;
+    if (res.code === 0) {
+      pageData.collectData = fillData(data);
+    }
+    loading.value = false;
+  }).catch(err => {
+    console.log(err)
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: err
+    });
+    loading.value = false;
+  });
+}
 const handleClickItem =(record) =>{
   let text = router.resolve({name: 'detailCanteen', query: {id: record.id}})
   window.open(text.href, '_blank')
@@ -117,6 +158,7 @@ const getCollectCanteenList =()=> {
 //   })
 // }
 </script>
+
 <style scoped lang="less">
 .flex-view {
   display: -webkit-box;

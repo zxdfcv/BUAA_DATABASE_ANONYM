@@ -34,17 +34,21 @@
     </div>
     <div class="setting-box"  v-if="appStore.view_user_id === userStore.user_id">
       <div class="list">
+        <div class="mine-item flex-view" @click="clickMenu('addProduct')">
+          <img :src="PointIconImage">
+          <span>发布商品</span>
+        </div>
         <div class="mine-item flex-view" @click="clickMenu('scoreView')">
           <img :src="PointIconImage">
           <span>商品收藏</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('thingHistory')">
           <img :src="AddressIconImage">
-          <span>我买到的</span>
+          <span>我买到的(待实现)</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('commentView')">
           <img :src="CommentIconImg">
-          <span>我的评论</span>
+          <span>我的评论(待实现)</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('userInfoEditView')">
           <img :src="SettingIconImage" alt="编辑资料">

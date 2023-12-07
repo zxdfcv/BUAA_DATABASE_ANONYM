@@ -39,7 +39,7 @@
             <a-menu style="width: 120px">
               <a-menu-item>
                 <template #icon><WalletOutlined /></template>
-                <a @click="router.push({name: 'createProductView'})">我要发布</a>
+                <a @click="router.push({name: 'addProduct', query: {id: appStore.view_user_id}})">我要发布</a>
               </a-menu-item>
               <a-menu-item>
                 <template #icon><UserOutlined /></template>
