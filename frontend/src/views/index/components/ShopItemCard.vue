@@ -18,6 +18,7 @@
         alt="example"
         :src="props.shopCard.url"
         style="margin: 0 auto; background-size: cover; object-fit: contain; height: 160px"
+        @error="handleImgError"
     />
     <img
         v-else
@@ -70,6 +71,7 @@
 <script setup lang="ts">
 import router from "/@/router";
 import placeHolder from "/@/assets/images/placeHolder.svg";
+import failedHolder from '/@/assets/images/failedHolder.svg'
 import {deleteFromCollect, deleteProduct} from "/@/api/index/product";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
 import {useUserStore} from "/@/store";
@@ -134,6 +136,10 @@ const deletePro = async () => {
 const closeModifier = () => {
   open2.value = false;
   emits('deleteCollecter')
+}
+
+const handleImgError = (e) => {
+  e.target.src = failedHolder;
 }
 
 watch(useRoute(), (to, from) => {
