@@ -127,7 +127,7 @@ class CommentNoticeView(generics.ListAPIView):
         user_products = Product.objects.filter(merchant=user)
         comments = Comment.objects.filter(product__in=user_products).order_by('-create_time')
         get_all = request.GET.get('get_all', '0')
-        if get_all == '0':
+        if not get_all == '1':
             comments = comments.filter(is_read=False)
         page = self.paginate_queryset(comments)
         if page is not None:

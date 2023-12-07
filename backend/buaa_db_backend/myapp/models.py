@@ -41,6 +41,7 @@ class Follow(models.Model):
 class Classification1(models.Model):
     name = models.CharField(max_length=255, unique=True)
     image = models.FileField(upload_to='c1_images/', null=True, blank=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -55,6 +56,7 @@ class Classification2(models.Model):
     name = models.CharField(max_length=255, unique=True)
     image = models.FileField(upload_to='c2_images/', null=True, blank=True)
     classification_1 = models.ForeignKey(Classification1, on_delete=models.CASCADE, related_name='c1_c2')
+    description = models.TextField(max_length=1000, blank=True, null=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -146,8 +148,10 @@ class Reply(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True)
     # like_count = models.IntegerField(default=0)
     is_read = models.BooleanField(default=False)
+    comment_read = models.BooleanField(default=False)
 
-    mentioned_users = models.ManyToManyField(User, blank=True, related_name='mentioned_reply')
+    mentioned_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mentioned_reply', blank=True,
+                                       null=True)
     likes = models.ManyToManyField(User, blank=True, related_name='like_comment')
 
     def __str__(self):

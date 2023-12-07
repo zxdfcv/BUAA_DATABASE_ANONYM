@@ -88,3 +88,13 @@ class CanEditCommentPermission(BasePermission):
                 and request.user.has_perm('myapp.view_comment')
         )
         return request.user.is_staff or has_permission
+
+
+class CanEditReplyPermission(BasePermission):
+    def has_permission(self, request, view):
+        has_permission = (
+                request.user.has_perm('myapp.add_reply') and
+                request.user.has_perm('myapp.delete_reply')
+                and request.user.has_perm('myapp.view_reply')
+        )
+        return request.user.is_staff or has_permission
