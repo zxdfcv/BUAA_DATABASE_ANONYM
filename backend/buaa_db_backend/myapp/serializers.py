@@ -68,6 +68,33 @@ class UserLoginSerializer(serializers.ModelSerializer):
         return user
 
 
+class AdminUserCreateSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    groups = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=Group.objects.all()
+    )
+
+    class Meta:
+        model = get_user_model()
+        # fields = '__all__'
+        exclude = ('is_superuser', 'user_permissions')
+        extra_kwargs = {'id': {'read_only': True},
+                        'last_login': {'read_only': True},
+                        'password': {'write_only': True}
+                        }
+
+    def create(self, validated_data):
+        groups_data = validated_data.pop('groups', [])  # 移除 groups 数据
+        user = User.objects.create_user(**validated_data)
+        for group_data in groups_data:
+            group_name = group_data['name']
+            group, created = Group.objects.get_or_create(name=group_name)
+            user.groups.add(group)
+        return user
+
+
 class LoginLogSerializer(serializers.ModelSerializer):
     log_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
 

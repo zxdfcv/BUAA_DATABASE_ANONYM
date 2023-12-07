@@ -11,7 +11,8 @@ from sqlparse.sql import Case
 
 from ..models import User, Product, Classification1, Classification2, ProductImage, Comment, Reply
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
-    ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer, ReplyAllDetailSerializer
+    ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer, ReplyAllDetailSerializer, \
+    AdminUserCreateSerializer
 from ..utils import APIResponse, make_error_log, dict_fetchall, getWeekDays
 
 
@@ -143,15 +144,18 @@ class UserAllDetailView(APIView):
         make_error_log(request, '用户更新失败')
         return APIResponse(code=1, msg='更新失败', data=serializer.errors)
 
-    # def put(self, request, *args, **kwargs):
-    #
-    #     serializer = UserAllDetailSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return APIResponse(code=0, msg='创建成功', data=serializer.data)
-    #     else:
-    #         # print(serializer.errors)
-    #         return APIResponse(code=1, msg='创建失败', data=serializer.errors)
+    def put(self, request):
+        data = request.data.copy()
+        groups = data.getlist('groups', [])
+        if not groups or all(not group for group in groups):
+            data.pop('groups', None)
+        serializer = AdminUserCreateSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='创建成功', data=serializer.data)
+        else:
+            print(serializer.errors)
+            return APIResponse(code=1, msg='创建失败', data=serializer.errors)
 
 
 class UserListView(generics.ListAPIView):

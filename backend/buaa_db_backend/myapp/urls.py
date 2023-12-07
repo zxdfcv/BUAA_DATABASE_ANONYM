@@ -33,6 +33,8 @@ urlpatterns = [
     path("admin/user/update", admin.UserAllDetailView.as_view(), name="user_allUpdate"),
     path("admin/user/list", admin.UserListView.as_view(), name="user_list"),
     path("admin/user/delete", admin.UserListView.as_view(), name="user_allDelete"),
+    path("admin/user/create", admin.UserAllDetailView.as_view(), name="user_allCreate"),
+
     path("admin/product/list", admin.ProductDetailListView.as_view(), name="product_allList"),
     path("admin/product/create", admin.EditProductDetailView.as_view(), name="product_allCreate"),
     path("admin/product/update", admin.EditProductDetailView.as_view(), name="product_allUpdate"),

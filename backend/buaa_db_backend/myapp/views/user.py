@@ -62,7 +62,7 @@ class RegistrationView(APIView):
         if serializer.is_valid():
             user = serializer.save()
         else:
-            # print(serializer.errors)
+            print(serializer.errors)
             return APIResponse(code=1, msg='创建失败', data=serializer.errors)
 
         refresh = RefreshToken.for_user(user)
