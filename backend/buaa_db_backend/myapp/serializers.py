@@ -301,3 +301,13 @@ class CommentNoticeSerializer(serializers.ModelSerializer):
 
     def get_user_avatar(self, obj):
         return str(obj.user.avatar) if obj.user.avatar else ''
+
+
+class CommentAllDetailSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Comment
+        fields = '__all__'

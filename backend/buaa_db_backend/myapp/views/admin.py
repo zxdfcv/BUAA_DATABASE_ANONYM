@@ -9,9 +9,9 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from sqlparse.sql import Case
 
-from ..models import User, Product, Classification1, Classification2, ProductImage
+from ..models import User, Product, Classification1, Classification2, ProductImage, Comment
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
-    ProductImageSerializer, ProductCreateSerializer
+    ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer
 from ..utils import APIResponse, make_error_log, dict_fetchall, getWeekDays
 
 
@@ -228,11 +228,15 @@ class EditProductDetailView(APIView):
 
     def put(self, request):
         data = request.data.copy()
-        user_ids = data.getlist('collectors', [])
-        excluded_fields = ['id', 'collectors']
+        # user_ids = data.getlist('collectors', [])
+        excluded_fields = ['id', ]
 
         for field in excluded_fields:
             data.pop(field, None)
+
+        user_ids = data.getlist('collectors', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('collectors', None)
 
         if 'classification_1' in data and 'classification_2' in data:
             classification_1_id = data['classification_1']
@@ -250,10 +254,10 @@ class EditProductDetailView(APIView):
                 make_error_log(request, "创建商品时指定二级分类不存在")
                 return APIResponse(code=1, msg='二级分类不存在')
 
-        for user_id in user_ids:
-            if not User.objects.filter(id=user_id).exists():
-                make_error_log(request, '用户不存在')
-                return APIResponse(code=1, msg='用户不存在')
+        # for user_id in user_ids:
+        #     if not User.objects.filter(id=user_id).exists():
+        #         make_error_log(request, '用户不存在')
+        #         return APIResponse(code=1, msg='用户不存在')
 
         product_serializer = ProductAllDetailSerializer(data=data,
                                                         # partial=True
@@ -266,15 +270,16 @@ class EditProductDetailView(APIView):
 
         # product_id = product_instance.id
 
-        for user_id in user_ids:
-            user = User.objects.get(pk=user_id)
-            product_instance.collectors.add(user)
-
-        product_instance.save()
+        # for user_id in user_ids:
+        #     user = User.objects.get(pk=user_id)
+        #     product_instance.collectors.add(user)
+        #
+        # product_instance.save()
 
         images_data = request.data.getlist('images', [])
         for image_data in images_data:
-            ProductImage.objects.create(product=product_instance, image=image_data)
+            if images_data:
+                ProductImage.objects.create(product=product_instance, image=image_data)
         product_images = ProductImage.objects.filter(product=product_instance)
         product_images_serializer = ProductImageSerializer(product_images, many=True)
 
@@ -291,31 +296,36 @@ class EditProductDetailView(APIView):
         except Product.DoesNotExist:
             make_error_log(request, '修改商品时商品不存在')
             return APIResponse(code=1, msg='商品不存在')
-
-        remove_images_ids = request.data.getlist('remove_images_ids', [])
-        remove_collectors_ids = request.data.getlist('remove_collectors_ids', [])
-        user_ids = request.data.getlist('collectors', [])
-        images_data = request.data.getlist('images', [])
-
-        product_images = ProductImage.objects.filter(product=product, id__in=remove_images_ids)
-        if len(product_images) != len(remove_images_ids):
-            make_error_log(request, '修改商品时删除的图片不存在或不属于该商品')
-            return APIResponse(code=1, msg='删除的图片不存在或不属于该商品')
-
-        for user_id in remove_collectors_ids:
-            if not User.objects.filter(id=user_id).exists():
-                make_error_log(request, '用户不存在')
-                return APIResponse(code=1, msg='用户不存在')
-
-        for user_id in user_ids:
-            if not User.objects.filter(id=user_id).exists():
-                make_error_log(request, '用户不存在')
-                return APIResponse(code=1, msg='用户不存在')
-
         data = request.data.copy()
-        excluded_fields = ['id', 'collectors']
+        excluded_fields = ['id', ]
         for field in excluded_fields:
             data.pop(field, None)
+
+        remove_images_ids = data.getlist('remove_images_ids', [])
+        remove_images_ids = [image_id for image_id in remove_images_ids if image_id]
+
+        # remove_collectors_ids = request.data.getlist('remove_collectors_ids', [])
+        user_ids = data.getlist('collectors', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('collectors', None)
+        images_data = request.data.getlist('images', [])
+        # images_data = [image_id for image_id in images_data if image_id]
+
+        if remove_images_ids:
+            product_images = ProductImage.objects.filter(product=product, id__in=remove_images_ids)
+            if len(product_images) != len(remove_images_ids):
+                make_error_log(request, '修改商品时删除的图片不存在或不属于该商品')
+                return APIResponse(code=1, msg='删除的图片不存在或不属于该商品')
+
+        # for user_id in remove_collectors_ids:
+        #     if not User.objects.filter(id=user_id).exists():
+        #         make_error_log(request, '用户不存在')
+        #         return APIResponse(code=1, msg='用户不存在')
+
+        # for user_id in user_ids:
+        #     if not User.objects.filter(id=user_id).exists():
+        #         make_error_log(request, '用户不存在')
+        #         return APIResponse(code=1, msg='用户不存在')
 
         if 'classification_1' in data and 'classification_2' in data:
             classification_1_id = data['classification_1']
@@ -337,27 +347,29 @@ class EditProductDetailView(APIView):
                                                         # partial=True
                                                         )
         if product_serializer.is_valid():
-            product_serializer.save()
+            product = product_serializer.save()
         else:
             make_error_log(request, '更新商品失败')
             return APIResponse(code=1, msg='更新商品失败', data=product_serializer.errors)
 
-        for user_id in remove_collectors_ids:
-            user = User.objects.get(pk=user_id)
-            product.collectors.remove(user)
-
-        for user_id in user_ids:
-            user = User.objects.get(pk=user_id)
-            product.collectors.add(user)
-
-        product.save()
-
-        for product_image in product_images:
-            product_image.image.delete()
-            product_image.delete()
+        # for user_id in remove_collectors_ids:
+        #     user = User.objects.get(pk=user_id)
+        #     product.collectors.remove(user)
+        #
+        # for user_id in user_ids:
+        #     user = User.objects.get(pk=user_id)
+        #     product.collectors.add(user)
+        #
+        # product.save()
+        if remove_images_ids:
+            product_images = ProductImage.objects.filter(product=product, id__in=remove_images_ids)
+            for product_image in product_images:
+                product_image.image.delete()
+                product_image.delete()
 
         for image_data in images_data:
-            ProductImage.objects.create(product=product, image=image_data)
+            if images_data:
+                ProductImage.objects.create(product=product, image=image_data)
 
         product_images = ProductImage.objects.filter(product=product)
         product_images_serializer = ProductImageSerializer(product_images, many=True)
@@ -380,3 +392,77 @@ class EditProductDetailView(APIView):
                 product_image.delete()
             product.delete()
         return APIResponse(code=0, msg='商品删除成功')
+
+
+class CommentView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        keyword = request.GET.get("keyword", None)
+        comments = Comment.objects.all().order_by('-create_time')
+        if keyword:
+            users = User.objects.filter(username__contains=keyword)
+            comments = comments.filter(user__in=users)
+        page = self.paginate_queryset(comments)
+        if page is not None:
+            serializer = CommentAllDetailSerializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = CommentAllDetailSerializer(comments, many=True)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+    def put(self, request):
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+        user_ids = data.getlist('likes', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('likes', None)
+        serializer = CommentAllDetailSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='评论创建成功', data=serializer.data)
+        make_error_log(request, '创建评论失败')
+        return APIResponse(code=1, msg='评论创建失败', data=serializer.errors)
+
+    def post(self, request):
+        try:
+            comment_id = request.GET.get('comment_id')
+            comment = Comment.objects.get(pk=comment_id)
+        except Comment.DoesNotExist:
+            make_error_log(request, '修改的评论不存在')
+            return APIResponse(code=1, msg='评论不存在')
+
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+        user_ids = data.getlist('likes', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('likes', None)
+        serializer = CommentAllDetailSerializer(comment, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='评论更新成功', data=serializer.data)
+        make_error_log(request, '更新评论失败')
+        return APIResponse(code=1, msg='评论更新失败', data=serializer.errors)
+
+    def delete(self, request):
+        ids = request.GET.get('ids')
+        ids_arr = ids.split(',')
+        comments = Comment.objects.filter(id__in=ids_arr)
+        if comments.count() != len(ids_arr):
+            make_error_log(request, '删除的评论不存在')
+            return APIResponse(code=1, msg='删除的评论不存在')
+        comments.delete()
+        return APIResponse(code=0, msg='评论删除成功')
