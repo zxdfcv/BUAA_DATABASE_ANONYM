@@ -121,6 +121,11 @@ const constantRouterMap = [
         name: 'myFans',
         component: () => import('/@/views/index/user/MyFans.vue')
       },
+      {
+        path: 'addProduct',
+        name: 'addProduct',
+        component: () => import('/@/views/index/user/addProduct.vue')
+      },
     ]
   },
   {

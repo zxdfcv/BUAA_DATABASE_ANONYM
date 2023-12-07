@@ -37,7 +37,6 @@
               </template>
             </a-list>
             <template v-if="!listData || listData.length <= 0">
-            <a-empty style="width: 100%;margin-top: 200px;"/>
           </template>
           </div>
         </a-spin>
