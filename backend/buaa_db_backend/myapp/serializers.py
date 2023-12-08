@@ -239,6 +239,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     # images = ProductImageSerializer(many=True, read_only=True)
     create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
     merchant_name = serializers.ReadOnlyField(source='merchant.username')
+    merchant_avatar = serializers.SerializerMethodField()
     classification_1_name = serializers.ReadOnlyField(source='classification_1.name')
     classification_2_name = serializers.ReadOnlyField(source='classification_2.name')
     collectors_count = serializers.SerializerMethodField()
@@ -249,6 +250,8 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_collectors_count(self, obj):
         return obj.collectors.count()
+    def get_merchant_avatar(self, obj):
+        return str(obj.merchant.avatar) if obj.merchant.avatar else ''
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
