@@ -255,7 +255,7 @@ const getUserInfo = () => {
     if (tData.form.avatar) {
       userStore.user_avatar = tData.form.avatar
       tData.form.avatar = BASE_URL  + tData.form.avatar
-      appStore.view_user_avatar = BASE_URL  + tData.form.avatar
+      appStore.view_user_avatar = tData.form.avatar
       localStorage.setItem(USER_AVATAR, userStore.user_avatar)
     }
     loading.value = false

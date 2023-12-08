@@ -36,7 +36,7 @@
     <div class="info-view">
       <h4 v-if="props.shopCard.price !== undefined" class="price">{{ props.shopCard.price }} 元</h4>
       <div class="wrap" @click.stop="pushToMerchant" v-if="!props.editable">
-        <el-avatar v-if="!(props.shopCard.avatarUrl === '' || props.shopCard.avatarUrl === null || props.shopCard.avatarUrl === undefined)" :size="40" :src="props.shopCard.avatarUrl" />
+        <el-avatar v-if="!(props.shopCard.avatarUrl === '' || props.shopCard.avatarUrl === null || props.shopCard.avatarUrl === undefined)" :size="40" :src="BASE_URL + '/upload/' + props.shopCard.avatarUrl" />
         <el-avatar v-else :src="AvatarIcon" />
       <span style="color: #444; font-size: 13px; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 8px">{{ props.shopCard.uploaderName }}</span>
         <div v-if="props.shopCard.pv !== undefined" style="color: #444; font-size: 11px; margin-left: 50px; margin-top: -5px">{{ props.shopCard.pv }} 次浏览</div>
@@ -77,6 +77,7 @@ import AvatarIcon from "/@/assets/images/avatar.jpg";
 import {useUserStore} from "/@/store";
 import {openNotification} from "/@/utils/notice";
 import AddProduct from "/@/views/index/user/addProduct.vue";
+import {BASE_URL} from "/@/store/constants";
 
 const props = defineProps(['shopCard', 'loading', 'deletable', 'editable']);
 const emits = defineEmits(['deleteCollecter'])
@@ -146,7 +147,7 @@ watch(useRoute(), (to, from) => {
     router.go(0); // 相当于刷新当前页面
 })
 
-console.log(props.shopCard)
+// console.log(props.shopCard)
 </script>
 
 
