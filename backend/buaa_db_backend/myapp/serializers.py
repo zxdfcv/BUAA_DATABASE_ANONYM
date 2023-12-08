@@ -310,7 +310,10 @@ class CommentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        exclude = ('is_read', 'likes',)
+        exclude = ('is_read', )
+        extra_kwargs = {'id': {'read_only': True},
+                        'likes': {'read_only': True},
+                        }
 
     def get_user_avatar(self, obj):
         return str(obj.user.avatar) if obj.user.avatar else ''
@@ -369,7 +372,10 @@ class ReplyListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reply
-        exclude = ('is_read', 'likes', 'comment_read')
+        exclude = ('is_read',  'comment_read')
+        extra_kwargs = {'id': {'read_only': True},
+                        'likes': {'read_only': True},
+                        }
 
     def get_user_avatar(self, obj):
         return str(obj.user.avatar) if obj.user.avatar else ''
