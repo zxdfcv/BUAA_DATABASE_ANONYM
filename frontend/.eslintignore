@@ -1,4 +1,4 @@
-
+/src
 *.sh
 node_modules
 *.md
