@@ -32,7 +32,7 @@
                     </CarouselItem>
                   </Carousel></el-col>
                     <el-col :span="6">
-                      <div class="">
+                      <div class="" style="margin: 35px">
                         <div class="count-item flex-view pointer" @click="addCollect()">
                           <div class="count-img">
                             <img :src="Collect_on" v-if="detailData.isCollected === true">
@@ -88,14 +88,22 @@
                           </div>
                         </div> -->
                         </div>
-                        <a-card style="margin: 15px" hoverable>
+                        <a-card style="margin: 15px; cursor: default;" hoverable>
                           <a-descriptions title="商品信息" :column="1" style="vertical-align: center; font-size: large; overflow-y: auto; max-height: 400px">
                             <a-descriptions-item label="商品名称">
                               <div>{{ detailData.title }}</div>
                             </a-descriptions-item>
                             <a-descriptions-item label="发布者">
-                              <a-avatar v-if="!(detailData.avatarUrl === '' || detailData.avatarUrl === null || detailData.avatarUrl === undefined)" :size="40" :src="BASE_URL + '/upload/' + detailData.avatarUrl" />
-                              <a-avatar v-else :src="AvatarIcon" />
+                              <a-avatar
+                                v-if="!(detailData.avatarUrl === '' || detailData.avatarUrl === null || detailData.avatarUrl === undefined)"
+                                style="cursor: pointer"
+                                :size="40"
+                                :src="BASE_URL + '/upload/' + detailData.avatarUrl"
+                                @click="router.push({ name: 'usercenter', query:{id: detailData.uploaderId}})"/>
+                              <a-avatar
+                                v-else
+                                :src="AvatarIcon"
+                                style="cursor: pointer" />
                               <a-button type="link" @click="router.push({ name: 'usercenter', query:{id: detailData.uploaderId}})" style="top: -13px; left: -7px">{{ detailData.uploaderName }}</a-button>
                             </a-descriptions-item>
 

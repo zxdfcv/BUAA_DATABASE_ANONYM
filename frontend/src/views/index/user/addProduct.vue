@@ -1,8 +1,9 @@
 <template>
   <div class="content-list">
+    <a-spin :spinning="loading">
     <div class="list-title" v-if="!modify">发布商品</div>
     <div class="list-title" v-else>修改商品</div>
-    <a-spin :spinning="loading" style="min-height: 200px;">
+
       <div class="list-content">
       <div class="edit-view">
         <div class="item flex-view">
@@ -309,20 +310,19 @@ const submit = () => {
       submitForm.append(key, tData.form[key]);
     }
   }
+  loading.value= true;
   imageList.value.forEach(file => { submitForm.append('images', file); })
   videoList.value.forEach(file => { submitForm.append('video', file); })
-  loading.value= true;
   if (!props.modify) {
     addProduct(submitForm).then(res => {
+      loading.value = false;
       if (res.code === 0) {
-        setTimeout(() => {
-          loading.value = false;
-        }, 300);
         openNotification({
           type: 'success',
           message: '成功上传商品！',
           description: '您成功上传了商品 ' + tData.form.name
         })
+        router.push({name: 'usercenter', query: {id: userStore.user_id }})
       } else {
         openNotification({
           type: 'error',
@@ -331,6 +331,7 @@ const submit = () => {
         })
       }
     }).catch(err => {
+      loading.value = false;
       console.log(err)
       openNotification({
         type: 'error',
@@ -340,6 +341,7 @@ const submit = () => {
     })
   } else {
     updateProduct({product_id: props.mid}, submitForm).then(res => {
+      loading.value = false;
       if (res.code === 0) {
         openNotification({
           type: 'success',
@@ -349,15 +351,17 @@ const submit = () => {
         emits('close');
       }
     }).catch(err => {
+      loading.value = false;
       console.log(err);
       openNotification({
         type: 'error',
         message: 'Oops!',
         description: '修改商品信息失败！'
       })
+
     });
   }
-  loading.value = false;
+  //loading.value = false;
 }
 
 const refillData = (data) => {

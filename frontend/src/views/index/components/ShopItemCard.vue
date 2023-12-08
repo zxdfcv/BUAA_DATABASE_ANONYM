@@ -1,6 +1,7 @@
 <template>
 <a-card
     hoverable
+    style="cursor: default"
     @click="toDetail"
 >
 
@@ -36,8 +37,8 @@
     <div class="info-view">
       <h4 v-if="props.shopCard.price !== undefined" class="price">{{ props.shopCard.price }} 元</h4>
       <div class="wrap" @click.stop="pushToMerchant" v-if="!props.editable">
-        <el-avatar v-if="!(props.shopCard.avatarUrl === '' || props.shopCard.avatarUrl === null || props.shopCard.avatarUrl === undefined)" :size="40" :src="BASE_URL + '/upload/' + props.shopCard.avatarUrl" />
-        <el-avatar v-else :src="AvatarIcon" />
+        <el-avatar style="cursor: pointer" v-if="!(props.shopCard.avatarUrl === '' || props.shopCard.avatarUrl === null || props.shopCard.avatarUrl === undefined)" :size="40" :src="BASE_URL + '/upload/' + props.shopCard.avatarUrl" />
+        <el-avatar style="cursor: pointer" v-else :src="AvatarIcon" />
       <span style="color: #444; font-size: 13px; width: 100px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-left: 8px">{{ props.shopCard.uploaderName }}</span>
         <div v-if="props.shopCard.pv !== undefined" style="color: #444; font-size: 11px; margin-left: 50px; margin-top: -5px">{{ props.shopCard.pv }} 次浏览</div>
       </div>
@@ -54,10 +55,10 @@
     </div>
   </div>
   </a-spin>
-  <a-modal :closable=false v-model:open="open" title="注意！" :confirm-loading="loading" @ok="deletePro">
+  <a-modal :closable=false v-model:visible="open" centered title="注意！" :confirm-loading="loading" @ok="deletePro">
     <p>真的要删除这个商品吗，这个操作不可恢复！</p>
   </a-modal>
-  <a-modal :closable=false :footer="null" v-model:open="open2" :confirm-loading="loading2" style="width: 80%">
+  <a-modal :closable=false :footer="null" v-model:visible="open2" centered :confirm-loading="loading2" style="width: 80%">
     <add-product
     :modify=true
     :mid=props.shopCard.id
