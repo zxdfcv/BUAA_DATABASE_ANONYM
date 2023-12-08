@@ -78,7 +78,7 @@ const fillData = (list) => {
     data["id"] = item.id;
     data["price"] = item.price;
     data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
-    data["avatarUrl"] = 'https://api.lolicon.app/assets/img/lx.jpg'; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["avatarUrl"] = item.merchant_avatar;
     data["uploaderId"] = item.merchant;
     data["uploaderName"] = item.merchant_name;
     data["pv"] = item.views;
@@ -197,7 +197,6 @@ const getThingList = (data) => {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  gap: 60px;
 }
 
 .thing-item {

@@ -15,7 +15,7 @@
                   <Carousel
                       v-model="value"
                       dots="outside"
-                      radius-dot="false"
+                      :radius-dot=false
                       trigger="hover"
                       arrow="hover"
                       style="width: 100%">
@@ -94,8 +94,9 @@
                               <div>{{ detailData.title }}</div>
                             </a-descriptions-item>
                             <a-descriptions-item label="发布者">
-                              <a-avatar :src="posterAvatar" size="small" @click="router.push({ name: 'usercenter', query:{id: detailData.uploaderId}})" style="left: 5px"/> <!-- TODO: 跳转到指定用户的用户中心 -->
-                              <a-button type="link" @click="router.push({ name: 'usercenter', query:{id: detailData.uploaderId}})" style="top: -7px; left: -2px">{{ detailData.uploaderName }}</a-button>
+                              <a-avatar v-if="!(detailData.avatarUrl === '' || detailData.avatarUrl === null || detailData.avatarUrl === undefined)" :size="40" :src="BASE_URL + '/upload/' + detailData.avatarUrl" />
+                              <a-avatar v-else :src="AvatarIcon" />
+                              <a-button type="link" @click="router.push({ name: 'usercenter', query:{id: detailData.uploaderId}})" style="top: -13px; left: -7px">{{ detailData.uploaderName }}</a-button>
                             </a-descriptions-item>
 
                             <a-descriptions-item label="分类所属">
@@ -131,18 +132,107 @@
         <div class="detail-content-bottom">
           <div class="thing-content-view flex-view">
             <div class="main-content">
-              <div class="order-view main-tab">
+
+
+              <div class="detail-content-bottom">
+                <div class="thing-content-view flex-view">
+                  <div class="main-content">
+                    <div class="order-view main-tab" >
                 <span class="tab" :class="selectTabIndex === index ? 'tab-select' : ''" v-for="(item, index) in tabData"
                   :key="index" @click="selectTab(index)">
                   {{ item }}
                 </span>
               </div>
+                    <div class="thing-comment" >
+                      <div class="title">发表新的评论</div>
+                      <div class="publish flex-view">
+                        <img v-if="userStore.user_avatar !== null && userStore.user_avatar !== undefined && userStore.user_avatar !== ''" :src="BASE_URL + userStore.user_avatar" class="mine-img">
+                        <img v-else :src="AvatarIcon" class="mine-img">
+                        <textarea placeholder="说点什么..." class="content-input" ref="commentRef"></textarea>
+                        <button class="send-btn" @click="sendComment()">发送</button>
+                      </div>
+                      <div class="tab-view flex-view">
+                        <div class="count-text">共有{{ commentData.length }}条评论</div>
+                        <div class="tab-box flex-view" v-if="commentData.length > 0">
+                          <span :class="sortIndex === 0 ? 'tab-select' : ''" @click="sortCommentList('recent')">最新</span>
+                          <div class="line"></div>
+                          <span :class="sortIndex === 1 ? 'tab-select' : ''" @click="sortCommentList('hot')">热门</span>
+                        </div>
+                      </div>
+                      <div class="comments-list">
+                        <div class="comment-item" v-for="item in commentData">
+                          <div class="flex-item flex-view">
+                            <img v-if="item.user_avatar !== null && item.user_avatar !== undefined && item.user_avatar !== ''" :src="BASE_URL + '/upload/' + item.user_avatar"
+                                 class="avator" @click="pushToTarget(item.user)">
+                            <img v-else :src="AvatarIcon" class="avator" @click="pushToTarget(item.user)">
+                            <div class="person">
+                              <div class="name" @click="pushToTarget(item.user)">{{ item.user_name }}</div>
+                              <div class="time">{{ item.create_time }}</div>
+                            </div>
+                            <div class="float-right">
+                              <ButtonGroup>
+                                <Button @click="toggleIsShow(item.id, item.id)"  style="width: 80px"><Icon type="md-chatboxes" style="margin-left: -3px"/> 回复&nbsp;&nbsp;&nbsp;</Button>
+                                <Button type="primary" v-if="item.isLiked" @click="dislike(item.id)" style="width: 80px"><Icon type="md-thumbs-up" /> {{ item.likes_count }}</Button>
+                                <Button v-else @click="like(item.id)" style="width: 80px"><Icon type="md-thumbs-up" /> {{ item.likes_count }}</Button>
+                              </ButtonGroup>
+                            </div>
+
+                          </div>
+                          <p class="comment-content">{{ item.content }}</p>
+                          <div v-if="item.reply_count > 0">
+                            <div class="publish flex-view">
+                              <div class="count-text" style="text-align: center">
+                                <span>共有{{ item.reply_count }}条回复，</span>
+                                <span class="more-btn-sub" @click="toggleShowReply(item.id)" v-if="showReplies.get(item.id) !== true"><a>点击查看</a></span>
+                                <span class="more-btn-sub" @click="toggleShowReply(item.id)" v-else><a>点击收折</a></span>
+                              </div>
+                            </div>
+                            <div v-if=showReplies.get(item.id)>
+                              <div class="comment-item-sub" v-for="reply in item.replies">
+                                <div class="flex-item flex-view">
+                                  <img v-if="reply.user_avatar !== null && reply.user_avatar !== undefined && reply.user_avatar !== ''" :src="BASE_URL + '/upload/' + reply.user_avatar"
+                                       class="avator" @click="toggleIsShow(item.id, reply.id)">
+                                  <img v-else :src="AvatarIcon" class="avator" @click="pushToTarget(reply.user)">
+                                  <div class="person">
+                                    <div class="name" @click="pushToTarget(reply.user)">{{ reply.user_name }}</div>
+                                    <div class="time">{{ reply.comment_time }}</div>
+                                  </div>
+                                  <div class="float-right">
+                                    <ButtonGroup>
+                                      <Button @click="toggleIsShow(item.id, reply.id)"  style="width: 70px"><Icon type="md-chatboxes" style="font-size: 10px"/> 回复&nbsp;&nbsp;&nbsp;</Button>
+                                      <Button type="primary" v-if="reply.isLiked" @click="dislikeReply(reply.id)" style="width: 70px"><Icon type="md-thumbs-up" /> {{ reply.likes_count }}</Button>
+                                      <Button v-else @click="likeReply(reply.id)" style="width: 70px"><Icon type="md-thumbs-up" /> {{ reply.likes_count }}</Button>
+                                    </ButtonGroup>
+                                    <span class="num">{{ reply.like_count }}</span>
+                                  </div>
+                                </div>
+                                <p class="comment-content-sub">
+                                  <a @click="pushToTarget(reply.mentioned_user)">@{{ reply.mentioned_name }}&nbsp;&nbsp;</a>{{ reply.content }}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- <button class="float-right send-btn" @click="toggleReplies(item)">回复</button> -->
+                          <div v-if="isShow.get(item.id)" class="publish flex-view">
+                            <textarea :placeholder="showTarget" class="content-input-sub" v-model="replyText"></textarea>
+                            <button class="send-btn-sub" @click="sendReply(item.id, item)">发送</button>
+                          </div>
+                        </div>
+                        <div class="infinite-loading-container">
+                          <div class="infinite-status-prompt" style="">
+                            <div slot="no-results" class="no-results">
+                              <div></div>
+                              <p>没有更多了</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
 
 <!-- TODO: 考虑用 a-comment 重写评论部分-->
 
-
-            </div>
+                  </div></div></div></div>
             <div class="recommend" style="">
               <div class="title">热门推荐</div>
               <ShopItemCard
@@ -151,23 +241,6 @@
                   :shop-card="item"
                   :loading="false"
                   style="margin: 5%;" />
-              <div class="things">
-<!--                <div v-for="item in recommendData" :key="item.id" @click="handleDetail(item)"-->
-<!--                  class="thing-item item-column-3">&lt;!&ndash;&ndash;&gt;-->
-<!--                  <div class="img-view">-->
-<!--                    <img :src="item.cover">-->
-<!--                    &lt;!&ndash; <div style="position: absolute; left: 10px; bottom: 10px;">-->
-<!--                    <img :src="PlayIcon" style="width: 30px;height: 30px;">-->
-<!--                  </div> &ndash;&gt;-->
-<!--                  </div>-->
-<!--                  <div class="info-view">-->
-<!--                    <h3 class="thing-name">{{ item.title.substring(0, 12) }}</h3>-->
-<!--                    <span style="color: #444; font-size: 11px;height: 11px;">{{ item.create_time.substring(0, 16) }}</span>-->
-<!--                    <br />-->
-<!--                    <span style="color: #444; font-size: 11px;height: 11px;">{{ item.pv }}次浏览</span>-->
-<!--                  </div>-->
-<!--                </div>-->
-              </div>
             </div>
           </div>
         </div>
@@ -198,7 +271,13 @@ import {
   detailApi as thingDetailApi,
   listApi as listThingList
 } from '/@/api/index/thing'
-import { listThingCommentsApi, createApi as createCommentApi, likeApi } from '/@/api/index/comment'
+import {
+  listThingCommentsApi,
+  createApi as createCommentApi,
+  likeApi,
+  likeCommentApi,
+  dislikeCommentApi, queryProductCommentApi, queryCommentReplyApi, createReplyApi, likeReplyApi, dislikeReplyApi
+} from '/@/api/index/comment'
 import { addWishUserApi } from '/@/api/index/thing'
 import { addCollectUserApi } from '/@/api/index/thing'
 import { BASE_URL } from "/@/store/constants";
@@ -229,7 +308,7 @@ let selectTabIndex = ref(0)
 let commentData = ref([])
 const recommendData = reactive([])
 let sortIndex = ref(0)
-let order = ref('recent') // 默认排序最新
+let order = ref('create_time') // 默认排序最新
 
 let commentRef = ref()
 
@@ -243,7 +322,7 @@ let last1 = ref(-1)
 let last2 = ref(-1)
 
 const replyText = ref('')
-
+const replyId = ref(0)
 // const comments = ref(commentData.map(comment => ({ ...comment, showReplies: false})));
 
 let showTarget = ref('')
@@ -258,6 +337,12 @@ const SelfAvatar = (avatar) => {
     return true
   }
 }
+
+const pushToTarget = (targetId) => {
+  console.log(targetId)
+  router.push({name: 'usercenter', query: {id: targetId}})
+}
+
 const toggleIsShow = (index, id) => {
   if (!isShow.value.has(index)) {
     isShow.value.set(index, false)
@@ -273,16 +358,18 @@ const toggleIsShow = (index, id) => {
     replyText.value = ''
     if (index == id) {
       const replyee = commentData.value.filter(element => element.id == id)
-      showTarget.value = "@" + replyee[0].username + ": "
+      showTarget.value = "@" + replyee[0].user_name + ": "
+      replyId.value = replyee[0].user;
       console.log(replyee[0])
-      console.log(replyee[0].username)
+      console.log(replyee[0].user_name)
     } else {
       const father = commentData.value.filter(element => element.id == index)
       console.log(father[0])
-      const replyee = father[0].replies.data.filter(element => element.id == id)
-      showTarget.value = "@" + replyee[0].username + ": "
+      const replyee = father[0].replies.filter(element => element.id == id)
+      showTarget.value = "@" + replyee[0].user_name + ": "
+      replyId.value = replyee[0].user;
       console.log(replyee[0])
-      console.log(replyee[0].username)
+      console.log(replyee[0].user_name)
     }
     for (const idx in commentData.value) {
       console.log(commentData.value[idx].id)
@@ -310,7 +397,7 @@ const getPostDetail = async () => {
     detailData.value['pv'] = res.data.views;
     detailData.value['description'] = res.data.description;
     detailData.value['collect_count'] = res.data.collectors_count;
-    detailData.value['wish_count'] = res.data.wants; /* TODO: 没有发布者信息、是否卖出/下架、分类 & 校区信息在前端的展示点 */
+    detailData.value['wish_count'] = res.data.wants; /* TODO: 缺少是否卖出/下架在前端的展示点 */
     for (var i = 0; i < res.data.images.length; i++) {
       detailData.value['cover'][i] = BASE_URL + detailData.value['cover'][i].image;
     }
@@ -327,6 +414,7 @@ const getPostDetail = async () => {
     detailData.value['isWanted'] = (userStore.user_access) ? false : false;
     detailData.value['onSale'] = true;
     detailData.value["uploaderId"] = res.data.merchant;
+    detailData.value["avatarUrl"] = res.data.merchant_avatar;
     detailData.value["uploaderName"] = res.data.merchant_name;
     detailData.value["Class1"] = res.data.classification_1_name;
     detailData.value["Class2"] = res.data.classification_2_name;
@@ -351,7 +439,7 @@ const fillData = (list) => {
     data["id"] = item.id;
     data["price"] = item.price;
     data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
-    data["avatarUrl"] = 'https://api.lolicon.app/assets/img/lx.jpg'; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["avatarUrl"] = item.merchant_avatar; /* TODO: 缺少一个上传者的 avatar_URL */
     data["uploaderId"] = item.merchant;
     data["uploaderName"] = item.merchant_name;
     data["pv"] = item.views;
@@ -393,11 +481,11 @@ onMounted(async () => {
   await getRecommendPost();
   console.log("mounted")
   // getRecommendThing()
-  // getCommentList()
-  // for (const idx in commentData.value) {
-  //   isShow.value.set(idx, false)
-  //   showReplies.value.set(idx, false)
-  // }
+  getCommentList()
+  for (const idx in commentData.value) {
+    isShow.value.set(idx, false)
+    showReplies.value.set(idx, false)
+  }
   // nextTick(() => {
   //   for (myElementRef in replyRef) {
   //     const myElementRef = myElementRef.value;
@@ -513,18 +601,35 @@ const sendComment = () => {
   let text = commentRef.value.value.trim()
   console.log(text)
   if (text.length <= 0) {
-    return
+    openNotification({
+      type: 'error',
+      message: '评论发送失败',
+      description: '评论文字不能为空！'
+    })
+    return;
   }
   commentRef.value.value = ''
-  let userId = userStore.user_id
-  if (userId) {
-    createCommentApi({ content: text, thing: thingId.value, user: userId }, {}).then(res => {
+  if (userStore.user_access) {
+    spin.value = true;
+    createCommentApi({ content: text, product: thingId.value, user: String(userStore.user_id) }).then(res => {
       getCommentList()
+      if (res.data.code === 0) {
+        openNotification({
+          type: 'success',
+          message: '评论发送成功',
+          description: ''
+        })
+      }
+      spin.value = false;
     }).catch(err => {
       console.log(err)
     })
   } else {
-    message.warn('请先登录！')
+    openNotification({
+      type: 'error',
+      message: '您尚未登陆',
+      description: '评论前需要登录！'
+    })
     router.push({ name: 'login' })
   }
 }
@@ -539,15 +644,20 @@ const getReply = (parentId) => {
 }
 
 const sendReply = (parentId) => {
-  let text = showTarget.value + replyText.value.trim()
-  console.log(text)
+  let text = replyText.value.trim()
   if (text.length <= 0) {
+    openNotification({
+      type: 'error',
+      message: '回复发送失败',
+      description: '回复的内容不能为空！'
+    })
     return
   }
   replyText.value = ''
   let userId = userStore.user_id
   if (userId) {
-    createCommentApi({ content: text, thing: thingId.value, user: userId }, { parentId: parentId }).then(res => {
+    console.log(userId, parentId, text)
+    createReplyApi({user: String(userId), comment: parentId, content: text, mentioned_user: replyId.value}).then(res => {
       getCommentList()
     }).catch(err => {
       console.log(err)
@@ -557,20 +667,81 @@ const sendReply = (parentId) => {
     router.push({ name: 'login' })
   }
 }
-const like = (commentId) => {
-  likeApi({ commentId: commentId }).then(res => {
-    getCommentList()
-  }).catch(err => {
-    console.log(err)
-  })
+const like = async (commentId) => {
+  if (userStore.user_access) {
+    const res = await likeCommentApi({comment_id: commentId});
+    if (res.code === 0) {
+      console.log(res)
+    }
+    getCommentList();
+  } else {
+    openNotification({
+      type: 'error',
+      message: '您尚未登陆',
+      description: '点赞前需要登录！'
+    })
+    await router.push({name: 'login'})
+  }
 }
+
+const likeReply = async (replyId) => {
+  if (userStore.user_access) {
+    const res = await likeReplyApi({reply_id: replyId});
+    if (res.code === 0) {
+      console.log(res)
+    }
+    getCommentList();
+  } else {
+    openNotification({
+      type: 'error',
+      message: '您尚未登陆',
+      description: '点赞前需要登录！'
+    })
+    await router.push({name: 'login'})
+  }
+}
+
+const dislike = async (commentId) => {
+  if (userStore.user_access) {
+    const res = await dislikeCommentApi({comment_id: commentId});
+    if (res.code === 0) {
+      console.log(res)
+    }
+    getCommentList(commentId);
+  } else {
+    openNotification({
+      type: 'error',
+      message: '您尚未登陆',
+      description: '点赞前需要登录！'
+    })
+    await router.push({name: 'login'})
+  }
+}
+
+const dislikeReply = async (replyId) => {
+  if (userStore.user_access) {
+    const res = await dislikeReplyApi({reply_id: replyId});
+    if (res.code === 0) {
+      console.log(res)
+    }
+    getCommentList();
+  } else {
+    openNotification({
+      type: 'error',
+      message: '您尚未登陆',
+      description: '点赞前需要登录！'
+    })
+    await router.push({name: 'login'})
+  }
+}
+
 const getCommentList = () => {
-  listThingCommentsApi({ thingId: thingId.value, order: order.value })
+  queryProductCommentApi({ product_id: thingId.value, sort: order.value })
     .then((res) => {
       const commentDataCopy = [...res.data]; // Make a copy of the original data
       const promises = commentDataCopy.map((item) =>
         // Use map to return an array of promises for fetching replies
-        listThingCommentsApi({ parentId: item.id, order: order.value })
+        queryCommentReplyApi({ comment_id: item.id, sort: order.value })
       );
 
       // Wait for all promises to resolve using Promise.all
@@ -578,11 +749,17 @@ const getCommentList = () => {
         .then((repliesData) => {
           // Merge repliesData with the original commentDataCopy
           repliesData.forEach((replies, index) => {
-            commentDataCopy[index].replies = replies;
+            commentDataCopy[index].replies = replies.data;
+            for (let i = 0; i < commentDataCopy[index].replies.length; i++) {
+              commentDataCopy[index].replies[i]['isLiked'] = !!commentDataCopy[index].replies[i].likes.includes(userStore.user_id);
+            }
           });
 
           // Now update commentData.value with the modified data
           commentData.value = commentDataCopy;
+          for (let i = 0; i < commentData.value.length; i++) {
+            commentData.value[i]['isLiked'] = !!commentData.value[i].likes.includes(userStore.user_id);
+          }
           console.log(commentData.value)
         })
         .catch((err) => {
@@ -971,8 +1148,8 @@ const sortCommentList = (sortType) => {
 
 .recommend {
   -webkit-box-flex: 0;
-  -ms-flex: 0 0 360px;
-  flex: 0 0 360px;
+  -ms-flex: 0 0 460px;
+  flex: 0 0 460px;
   margin-left: 20px;
 
   .title {

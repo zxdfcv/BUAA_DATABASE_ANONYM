@@ -58,7 +58,7 @@ const fillData = (list) => {
     data["id"] = item.id;
     data["price"] = item.price;
     data["url"] = (item.images.length !== 0) ? BASE_URL + item.images[0].image : null; /* TODO: 服务器端可以默认配置一个缺省的图片 url */
-    data["avatarUrl"] = userStore.user_avatar; /* TODO: 缺少一个上传者的 avatar_URL */
+    data["avatarUrl"] = item.merchant_avatar;
     data["uploaderId"] = item.merchant;
     data["uploaderName"] = item.merchant_name;
     data["pv"] = item.views;
@@ -70,9 +70,9 @@ const fillData = (list) => {
 onMounted(() => {
   if (useRoute().query.id) {
   } else {
-    router.push({name: 'wishThingView', query: {id: userStore.user_id}});
+    router.push({name: 'wishThingView', query: {id: String(userStore.user_id)}});
   }
-  appStore.setViewId(useRoute().query.id.trim());
+  appStore.setViewId(useRoute().query.id);
   getProduct();
   //getCollectThingList()
   //getCollectCounterList()

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { loginApi as adminLogin, userRegisterApi as adminRegister} from '/@/api/admin/user';
-import { userLoginApi, userRegisterApi } from '/@/api/index/user';
+import {userDetailApi, userLoginApi, userRegisterApi} from '/@/api/index/user';
 import { UserState } from './types';
 import {
   USER_ID,
@@ -97,7 +97,10 @@ try {
   }
 }
 
-
+  if (this.user_access !== undefined) {
+    const res = await userDetailApi({user_id: this.user_id});
+    this.user_avatar = res.data.avatar;
+  }
 
 
       return result;

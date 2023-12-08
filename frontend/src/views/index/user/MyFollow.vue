@@ -76,11 +76,13 @@ const pagination = {
 const loading = ref(false)
 
 const queryFollow = async () => {
+  loading.value = true;
   const res = await userFollowersApi({user_id: appStore.view_user_id});
   listData.length = 0;
   for (let i = 0; i < res.data.length; i++) {
     listData.push(res.data[i]);
   }
+  loading.value = false;
 }
 
 const deleteFollow = async (targetId) => {
