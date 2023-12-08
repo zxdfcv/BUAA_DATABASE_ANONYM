@@ -157,8 +157,8 @@
     },
     {
       title: '手机号',
-      dataIndex: 'mobile',
-      key: 'mobile',
+      dataIndex: 'phone',
+      key: 'phone',
       align: 'center',
     },
     {
@@ -226,7 +226,7 @@
       status: undefined,
       nickname: undefined,
       email: undefined,
-      mobile: undefined,
+      phone: undefined,
     },
     rules: {
       username: [{ required: true, message: '请输入', trigger: 'change' }],
@@ -353,8 +353,8 @@
         if (modal.form.cover) {
           formData.append('cover', modal.form.cover);
         }
-        if (modal.form.mobile) {
-          formData.append('mobile', modal.form.mobile);
+        if (modal.form.phone) {
+          formData.append('phone', modal.form.phone);
         }
         if (modal.form.email) {
           formData.append('email', modal.form.email);
