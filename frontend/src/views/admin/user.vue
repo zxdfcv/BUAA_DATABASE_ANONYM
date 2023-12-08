@@ -361,7 +361,7 @@
         }
         if (modal.editFlag) {
           updateApi({
-            id: modal.form.id
+            user_id: modal.form.id
           },formData)
             .then((res) => {
               hideModal();

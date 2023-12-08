@@ -3,16 +3,13 @@ import { get, post } from '/@/utils/http/axios';
 import { UserState } from '/@/store/modules/user/types';
 // import axios from 'axios';
 enum URL {
-    login = '/myapp/admin/adminLogin',
+    login = '/myapp/login/',
     userList = '/myapp/admin/user/list',
-    detail = '/api/user/detail',
+    detail = '/myapp/admin/user/detail',
     create = '/myapp/admin/user/create',
     update = '/myapp/admin/user/update',
     delete = '/myapp/admin/user/delete',
-    userLogin = '/api/user/userLogin',
-    userRegister = '/api/user/userRegister',
-    updateUserPwd = '/api/user/updatePwd',
-    updateUserInfo = '/api/user/updateUserInfo'
+    userRegister = '/myapp/register/', // 管理员和用户注册接口实际上相同
 }
 interface LoginRes {
     token: string;
@@ -29,9 +26,6 @@ const detailApi = async (params: any) => get<any>({ url: URL.detail, params: par
 const createApi = async (data: any) => post<any>({ url: URL.create, params: {}, data: data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
 const updateApi = async (params: any, data: any) => post<any>({ url: URL.update,params: params, data: data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
 const deleteApi = async (params: any) => post<any>({ url: URL.delete, params: params, headers: {} });
-const userLoginApi = async (data: LoginData) => post<any>({ url: URL.userLogin, data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
 const userRegisterApi = async (data: any) => post<any>({ url: URL.userRegister, params: {}, data: data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
-const updateUserPwdApi = async (params: any) => post<any>({ url: URL.updateUserPwd, params: params });
-const updateUserInfoApi = async (data: any) => post<any>({ url: URL.updateUserInfo, data: data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
 
-export { loginApi, listApi, detailApi, createApi, updateApi, deleteApi, userLoginApi, userRegisterApi, updateUserPwdApi, updateUserInfoApi};
+export { loginApi, listApi, detailApi, createApi, updateApi, deleteApi, userRegisterApi};
