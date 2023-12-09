@@ -26,12 +26,11 @@
           showTotal: (total) => `共${total}条数据`,
         }"
       >
-        <template #bodyCell="{ text, record, index, column }">
-          <template v-if="column.key === 'role'">
+        <template #bodyCell="{ text, record, index, column }"> <!-- slot 插槽的时使用 -->
+          <template v-if="column.key === 'is_staff'">
             <span>
-              <span v-if="text === '1'">管理员</span>
-              <span v-if="text === '2'">普通用户</span>
-              <span v-if="text === '3'">演示账号</span>
+              <span v-if="text === true">管理员</span>
+              <span v-else>普通用户</span>
             </span>
           </template>
           <template v-if="column.key === 'operation'">
@@ -77,19 +76,19 @@
                 </a-form-item>
               </a-col>
               <a-col span="24">
-                <a-form-item label="角色" name="role">
-                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.role">
-                    <template v-for="item in modal.roleData">
+                <a-form-item label="角色" name="is_staff">
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.is_staff">
+                    <template v-for="item in modal.roleData"> <!-- 角色数据 -->
                       <a-select-option :value="item.id">{{ item.title }}</a-select-option>
                     </template>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col span="24">
-                <a-form-item label="状态" name="status">
-                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.status">
-                    <a-select-option key="0" value="0">正常</a-select-option>
-                    <a-select-option key="1" value="1">封号</a-select-option>
+                <a-form-item label="状态" name="is_active">
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.is_active">
+                    <a-select-option key="0" :value="true">正常</a-select-option>
+                    <a-select-option key="1" :value="false">封号</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -99,8 +98,8 @@
                 </a-form-item>
               </a-col>
               <a-col span="24">
-                <a-form-item label="手机号" name="mobile">
-                  <a-input placeholder="请输入" v-model:value="modal.form.mobile" allowClear />
+                <a-form-item label="手机号" name="phone">
+                  <a-input placeholder="请输入" v-model:value="modal.form.phone" allowClear />
                 </a-form-item>
               </a-col>
             </a-row>
@@ -138,16 +137,16 @@
     },
     {
       title: '角色',
-      dataIndex: 'role',
-      key: 'role',
+      dataIndex: 'is_staff',
+      key: 'is_staff',
       align: 'center',
     },
     {
       title: '状态',
-      dataIndex: 'status',
-      key: 'status',
+      dataIndex: 'is_active',
+      key: 'is_active',
       align: 'center',
-      customRender: ({ text, record, index, column }) => (text === '0' ? '正常' : '封号'),
+      customRender: ({ text, record, index, column }) => (text === true ? '正常' : '封号'),
     },
     {
       title: '邮箱',
@@ -163,8 +162,8 @@
     },
     {
       title: '创建时间',
-      dataIndex: 'create_time',
-      key: 'create_time',
+      dataIndex: 'date_joined',
+      key: 'date_joined',
       align: 'center',
     },
     {
@@ -206,24 +205,20 @@
     title: '',
     roleData: [
       {
-        id: '1',
+        id: true,
         title: '管理员',
       },
       {
-        id: '2',
+        id: false,
         title: '普通用户',
-      },
-      {
-        id: '3',
-        title: '演示账号',
       },
     ],
     form: {
       id: undefined,
       username: undefined,
       password: undefined,
-      role: undefined,
-      status: undefined,
+      is_staff: undefined,
+      is_active: undefined,
       nickname: undefined,
       email: undefined,
       phone: undefined,
@@ -231,8 +226,8 @@
     rules: {
       username: [{ required: true, message: '请输入', trigger: 'change' }],
       password: [{ required: true, message: '请输入', trigger: 'change' }],
-      role: [{ required: true, message: '请选择', trigger: 'change' }],
-      status: [{ required: true, message: '请选择', trigger: 'change' }],
+      is_staff: [{ required: true, message: '请选择', trigger: 'change' }],
+      is_active: [{ required: true, message: '请选择', trigger: 'change' }],
     },
   });
 
@@ -344,11 +339,11 @@
         if (modal.form.nickname) {
           formData.append('nickname', modal.form.nickname);
         }
-        if (modal.form.role) {
-          formData.append('role', modal.form.role);
+        if (modal.form.is_staff) {
+          formData.append('is_staff', modal.form.is_staff);
         }
-        if (modal.form.status) {
-          formData.append('status', modal.form.status);
+        if (modal.form.is_active) {
+          formData.append('is_active', modal.form.is_active);
         }
         if (modal.form.cover) {
           formData.append('cover', modal.form.cover);
