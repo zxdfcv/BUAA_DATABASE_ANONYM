@@ -33,6 +33,22 @@
               </a-popconfirm>
             </span>
           </template>
+          <template v-if="column.key === 'likes'">
+            <span>
+              <a-divider type="vertical"/>
+              <a-dropdown :trigger="['click']">
+                <a class="ant-dropdown-link" @click.prevent>
+                  点我
+                  <DownOutlined />
+                </a>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item v-for="item in record.likes" :key="item"> {{ item }} </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+            </span>
+          </template>
         </template>
       </a-table>
     </div>
@@ -42,9 +58,10 @@
 
 <script setup lang="ts">
 import {FormInstance, message} from 'ant-design-vue';
-import {createApi, listApi, deleteApi} from '/@/api/admin/comment';
+import {createApi, listApi, deleteApi} from '/@/api/admin/reply';
 import {BASE_URL} from "/@/store/constants";
 import {getFormatTime} from "/@/utils";
+import { DownOutlined } from '@ant-design/icons-vue'
 
 const columns = reactive([
   {
@@ -55,26 +72,39 @@ const columns = reactive([
   },
   {
     title: '用户',
-    dataIndex: 'username',
-    key: 'username',
+    dataIndex: 'user_name',
+    key: 'user_name',
+    align: 'center'
+  }
+  ,
+  {
+    title: '@用户 id',
+    dataIndex: 'mentioned_user',
+    key: 'mentioned_user',
     align: 'center'
   },
   {
-    title: '名称',
-    dataIndex: 'title',
-    key: 'title',
+    title: '商品名称',
+    dataIndex: 'product_name',
+    key: 'product_name',
     align: 'center'
   },
   {
-    title: '评论内容',
+    title: '回复内容',
     dataIndex: 'content',
     key: 'content',
     align: 'center'
   },
   {
-    title: '评论时间',
-    dataIndex: 'comment_time',
-    key: 'comment_time',
+    title: '获赞',
+    dataIndex: 'likes',
+    key: 'likes',
+    align: 'center',
+  },
+  {
+    title: '回复时间',
+    dataIndex: 'create_time',
+    key: 'create_time',
     align: 'center',
   },
   {
@@ -129,6 +159,11 @@ const getList = () => {
           item.index = index + 1;
           if (item.image) {
             item.image = BASE_URL + item.image
+          }
+          if (item.content) {
+            if (item.content.length > 50) {
+              item.content = item.content.substring(0, 50) + '...'
+            }
           }
           if (item.canteen_title !== undefined) {
             item.title = item.canteen_title

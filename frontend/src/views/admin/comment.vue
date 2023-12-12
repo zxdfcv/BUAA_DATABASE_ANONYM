@@ -56,26 +56,27 @@ const columns = reactive([
   },
   {
     title: '用户',
-    dataIndex: 'username',
-    key: 'username',
+    dataIndex: 'user_name',
+    key: 'user_name',
     align: 'center'
   },
   {
-    title: '名称',
-    dataIndex: 'title',
-    key: 'title',
+    title: '商品名称',
+    dataIndex: 'product_name',
+    key: 'product_name',
     align: 'center'
   },
   {
     title: '评论内容',
     dataIndex: 'content',
     key: 'content',
-    align: 'center'
+    align: 'center',
+    ellipsis: true
   },
   {
     title: '评论时间',
-    dataIndex: 'comment_time',
-    key: 'comment_time',
+    dataIndex: 'create_time',
+    key: 'create_time',
     align: 'center',
   },
   {
@@ -92,7 +93,7 @@ const columns = reactive([
 const data = reactive({
   list: [],
   loading: false,
-  currentAdminUserName: '',
+  currentAdminuser_name: '',
   keyword: '',
   selectedRowKeys: [] as any[],
   pageSize: 10,
@@ -131,10 +132,10 @@ const getList = () => {
           if (item.image) {
             item.image = BASE_URL + item.image
           }
-          if (item.canteen_title !== undefined) {
-            item.title = item.canteen_title
-          } else if (item.classification_title != undefined) {
-            item.title = item.classification_title
+          if (item.content) {
+            if (item.content.length > 50) {
+              item.content = item.content.substring(0, 50) + '...'
+            }
           }
         });
         data.list = res.data;

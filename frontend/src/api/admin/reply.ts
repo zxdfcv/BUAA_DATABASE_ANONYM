@@ -1,11 +1,11 @@
 import {get, post} from '/@/utils/http/axios';
 
 enum URL {
-    list = '/myapp/admin/comment/list',
-    create = '/myapp/admin/comment/create',
-    delete = '/myapp/admin/comment/delete',
-    listProductComments = '/api/comment/listThingComments',
-    listUserComments = '/api/comment/listUserComments',
+    list = '/myapp/admin/reply/list',
+    create = '/myapp/admin/reply/create',
+    delete = '/myapp/admin/reply/delete',
+    listProductComments = '/api/reply/listThingComments',
+    listUserComments = '/api/reply/listUserComments',
     like = '/api/comment/like'
 }
 
