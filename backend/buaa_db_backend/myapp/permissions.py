@@ -98,3 +98,14 @@ class CanEditReplyPermission(BasePermission):
                 and request.user.has_perm('myapp.view_reply')
         )
         return request.user.is_staff or has_permission
+
+
+class CanBuyPermission(BasePermission):
+    def has_permission(self, request, view):
+        has_permission = (
+                request.user.has_perm('myapp.add_order') and
+                request.user.has_perm('myapp.change_order')
+                and request.user.has_perm('myapp.view_order')
+                and request.user.has_perm('myapp.delete_order')
+        )
+        return request.user.is_staff or has_permission

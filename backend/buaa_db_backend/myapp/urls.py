@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import user, log, admin, classification, product, comment, reply
+from .views import user, log, admin, classification, product, comment, reply, order
 
 app_name = 'myapp'
 urlpatterns = [
@@ -48,6 +48,11 @@ urlpatterns = [
     path("admin/reply/update", admin.ReplyView.as_view(), name="reply_allUpdate"),
     path("admin/reply/delete", admin.ReplyView.as_view(), name="reply_allDelete"),
 
+    path("admin/order/list", admin.OrderView.as_view(), name="order_allList"),
+    path("admin/order/create", admin.OrderView.as_view(), name="order_allCreate"),
+    path("admin/order/update", admin.OrderView.as_view(), name="order_allUpdate"),
+    path("admin/order/delete", admin.OrderView.as_view(), name="order_allDelete"),
+
     path("admin/statistics", admin.StatisticsView.as_view(), name="statistics"),
 
 
@@ -92,6 +97,12 @@ urlpatterns = [
 
     path("mention/notice", reply.MentionNoticeView.as_view(), name='mention_notice'),
     path("mention/read", reply.MentionNoticeView.as_view(), name='mention_read'),
+
+    path("order/create", order.EditOrderView.as_view(), name='order_create'),
+    path("order/pay", order.AlipayAPIView.as_view(), name='order_pay'),
+    path("order/cancel", order.EditOrderView.as_view(), name='order_cancel'),
+    path("order/return", order.AliPayResultAPIView.as_view(), name='order_return'),
+    path("order/list", order.OrderListView.as_view(), name='order_list'),
 
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

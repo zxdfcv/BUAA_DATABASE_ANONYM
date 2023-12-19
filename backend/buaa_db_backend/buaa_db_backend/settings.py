@@ -170,3 +170,19 @@ SIMPLE_JWT = {
     # token刷新的有效时间(返回的 refresh 有效时长)
     'REFRESH_TOKEN_LIFETIME': datetime.timedelta(hours=3),
 }
+# 支付配置
+# 支付宝配置信息
+ALIAPY_CONFIG = {
+    # "gateway_url": "https://openapi.alipay.com/gateway.do?", # 真实支付宝网关地址
+    "gateway_url": "https://openapi-sandbox.dl.alipaydev.com/gateway.do?",  # 沙箱支付宝网关地址
+    "appid": "9021000132683113",
+    "app_notify_url": None,
+    # "app_private_key_path": os.path.join(BASE_DIR, "app_private_key.pem"),
+    "app_private_key_string": open(os.path.join(BASE_DIR, 'app_private_key.pem')).read(),
+    # "alipay_public_key_path": os.path.join(BASE_DIR, "aliapy_public_key.pem"),
+    "alipay_public_key_string": open(os.path.join(BASE_DIR, 'app_public_key.pem')).read(),
+    "sign_type": "RSA2",
+    "debug": True,
+    "return_url": "http://127.0.0.1:8000/myapp/order/return",  # 同步回调地址
+    "notify_url": "http://127.0.0.1:8000/myapp/order/return",  # 异步结果通知
+}

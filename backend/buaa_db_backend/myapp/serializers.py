@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group
 
 from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment, \
-    Reply
+    Reply, Order
 
 User = get_user_model()
 
@@ -250,6 +250,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_collectors_count(self, obj):
         return obj.collectors.count()
+
     def get_merchant_avatar(self, obj):
         return str(obj.merchant.avatar) if obj.merchant.avatar else ''
 
@@ -310,7 +311,7 @@ class CommentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        exclude = ('is_read', )
+        exclude = ('is_read',)
         extra_kwargs = {'id': {'read_only': True},
                         'likes': {'read_only': True},
                         }
@@ -372,7 +373,7 @@ class ReplyListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reply
-        exclude = ('is_read',  'comment_read')
+        exclude = ('is_read', 'comment_read')
         extra_kwargs = {'id': {'read_only': True},
                         'likes': {'read_only': True},
                         }
@@ -436,4 +437,16 @@ class ReplyAllDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reply
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    merchant_name = serializers.ReadOnlyField(source='merchant.username')
+    receiver_name = serializers.ReadOnlyField(source='receiver.username')
+    pay_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', allow_null=True, required=False)
+
+    class Meta:
+        model = Order
         fields = '__all__'
