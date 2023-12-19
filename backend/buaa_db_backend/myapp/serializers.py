@@ -4,7 +4,7 @@ from django.utils import timezone
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 
 from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment, \
     Reply, Order
@@ -166,6 +166,41 @@ class UserAllDetailSerializer(serializers.ModelSerializer):
         exclude = ('password', 'is_superuser', 'user_permissions')
         extra_kwargs = {'id': {'read_only': True},
                         'last_login': {'read_only': True},
+                        }
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
+
+
+# class PermissionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Permission
+#         fields = ('id', 'name')
+
+
+class UserAllDetailAndPermissionSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    groups = GroupSerializer(many=True)
+    permissions = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        # 获取用户的所有权限
+        permissions = []
+        for group in obj.groups.all():
+            for permission in group.permissions.all():
+                permissions.append({'id': permission.id, 'name': permission.name})
+        return permissions
+
+    class Meta:
+        model = get_user_model()
+        # fields = '__all__'
+        exclude = ('password', 'is_superuser', 'user_permissions')
+        extra_kwargs = {'id': {'read_only': True},
+                        'last_login': {'read_only': True},
+                        # 'user_permissions': {'read_only': True},
                         }
 
 

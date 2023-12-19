@@ -12,7 +12,7 @@ from sqlparse.sql import Case
 from ..models import User, Product, Classification1, Classification2, ProductImage, Comment, Reply, Order
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
     ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer, ReplyAllDetailSerializer, \
-    AdminUserCreateSerializer, OrderSerializer
+    AdminUserCreateSerializer, OrderSerializer, UserAllDetailAndPermissionSerializer
 from ..utils import APIResponse, make_error_log, dict_fetchall, getWeekDays
 
 
@@ -124,7 +124,7 @@ class UserAllDetailView(APIView):
         except User.DoesNotExist:
             make_error_log(request, '用户不存在')
             return APIResponse(code=1, msg='用户不存在')
-        serializer = UserAllDetailSerializer(user)
+        serializer = UserAllDetailAndPermissionSerializer(user)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
     def post(self, request):
@@ -135,6 +135,9 @@ class UserAllDetailView(APIView):
             make_error_log(request, '用户不存在')
             return APIResponse(code=1, msg='用户不存在')
         data = request.data.copy()
+        # excluded_fields = ['id', 'order_number', 'status', 'create_time', 'pay_time']
+        # for field in excluded_fields:
+        #     data.pop(field, None)
         serializer = UserAllDetailSerializer(user, data=data,
                                              # partial=True
                                              )
