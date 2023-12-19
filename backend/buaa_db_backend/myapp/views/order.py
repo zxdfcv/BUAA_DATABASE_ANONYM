@@ -56,7 +56,7 @@ class EditOrderView(APIView):
         serializer = OrderSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return APIResponse(code=1, msg='下单成功', data=serializer.data)
+            return APIResponse(code=0, msg='下单成功', data=serializer.data)
 
         make_error_log(request, '下单失败')
         return APIResponse(code=1, msg='下单失败', data=serializer.errors)
