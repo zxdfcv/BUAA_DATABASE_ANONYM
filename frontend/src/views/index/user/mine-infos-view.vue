@@ -44,7 +44,7 @@
         </div>
         <div class="mine-item flex-view" @click="clickMenu('thingHistory')">
           <img :src="AddressIconImage">
-          <span>我买到的(待实现)</span>
+          <span>我的订单</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('commentView')">
           <img :src="CommentIconImg">
