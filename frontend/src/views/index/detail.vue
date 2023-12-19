@@ -524,6 +524,7 @@ const addWanted = () => {
   if (userStore.user_access) {
     /* TODO: addWantedProductApi here userId/name, productId, state(ONLY ADD) */
     detailData.value.isWanted = true;
+    router.push({name: 'purchase', query: {product: thingId.value}});
     getPostDetail();
   } else {
     openNotification({

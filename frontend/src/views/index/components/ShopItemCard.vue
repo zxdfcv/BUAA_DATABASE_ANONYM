@@ -8,12 +8,12 @@
   <template #cover style="display: flex;
     justify-content: space-around;">
     <Button
-        type="primary"
+        type="error"
         shape="circle"
         icon="md-close"
-        style="position: absolute; right: 10px; top: 10px;"
+        style="position: absolute; right: 10px; top: 10px; width: fit-content"
         @click.stop="deleteCollect"
-        v-if="props.deletable"/>
+        v-if="props.deletable">删除收藏</Button>
     <img
         v-if="props.shopCard.url"
         alt="example"
