@@ -4,10 +4,10 @@ from django.utils import timezone
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 
 from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment, \
-    Reply
+    Reply, Order
 
 User = get_user_model()
 
@@ -169,6 +169,41 @@ class UserAllDetailSerializer(serializers.ModelSerializer):
                         }
 
 
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
+
+
+# class PermissionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Permission
+#         fields = ('id', 'name')
+
+
+class UserAllDetailAndPermissionSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    groups = GroupSerializer(many=True)
+    permissions = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        # 获取用户的所有权限
+        permissions = []
+        for group in obj.groups.all():
+            for permission in group.permissions.all():
+                permissions.append({'id': permission.id, 'name': permission.name})
+        return permissions
+
+    class Meta:
+        model = get_user_model()
+        # fields = '__all__'
+        exclude = ('password', 'is_superuser', 'user_permissions')
+        extra_kwargs = {'id': {'read_only': True},
+                        'last_login': {'read_only': True},
+                        # 'user_permissions': {'read_only': True},
+                        }
+
+
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
@@ -250,6 +285,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_collectors_count(self, obj):
         return obj.collectors.count()
+
     def get_merchant_avatar(self, obj):
         return str(obj.merchant.avatar) if obj.merchant.avatar else ''
 
@@ -310,7 +346,7 @@ class CommentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        exclude = ('is_read', )
+        exclude = ('is_read',)
         extra_kwargs = {'id': {'read_only': True},
                         'likes': {'read_only': True},
                         }
@@ -372,7 +408,7 @@ class ReplyListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reply
-        exclude = ('is_read',  'comment_read')
+        exclude = ('is_read', 'comment_read')
         extra_kwargs = {'id': {'read_only': True},
                         'likes': {'read_only': True},
                         }
@@ -436,4 +472,16 @@ class ReplyAllDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Reply
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    merchant_name = serializers.ReadOnlyField(source='merchant.username')
+    receiver_name = serializers.ReadOnlyField(source='receiver.username')
+    pay_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', allow_null=True, required=False)
+
+    class Meta:
+        model = Order
         fields = '__all__'
