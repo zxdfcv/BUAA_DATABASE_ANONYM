@@ -56,6 +56,28 @@
         </div>
         <div class="flex-view">
           <div class="item">
+            <div class="label">上架状态</div>
+          </div>
+          <div class="right-box" style="margin-top: 20px">
+            <a-radio-group v-model:value="tData.form.off_shelve" button-style="solid">
+              <a-radio-button value="0">商品上架</a-radio-button>
+              <a-radio-button value="1">商品下架</a-radio-button>
+            </a-radio-group>
+          </div>
+        </div>
+        <div class="flex-view">
+          <div class="item">
+            <div class="label">售出状态</div>
+          </div>
+          <div class="right-box" style="margin-top: 20px">
+            <a-radio-group v-model:value="tData.form.is_sold" button-style="solid">
+              <a-radio-button value="0">未售出</a-radio-button>
+              <a-radio-button value="1">已售出</a-radio-button>
+            </a-radio-group>
+          </div>
+        </div>
+        <div class="flex-view">
+          <div class="item">
             <div class="label">商品分类</div>
           </div>
           <div class="right-box" style="margin-top: 20px">
@@ -168,6 +190,8 @@ let tData = reactive({
     merchant: userStore.user_id,
     status: undefined,
     addr: undefined,
+    is_sold: undefined,
+    off_shelve: undefined,
     classification_1: undefined,
     classification_2: undefined,
     description: undefined,
@@ -307,12 +331,18 @@ const submit = () => {
   for (const key in tData.form) {
     if (tData.form[key] !== undefined) {
       console.log(key)
-      submitForm.append(key, tData.form[key]);
+      if (key === "is_sold" || key==="off_shelve") {
+        console.log((tData.form[key] === '1') ? 'true' : 'false')
+        submitForm.append(key, (tData.form[key] === '1') ? 'true' : 'false');
+      } else {
+        submitForm.append(key, tData.form[key]);
+      }
     }
   }
   loading.value= true;
   imageList.value.forEach(file => { submitForm.append('images', file); })
   videoList.value.forEach(file => { submitForm.append('video', file); })
+  console.log(submitForm)
   if (!props.modify) {
     addProduct(submitForm).then(res => {
       loading.value = false;
@@ -379,6 +409,8 @@ const refillData = (data) => {
     case "沙河校区": tData.form.addr = '2'; break;
     case "两校区均可": tData.form.addr = '3'; break;
   }
+  tData.form.is_sold = data.is_sold ? '1' : '0';
+  tData.form.off_shelve = data.off_shelve ? '1' : '0';
   tData.form.classification_1 = data.classification_1;
   tData.form.classification_2 = data.classification_2;
   tData.form.description = data.description;

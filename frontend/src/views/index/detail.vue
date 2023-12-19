@@ -119,6 +119,12 @@
                             <a-descriptions-item label="发布时间">
                               <div>{{ detailData.createTime }}</div>
                             </a-descriptions-item>
+                            <a-descriptions-item label="在售状态" v-if="detailData.is_sold || detailData.off_shelve">
+                              <div>
+                                <a-button danger shape="round" v-if="detailData.is_sold">已售出</a-button>
+                                <a-button shape="round" v-else-if="detailData.off_shelve">已下架</a-button>
+                              </div>
+                            </a-descriptions-item>
 
                           </a-descriptions>
                         </a-card>
@@ -399,6 +405,9 @@ const toggleShowReply = (index) => {
 
 const getPostDetail = async () => {
   await getProductDetail({product_id: thingId.value}).then(async res => {
+    console.log(res.data)
+    detailData.value['is_sold'] = res.data.is_sold;
+    detailData.value['off_shelve'] = res.data.off_shelve;
     detailData.value['id'] = res.data.id;
     detailData.value['cover'] = res.data.images;
     detailData.value['title'] = res.data.name;
@@ -521,6 +530,14 @@ const getThingDetail = () => { /* 收藏、Like 后均需要刷新数据详情�
   })
 }
 const addWanted = () => {
+  if (detailData.value.is_sold || detailData.value.off_shelve) {
+    openNotification({
+      type: 'error',
+      message: 'Oops!',
+      description: "当前商品不允许购买！",
+    })
+    return;
+  }
   if (userStore.user_access) {
     /* TODO: addWantedProductApi here userId/name, productId, state(ONLY ADD) */
     detailData.value.isWanted = true;
