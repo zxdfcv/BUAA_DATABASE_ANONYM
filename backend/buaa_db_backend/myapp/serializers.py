@@ -167,7 +167,33 @@ class UserAllDetailSerializer(serializers.ModelSerializer):
         extra_kwargs = {'id': {'read_only': True},
                         'last_login': {'read_only': True},
                         }
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ('id', 'name')
+        # read_only_fields = ('id',)
 
+class GroupWithPermissionsSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name', 'permissions')
+
+    # def create(self, validated_data):
+    #     print("create - validated_data:", validated_data)
+    #     permissions_data = validated_data.pop('permissions', [])  # 获取 permissions 字段
+    #     group = Group.objects.create(**validated_data)
+    #
+    #     # 转换权限ID为整数
+    #     permission_ids = [int(permission['id']) for permission in permissions_data]
+    #
+    #     # 添加权限到组中
+    #     if permission_ids:
+    #         permissions = Permission.objects.filter(id__in=permission_ids)
+    #         group.permissions.set(permissions)
+    #
+    #     return group
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
