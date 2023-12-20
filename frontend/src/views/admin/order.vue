@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import {listApi, createApi, updateApi, cancelOrderApi, delayApi, deleteApi} from '@/api/admin/order'
+import {listApi, createApi, updateApi, cancelApi, deleteApi} from '/@/api/admin/order'
 
 const columns = [
   {
@@ -134,7 +134,7 @@ export default {
       this.$confirm({
         title: '确定取消?',
         onOk () {
-          cancelOrderApi({
+          cancelApi({
             id: record.id
           }).then(res => {
             that.$message.success('取消成功')
