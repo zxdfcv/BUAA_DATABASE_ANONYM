@@ -66,11 +66,10 @@ const initPieChart = () => {
     nowData.map((item) => {
       pieData.push({name: item.key, value: item.value})
     })
-    pieData.push({name: '111', value: 6})
-    pieData.push({name: '121', value: 6})
-    pieData.push({name: '131', value: 6})
-    pieData.push({name: '141', value: 6})
-
+    // pieData.push({name: '111', value: 6})
+    // pieData.push({name: '121', value: 6})
+    // pieData.push({name: '131', value: 6})
+    // pieData.push({name: '141', value: 6})
   }
   console.log(pieData)
   pieChart.value = echarts.init(chartContainer.value)
@@ -147,6 +146,6 @@ const initPieChart = () => {
 /* Add your component-specific styles here */
 .pie-chart-container {
   /* Add styles for the chart container */
-  height: 300px /* Set an appropriate height */
+  height: 400px /* Set an appropriate height */
 }
 </style>

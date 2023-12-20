@@ -1,7 +1,7 @@
 import {get, post} from '/@/utils/http/axios';
 
 enum URL {
-    list = '/myapp/admin/overview/count',
+    list = '/myapp/admin/statistics',
     sysInfo= '/myapp/admin/overview/sysInfo',
 }
 

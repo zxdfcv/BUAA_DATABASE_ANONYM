@@ -102,6 +102,20 @@
                   <a-input placeholder="请输入" v-model:value="modal.form.phone" allowClear />
                 </a-form-item>
               </a-col>
+              <a-col offset="1" span="23">
+                <p slot="title">修改权限组</p>
+                <a-form :label-width="40">
+                  <a-form-item>
+                    <a-transfer
+                        :list-style="{ width: '300px' }"
+                        :data="allGroups"
+                        :target-keys="modal.group"
+                        :titles="['可用分组', '当前分组']"
+                        filterable
+                    />
+                  </a-form-item>
+                </a-form>
+              </a-col>
             </a-row>
           </a-form>
         </div>
@@ -187,6 +201,8 @@
 
   const fileList = ref([]);
 
+  const allGroups = ref([])
+
   // 页面数据
   const data = reactive({
     userList: [],
@@ -203,6 +219,7 @@
     visile: false,
     editFlag: false,
     title: '',
+    group: [],
     roleData: [
       {
         id: true,

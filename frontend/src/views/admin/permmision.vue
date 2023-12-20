@@ -4,6 +4,7 @@
     <div class="page-view">
       <div class="table-operations">
         <a-space>
+          <a-button type="primary" @click="handleAdd">新增</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
         </a-space>
       </div>
@@ -12,7 +13,7 @@
           rowKey="id"
           :loading="data.loading"
           :columns="columns"
-          :data-source="data.list"
+          :data-source="data.tagList"
           :scroll="{ x: 'max-content' }"
           :row-selection="rowSelection"
           :pagination="{
@@ -27,41 +28,48 @@
         <template #bodyCell="{ text, record, index, column }">
           <template v-if="column.key === 'operation'">
             <span>
-              <a-divider type="vertical"/>
+              <a @click="handleEdit(record)">编辑</a>
+              <a-divider type="vertical" />
               <a-popconfirm title="确定删除?" ok-text="是" cancel-text="否" @confirm="confirmDelete(record)">
                 <a href="#">删除</a>
               </a-popconfirm>
-            </span>
-          </template>
-          <template v-if="column.key === 'likes'">
-            <span>
-              <a-divider type="vertical"/>
-              <a-dropdown :trigger="['click']">
-                <a class="ant-dropdown-link" @click.prevent>
-                  点我
-                  <DownOutlined />
-                </a>
-                <template #overlay>
-                  <a-menu>
-                    <a-menu-item v-for="item in record.likes" :key="item"> {{ item }} </a-menu-item>
-                  </a-menu>
-                </template>
-              </a-dropdown>
             </span>
           </template>
         </template>
       </a-table>
     </div>
 
+    <!--弹窗区域-->
+    <div>
+      <a-modal
+          :visible="modal.visile"
+          :forceRender="true"
+          :title="modal.title"
+          ok-text="确认"
+          cancel-text="取消"
+          @cancel="handleCancel"
+          @ok="handleOk"
+      >
+        <div>
+          <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
+            <a-row :gutter="24">
+              <a-col span="24">
+                <a-form-item label="标签名称" name="title">
+                  <a-input placeholder="请输入" v-model:value="modal.form.title"></a-input>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </div>
+      </a-modal>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import {FormInstance, message} from 'ant-design-vue';
-import {createApi, listApi, deleteApi} from '/@/api/admin/reply';
-import {BASE_URL} from "/@/store/constants";
-import {getFormatTime} from "/@/utils";
-import { DownOutlined } from '@ant-design/icons-vue'
+import { FormInstance, message } from 'ant-design-vue';
+import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/tag';
+
 
 const columns = reactive([
   {
@@ -71,41 +79,10 @@ const columns = reactive([
     align: 'center'
   },
   {
-    title: '用户',
-    dataIndex: 'user_name',
-    key: 'user_name',
+    title: '标签名称',
+    dataIndex: 'title',
+    key: 'title',
     align: 'center'
-  }
-  ,
-  {
-    title: '@用户 id',
-    dataIndex: 'mentioned_user',
-    key: 'mentioned_user',
-    align: 'center'
-  },
-  {
-    title: '商品名称',
-    dataIndex: 'product_name',
-    key: 'product_name',
-    align: 'center'
-  },
-  {
-    title: '回复内容',
-    dataIndex: 'content',
-    key: 'content',
-    align: 'center'
-  },
-  {
-    title: '点赞者id',
-    dataIndex: 'likes',
-    key: 'likes',
-    align: 'center',
-  },
-  {
-    title: '回复时间',
-    dataIndex: 'create_time',
-    key: 'create_time',
-    align: 'center',
   },
   {
     title: '操作',
@@ -119,9 +96,8 @@ const columns = reactive([
 
 // 页面数据
 const data = reactive({
-  list: [],
+  tagList: [],
   loading: false,
-  currentAdminUserName: '',
   keyword: '',
   selectedRowKeys: [] as any[],
   pageSize: 10,
@@ -135,19 +111,20 @@ const modal = reactive({
   title: '',
   form: {
     id: undefined,
-    image: undefined,
-    link: undefined,
+    title: undefined,
   },
   rules: {
-    link: [{required: true, message: '请输入', trigger: 'change'}],
+    title: [{ required: true, message: '请输入', trigger: 'change' }],
   },
 });
 
+const myform = ref<FormInstance>();
+
 onMounted(() => {
-  getList();
+  getDataList();
 });
 
-const getList = () => {
+const getDataList = () => {
   data.loading = true;
   listApi({
     keyword: data.keyword,
@@ -157,21 +134,8 @@ const getList = () => {
         console.log(res);
         res.data.forEach((item: any, index: any) => {
           item.index = index + 1;
-          if (item.image) {
-            item.image = BASE_URL + item.image
-          }
-          if (item.content) {
-            if (item.content.length > 50) {
-              item.content = item.content.substring(0, 50) + '...'
-            }
-          }
-          if (item.canteen_title !== undefined) {
-            item.title = item.canteen_title
-          } else if (item.classification_title != undefined) {
-            item.title = item.classification_title
-          }
         });
-        data.list = res.data;
+        data.tagList = res.data;
       })
       .catch((err) => {
         data.loading = false;
@@ -179,6 +143,14 @@ const getList = () => {
       });
 };
 
+const onSearchChange = (e: Event) => {
+  data.keyword = e?.target?.value;
+  console.log(data.keyword);
+};
+
+const onSearch = () => {
+  getDataList();
+};
 
 const rowSelection = ref({
   onChange: (selectedRowKeys: (string | number)[], selectedRows: DataItem[]) => {
@@ -187,11 +159,35 @@ const rowSelection = ref({
   },
 });
 
+const handleAdd = () => {
+  resetModal();
+  modal.visile = true;
+  modal.editFlag = false;
+  modal.title = '新增';
+  // 重置
+  for (const key in modal.form) {
+    modal.form[key] = undefined;
+  }
+};
+const handleEdit = (record: any) => {
+  resetModal();
+  modal.visile = true;
+  modal.editFlag = true;
+  modal.title = '编辑';
+  // 重置
+  for (const key in modal.form) {
+    modal.form[key] = undefined;
+  }
+  for (const key in record) {
+    modal.form[key] = record[key];
+  }
+};
+
 const confirmDelete = (record: any) => {
   console.log('delete', record);
-  deleteApi({ids: record.id})
+  deleteApi({ ids: record.id })
       .then((res) => {
-        getList();
+        getDataList();
       })
       .catch((err) => {
         message.error(err.msg || '操作失败');
@@ -205,15 +201,58 @@ const handleBatchDelete = () => {
     message.warn('请勾选删除项');
     return;
   }
-  deleteApi({ids: data.selectedRowKeys.join(',')})
+  deleteApi({ ids: data.selectedRowKeys.join(',') })
       .then((res) => {
         message.success('删除成功');
         data.selectedRowKeys = [];
-        getList();
+        getDataList();
       })
       .catch((err) => {
         message.error(err.msg || '操作失败');
       });
+};
+
+const handleOk = () => {
+  myform.value
+      ?.validate()
+      .then(() => {
+        if (modal.editFlag) {
+          updateApi({ id: modal.form.id }, modal.form)
+              .then((res) => {
+                hideModal();
+                getDataList();
+              })
+              .catch((err) => {
+                message.error(err.msg || '操作失败');
+              });
+        } else {
+          createApi(modal.form)
+              .then((res) => {
+                hideModal();
+                getDataList();
+              })
+              .catch((err) => {
+                message.error(err.msg || '操作失败');
+              });
+        }
+      })
+      .catch((err) => {
+        console.log('不能为空');
+      });
+};
+
+const handleCancel = () => {
+  hideModal();
+};
+
+// 恢复表单初始状态
+const resetModal = () => {
+  myform.value?.resetFields();
+};
+
+// 关闭弹窗
+const hideModal = () => {
+  modal.visile = false;
 };
 </script>
 

@@ -270,6 +270,7 @@ const modal = reactive({
     coverUrl: undefined,
     imageFile: undefined,
     rawFile: undefined,
+    description: undefined
   },
   rules: {
     name: [{ required: true, message: '请输入名称', trigger: 'change' }],

@@ -6,7 +6,7 @@
         <span class="header-title">北航闲鱼商城后台管理系统</span>
         <div class="empty"></div>
         <a-button style="margin-right: 24px;" @click="handlePreview">前台预览</a-button>
-        <span>管理员[{{ userStore.admin_user_name }}]</span>
+        <span>管理员[{{ userStore.user_name }}]</span>
         <a class="header-quit" @click="handleLogout">退出</a>
       </div>
     </a-layout-header>
@@ -17,6 +17,10 @@
           <a-menu-item key="thing">
             <database-outlined/>
             <span>商品管理</span>
+          </a-menu-item>
+          <a-menu-item key="order">
+            <database-outlined/>
+            <span>订单管理</span>
           </a-menu-item>
           <a-menu-item key="canteen">
             <layout-outlined/>
@@ -45,6 +49,10 @@
           <a-menu-item key="user">
             <user-outlined/>
             <span>用户管理</span>
+          </a-menu-item>
+          <a-menu-item key="permission">
+            <user-outlined/>
+            <span>权限管理</span>
           </a-menu-item>
           <!-- <a-sub-menu>
             <template #icon>

@@ -1,9 +1,9 @@
 import {get, post} from '/@/utils/http/axios';
 
 enum URL {
-    loginLogList = '/myapp/admin/loginLog/list',
-    opLogList = '/myapp/admin/opLog/list',
-    errorLogList = '/myapp/admin/errorLog/list',
+    loginLogList = '/myapp/log/login',
+    opLogList = '/myapp/log/op',
+    errorLogList = '/myapp/log/error',
 }
 
 const listLoginLogApi = async (params: any) =>

@@ -10,7 +10,7 @@ const barChart = ref()
 
 onMounted(() => {
   console.log('fuck')
-  Object.defineProperty(document.getElementById(props.id), 'clientHeight', { get: function() { return 300 } })
+  Object.defineProperty(document.getElementById(props.id), 'clientHeight', { get: function() { return 400 } })
   initBarChart()
   window.onresize = function () { // resize
     barChart.value.resize()
@@ -77,10 +77,10 @@ const initBarChart = () => {
       top: '40px',
       left: '40px',
       right: '40px',
-      bottom: '40px'
+      bottom: '15%', // 调整底部边距
     },
     title: {
-      text: '热门商品排名',
+      text: props.title,
       textStyle: {
         color: '#aaa',
         fontStyle: 'normal',
@@ -158,6 +158,6 @@ const initBarChart = () => {
 
 <style scoped>
 .column-chart-container {
-  height: 300px // 高度设置要合理
+  height: 400px // 高度设置要合理
 }
 </style>
