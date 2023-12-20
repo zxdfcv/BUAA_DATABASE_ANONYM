@@ -4,9 +4,10 @@ from django.utils import timezone
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
 
-from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment
+from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment, \
+    Reply, Order
 
 User = get_user_model()
 
@@ -64,6 +65,33 @@ class UserLoginSerializer(serializers.ModelSerializer):
         user = User.objects.create_user(**validated_data)
         group, created = Group.objects.get_or_create(name='普通用户')
         user.groups.add(group)
+        return user
+
+
+class AdminUserCreateSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    groups = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=Group.objects.all()
+    )
+
+    class Meta:
+        model = get_user_model()
+        # fields = '__all__'
+        exclude = ('is_superuser', 'user_permissions')
+        extra_kwargs = {'id': {'read_only': True},
+                        'last_login': {'read_only': True},
+                        'password': {'write_only': True}
+                        }
+
+    def create(self, validated_data):
+        groups_data = validated_data.pop('groups', [])  # 移除 groups 数据
+        user = User.objects.create_user(**validated_data)
+        for group_data in groups_data:
+            group_name = group_data['name']
+            group, created = Group.objects.get_or_create(name=group_name)
+            user.groups.add(group)
         return user
 
 
@@ -139,6 +167,67 @@ class UserAllDetailSerializer(serializers.ModelSerializer):
         extra_kwargs = {'id': {'read_only': True},
                         'last_login': {'read_only': True},
                         }
+class PermissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Permission
+        fields = ('id', 'name')
+        # read_only_fields = ('id',)
+
+class GroupWithPermissionsSerializer(serializers.ModelSerializer):
+    permissions = PermissionSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = ('id', 'name', 'permissions')
+
+    # def create(self, validated_data):
+    #     print("create - validated_data:", validated_data)
+    #     permissions_data = validated_data.pop('permissions', [])  # 获取 permissions 字段
+    #     group = Group.objects.create(**validated_data)
+    #
+    #     # 转换权限ID为整数
+    #     permission_ids = [int(permission['id']) for permission in permissions_data]
+    #
+    #     # 添加权限到组中
+    #     if permission_ids:
+    #         permissions = Permission.objects.filter(id__in=permission_ids)
+    #         group.permissions.set(permissions)
+    #
+    #     return group
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
+
+
+# class PermissionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Permission
+#         fields = ('id', 'name')
+
+
+class UserAllDetailAndPermissionSerializer(serializers.ModelSerializer):
+    date_joined = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
+    groups = GroupSerializer(many=True)
+    permissions = serializers.SerializerMethodField()
+
+    def get_permissions(self, obj):
+        # 获取用户的所有权限
+        permissions = []
+        for group in obj.groups.all():
+            for permission in group.permissions.all():
+                permissions.append({'id': permission.id, 'name': permission.name})
+        return permissions
+
+    class Meta:
+        model = get_user_model()
+        # fields = '__all__'
+        exclude = ('password', 'is_superuser', 'user_permissions')
+        extra_kwargs = {'id': {'read_only': True},
+                        'last_login': {'read_only': True},
+                        # 'user_permissions': {'read_only': True},
+                        }
 
 
 class UserListSerializer(serializers.ModelSerializer):
@@ -211,6 +300,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     # images = ProductImageSerializer(many=True, read_only=True)
     create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
     merchant_name = serializers.ReadOnlyField(source='merchant.username')
+    merchant_avatar = serializers.SerializerMethodField()
     classification_1_name = serializers.ReadOnlyField(source='classification_1.name')
     classification_2_name = serializers.ReadOnlyField(source='classification_2.name')
     collectors_count = serializers.SerializerMethodField()
@@ -221,6 +311,9 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_collectors_count(self, obj):
         return obj.collectors.count()
+
+    def get_merchant_avatar(self, obj):
+        return str(obj.merchant.avatar) if obj.merchant.avatar else ''
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):
@@ -279,7 +372,10 @@ class CommentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        exclude = ('is_read', 'likes',)
+        exclude = ('is_read',)
+        extra_kwargs = {'id': {'read_only': True},
+                        'likes': {'read_only': True},
+                        }
 
     def get_user_avatar(self, obj):
         return str(obj.user.avatar) if obj.user.avatar else ''
@@ -310,4 +406,108 @@ class CommentAllDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
+        fields = '__all__'
+
+
+# class MentionedUserSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('username', 'nickname')
+
+
+class ReplyListSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+    mentioned_nickname = serializers.ReadOnlyField(source="mentioned_user.nickname")
+    likes_count = serializers.SerializerMethodField()
+
+    # mentioned_users_detail = MentionedUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reply
+        exclude = ('is_read', 'comment_read')
+        extra_kwargs = {'id': {'read_only': True},
+                        'likes': {'read_only': True},
+                        }
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+
+class ReplyNoticeSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+    mentioned_nickname = serializers.ReadOnlyField(source="mentioned_user.nickname")
+
+    # mentioned_users = MentionedUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reply
+        exclude = ('likes', 'comment_read')
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+
+class MentionNoticeSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+    mentioned_nickname = serializers.ReadOnlyField(source="mentioned_user.nickname")
+
+    # mentioned_users = MentionedUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reply
+        exclude = ('likes', 'is_read')
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+
+class ReplyAllDetailSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+
+    class Meta:
+        model = Reply
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    merchant_name = serializers.ReadOnlyField(source='merchant.username')
+    receiver_name = serializers.ReadOnlyField(source='receiver.username')
+    pay_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', allow_null=True, required=False)
+
+    class Meta:
+        model = Order
         fields = '__all__'

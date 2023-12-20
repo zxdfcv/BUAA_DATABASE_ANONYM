@@ -1,7 +1,7 @@
 <template>
   <div class="mine-infos-view">
     <div class="info-box flex-view">
-      <img v-if = "!(appStore.view_user_avatar === null || appStore.view_user_avatar === undefined)" :src="BASE_URL+appStore.view_user_avatar" class="avatar-img">
+      <img v-if = "!(appStore.view_user_avatar === null || appStore.view_user_avatar === undefined)" :src="BASE_URL + appStore.view_user_avatar" class="avatar-img">
       <img v-else :src="AvatarImg" class="avatar-img">
       <div class="name-box">
         <h2 class="nick">{{ appStore.view_user_username }}</h2>
@@ -34,13 +34,17 @@
     </div>
     <div class="setting-box"  v-if="appStore.view_user_id === userStore.user_id">
       <div class="list">
+        <div class="mine-item flex-view" @click="clickMenu('addProduct')">
+          <img :src="PointIconImage">
+          <span>发布商品</span>
+        </div>
         <div class="mine-item flex-view" @click="clickMenu('scoreView')">
           <img :src="PointIconImage">
           <span>商品收藏</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('thingHistory')">
           <img :src="AddressIconImage">
-          <span>我买到的</span>
+          <span>我的订单</span>
         </div>
         <div class="mine-item flex-view" @click="clickMenu('commentView')">
           <img :src="CommentIconImg">

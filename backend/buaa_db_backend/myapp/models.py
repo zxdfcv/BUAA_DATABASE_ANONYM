@@ -41,6 +41,7 @@ class Follow(models.Model):
 class Classification1(models.Model):
     name = models.CharField(max_length=255, unique=True)
     image = models.FileField(upload_to='c1_images/', null=True, blank=True)
+    description = models.TextField(max_length=1000, blank=True, null=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -55,6 +56,7 @@ class Classification2(models.Model):
     name = models.CharField(max_length=255, unique=True)
     image = models.FileField(upload_to='c2_images/', null=True, blank=True)
     classification_1 = models.ForeignKey(Classification1, on_delete=models.CASCADE, related_name='c1_c2')
+    description = models.TextField(max_length=1000, blank=True, null=True)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     def __str__(self):
@@ -124,7 +126,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_comment')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_comment')
     # type = models.CharField(max_length=1, choices=TYPE_CHOICES, default=0)
-    content = models.CharField(max_length=255)
+    content = models.TextField(max_length=1023)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
     # like_count = models.IntegerField(default=0)
     reply_count = models.IntegerField(default=0)
@@ -142,12 +144,14 @@ class Comment(models.Model):
 class Reply(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_reply')
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE, related_name='comment_reply')
-    content = models.CharField(max_length=255)
+    content = models.TextField(max_length=1023)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
     # like_count = models.IntegerField(default=0)
     is_read = models.BooleanField(default=False)
+    comment_read = models.BooleanField(default=False)
 
-    mentioned_users = models.ManyToManyField(User, blank=True, related_name='mentioned_reply')
+    mentioned_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mentioned_reply', blank=True,
+                                       null=True)
     likes = models.ManyToManyField(User, blank=True, related_name='like_comment')
 
     def __str__(self):
@@ -201,3 +205,23 @@ class ErrorLog(models.Model):
     class Meta:
         db_table = "buaa_db_error_log"
         verbose_name = "错误日志"
+
+
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('0', '未支付'),
+        ('1', '已经支付'),
+        ('2', '订单取消')
+    ]
+    order_number = models.CharField(max_length=64,verbose_name="订单号")
+    merchant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='merchant_order')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver_order')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order')
+    amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default=0)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
+    pay_time = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "buaa_db_order"
+        verbose_name = "订单"

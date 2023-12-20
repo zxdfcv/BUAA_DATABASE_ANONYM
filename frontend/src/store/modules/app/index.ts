@@ -64,6 +64,7 @@ export const useAppStore = defineStore(
                             // @ts-ignore
                             state.classificationTree.push({
                                 label: state.classification1[j],
+                                id: this.checkC_1[state.classification1[j]],
                                 key: j + "-0",
                                 children: []
                             });
@@ -76,6 +77,7 @@ export const useAppStore = defineStore(
                                     // @ts-ignore
                                     state.classificationTree[l]['children'].push({
                                         label: res2[k].name,
+                                        id: res2[k].id,
                                         // @ts-ignore
                                         key: state.classificationTree[l]['key'] + '-' + state.classificationTree[l]['children'].length
                                     });

@@ -27,7 +27,7 @@
                       <a @click="router.push({name: 'wishThingView', query: {id: item.follower}})">{{ item.follower_name }}</a>
                     </template>
                     <template #avatar>
-                      <a-avatar v-if="!(item.following_avatar === '' || item.following_avatar === null || item.following_avatar === undefined)" :src="BASE_URL + '/upload/'+ item.follower_avatar"/>
+                      <a-avatar v-if="!(item.follower_avatar === '' || item.follower_avatar === null || item.follower_avatar === undefined)" :src="BASE_URL + '/upload/'+ item.follower_avatar"/>
                       <a-avatar v-else :src="AvatarIcon" />
                     </template>
 
@@ -37,7 +37,6 @@
               </template>
             </a-list>
             <template v-if="!listData || listData.length <= 0">
-            <a-empty style="width: 100%;margin-top: 200px;"/>
           </template>
           </div>
         </a-spin>
@@ -85,11 +84,13 @@ const pagination = {
 const loading = ref(false)
 
 const queryFollow = async () => {
+  loading.value = true;
   const res = await userFansApi({user_id: appStore.view_user_id});
   listData.length = 0;
   for (let i = 0; i < res.data.length; i++) {
     listData.push(res.data[i]);
   }
+  loading.value = false;
 }
 
 const deleteFollow = async (targetId) => {

@@ -1,7 +1,7 @@
 from datetime import datetime
 from random import random
 from django.db import connection
-from django.db.models import When, Count
+from django.db.models import When, Count, Max
 from django.forms import IntegerField
 from rest_framework import generics
 from rest_framework.pagination import LimitOffsetPagination
@@ -9,9 +9,10 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from sqlparse.sql import Case
 
-from ..models import User, Product, Classification1, Classification2, ProductImage, Comment
+from ..models import User, Product, Classification1, Classification2, ProductImage, Comment, Reply, Order
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
-    ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer
+    ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer, ReplyAllDetailSerializer, \
+    AdminUserCreateSerializer, OrderSerializer, UserAllDetailAndPermissionSerializer
 from ..utils import APIResponse, make_error_log, dict_fetchall, getWeekDays
 
 
@@ -123,7 +124,7 @@ class UserAllDetailView(APIView):
         except User.DoesNotExist:
             make_error_log(request, '用户不存在')
             return APIResponse(code=1, msg='用户不存在')
-        serializer = UserAllDetailSerializer(user)
+        serializer = UserAllDetailAndPermissionSerializer(user)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
     def post(self, request):
@@ -134,6 +135,9 @@ class UserAllDetailView(APIView):
             make_error_log(request, '用户不存在')
             return APIResponse(code=1, msg='用户不存在')
         data = request.data.copy()
+        # excluded_fields = ['id', 'order_number', 'status', 'create_time', 'pay_time']
+        # for field in excluded_fields:
+        #     data.pop(field, None)
         serializer = UserAllDetailSerializer(user, data=data,
                                              # partial=True
                                              )
@@ -142,6 +146,19 @@ class UserAllDetailView(APIView):
             return APIResponse(code=0, msg='更新成功', data=serializer.data)
         make_error_log(request, '用户更新失败')
         return APIResponse(code=1, msg='更新失败', data=serializer.errors)
+
+    def put(self, request):
+        data = request.data.copy()
+        groups = data.getlist('groups', [])
+        if not groups or all(not group for group in groups):
+            data.pop('groups', None)
+        serializer = AdminUserCreateSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='创建成功', data=serializer.data)
+        else:
+            print(serializer.errors)
+            return APIResponse(code=1, msg='创建失败', data=serializer.errors)
 
 
 class UserListView(generics.ListAPIView):
@@ -466,3 +483,158 @@ class CommentView(generics.ListAPIView):
             return APIResponse(code=1, msg='删除的评论不存在')
         comments.delete()
         return APIResponse(code=0, msg='评论删除成功')
+
+
+class ReplyView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        keyword = request.GET.get("keyword", None)
+        replies = Reply.objects.all().order_by('-create_time')
+        if keyword:
+            users = User.objects.filter(username__contains=keyword)
+            replies = replies.filter(user__in=users)
+        page = self.paginate_queryset(replies)
+        if page is not None:
+            serializer = ReplyAllDetailSerializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = ReplyAllDetailSerializer(replies, many=True)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+    def put(self, request):
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+        user_ids = data.getlist('likes', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('likes', None)
+        serializer = ReplyAllDetailSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='回复创建成功', data=serializer.data)
+        make_error_log(request, '创建回复失败')
+        return APIResponse(code=1, msg='回复创建失败', data=serializer.errors)
+
+    def post(self, request):
+        try:
+            reply_id = request.GET.get('reply_id')
+            reply = Reply.objects.get(pk=reply_id)
+        except Reply.DoesNotExist:
+            make_error_log(request, '修改的回复不存在')
+            return APIResponse(code=1, msg='回复不存在')
+
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+        user_ids = data.getlist('likes', [])
+        if not user_ids or all(not user_id for user_id in user_ids):
+            data.pop('likes', None)
+        serializer = ReplyAllDetailSerializer(reply, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='回复更新成功', data=serializer.data)
+        make_error_log(request, '更新回复失败')
+        return APIResponse(code=1, msg='回复更新失败', data=serializer.errors)
+
+    def delete(self, request):
+        ids = request.GET.get('ids')
+        ids_arr = ids.split(',')
+        replies = Reply.objects.filter(id__in=ids_arr)
+        if replies.count() != len(ids_arr):
+            make_error_log(request, '删除的回复不存在')
+            return APIResponse(code=1, msg='删除的回复不存在')
+        replies.delete()
+        return APIResponse(code=0, msg='回复删除成功')
+
+
+class OrderView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        keyword = request.GET.get("keyword", None)
+        orders = Order.objects.all().order_by('-create_time')
+        if keyword:
+            orders = orders.filter(order_number=keyword)
+        page = self.paginate_queryset(orders)
+        if page is not None:
+            serializer = OrderSerializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = OrderSerializer(orders, many=True)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+    def put(self, request):
+        data = request.data.copy()
+        excluded_fields = ['id', 'order_number', 'create_time']
+        for field in excluded_fields:
+            data.pop(field, None)
+        user_id = data['receiver']
+        if user_id is None:
+            make_error_log(request, '管理员创建订单失败')
+            return APIResponse(code=1, msg='创建失败', data={'details': "请传入receiver的用户id"})
+        max_order_id = Order.objects.aggregate(max_id=Max('id'))['max_id']
+        if not max_order_id:
+            max_order_id = 1
+        else:
+            max_order_id += 1
+        order_number = datetime.now().strftime("%Y%m%d%H%M%S") + "%06d" % int(user_id) + "%06d" % max_order_id
+        data['order_number'] = str(order_number)
+
+        serializer = OrderSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=1, msg='创建成功', data=serializer.data)
+
+        make_error_log(request, '管理员创建订单失败')
+        return APIResponse(code=1, msg='创建失败', data=serializer.errors)
+
+    def post(self, request):
+        try:
+            order_id = request.GET.get('order_id')
+            order = Order.objects.get(pk=order_id)
+        except Order.DoesNotExist:
+            make_error_log(request, '修改的订单不存在')
+            return APIResponse(code=1, msg='订单不存在')
+
+        data = request.data.copy()
+        excluded_fields = ['id', 'order_number', 'create_time']
+        for field in excluded_fields:
+            data.pop(field, None)
+        data['order_number'] = order.order_number
+        serializer = OrderSerializer(order, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='订单更新成功', data=serializer.data)
+        make_error_log(request, '更新订单失败')
+        return APIResponse(code=1, msg='订单更新失败', data=serializer.errors)
+
+    def delete(self, request):
+        ids = request.GET.get('ids')
+        ids_arr = ids.split(',')
+        orders = Order.objects.filter(id__in=ids_arr)
+        if orders.count() != len(ids_arr):
+            make_error_log(request, '删除的订单不存在')
+            return APIResponse(code=1, msg='删除的订单不存在')
+        orders.delete()
+        return APIResponse(code=0, msg='订单删除成功')

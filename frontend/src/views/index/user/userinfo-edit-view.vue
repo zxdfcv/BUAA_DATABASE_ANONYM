@@ -7,7 +7,7 @@
         <div class="item flex-view">
           <div class="label">头像</div>
           <div class="right-box avatar-box flex-view">
-            <img v-if="tData.form && tData.form.avatar" :src="tData.form.avatar" class="avatar">
+            <img v-if="tData.form && tData.form.avatar" :src="BASE_URL + tData.form.avatar" class="avatar">
             <img v-else :src="AvatarIcon" class="avatar">
             <div class="change-tips flex-view">
                 <a-upload
@@ -168,8 +168,7 @@ const getUserInfo = () => {
     console.log(tData.form)
     if (tData.form.avatar) {
       userStore.user_avatar = tData.form.avatar
-      tData.form.avatar = BASE_URL  + tData.form.avatar
-      appStore.view_user_avatar = BASE_URL  + tData.form.avatar
+      appStore.view_user_avatar = tData.form.avatar
       localStorage.setItem(USER_AVATAR, userStore.user_avatar)
     }
     loading.value = false

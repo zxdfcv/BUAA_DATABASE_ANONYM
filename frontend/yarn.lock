@@ -975,7 +975,7 @@ ansi-styles@^4.0.0, ansi-styles@^4.1.0:
 
 ant-design-vue@^3.2.20:
   version "3.2.20"
-  resolved "https://registry.npmmirror.com/ant-design-vue/-/ant-design-vue-3.2.20.tgz"
+  resolved "https://registry.npmjs.org/ant-design-vue/-/ant-design-vue-3.2.20.tgz"
   integrity sha512-YWpMfGaGoRastIXEYfCoJiaRiDHk4chqtYhlKQM5GqPt6NfvrM1Vg2e60yHtjxlZjed91wCMm0rAmyUr7Hwzdg==
   dependencies:
     "@ant-design/colors" "^6.0.0"

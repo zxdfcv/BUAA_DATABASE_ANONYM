@@ -6,7 +6,10 @@ enum URL {
     list = '/myapp/product/list',
     detail = '/myapp/product/detail',
     addCollect = '/myapp/product/collector/add',
-    deleteFromCollect = '/myapp/product/collector/remove'
+    deleteFromCollect = '/myapp/product/collector/remove',
+    addProduct = '/myapp/product/create',
+    deleteProduct = '/myapp/product/delete',
+    updateProduct = '/myapp/product/update',
 }
 
 /**
@@ -21,7 +24,12 @@ const getProductDetail = async (params: any) => get<any>({url: URL.detail, param
 const addToCollect = async (params: any) => post<any>({url: URL.addCollect, params: params, headers: {}});
 
 const deleteFromCollect = async (params: any) => deletes<any>({url: URL.deleteFromCollect, params: params, headers: {}});
+const addProduct = async (data: any) => put<any>({url: URL.addProduct, params: {}, data: data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' }});
+const updateProduct = async (params: any, data: any) => post<any>({url: URL.updateProduct, params: params, data: data, headers: {}});
+const deleteProduct = async (params: any, data: any) => deletes<any>({url: URL.deleteProduct, params: params, data: data, headers: {}});
 
 export {
-    getProductList, getProductDetail, addToCollect, deleteFromCollect
+    getProductList, getProductDetail,            /* 商品信息查询 */
+    addProduct, updateProduct, deleteProduct,    /* 单一商品增删改 */
+    addToCollect, deleteFromCollect,             /* 商品收藏 */
 };
