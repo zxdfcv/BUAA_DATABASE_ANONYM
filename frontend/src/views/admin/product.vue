@@ -490,12 +490,12 @@ const resetModal = () => {
   myform.value?.resetFields();
   fileList.value = []
   fileList1.value = []
-};
+}
 
 // 关闭弹窗
 const hideModal = () => {
   modal.visile = false;
-};
+}
 </script>
 
 <style scoped lang="less">
