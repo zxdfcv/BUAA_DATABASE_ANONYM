@@ -54,7 +54,7 @@
             </a-radio-group>
           </div>
         </div>
-        <div class="flex-view">
+        <div class="flex-view" v-if="props.modify">
           <div class="item">
             <div class="label">上架状态</div>
           </div>
@@ -65,7 +65,7 @@
             </a-radio-group>
           </div>
         </div>
-        <div class="flex-view">
+        <div class="flex-view" v-if="props.modify">
           <div class="item">
             <div class="label">售出状态</div>
           </div>
@@ -190,8 +190,8 @@ let tData = reactive({
     merchant: userStore.user_id,
     status: undefined,
     addr: undefined,
-    is_sold: undefined,
-    off_shelve: undefined,
+    is_sold: '0',
+    off_shelve: '0',
     classification_1: undefined,
     classification_2: undefined,
     description: undefined,

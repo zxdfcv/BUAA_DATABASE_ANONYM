@@ -10,7 +10,7 @@
           <div class="thing-list flex-view">
           <ShopItemCard
               v-for="(item,index) in pageData.collectData"
-              :key="index"
+              :key="item.id"
               :shop-card="item"
               :loading="false"
               :editable="appStore.view_user_id === userStore.user_id"
