@@ -413,7 +413,7 @@ const refillData = (data) => {
   tData.form.off_shelve = data.off_shelve ? '1' : '0';
   tData.form.classification_1 = data.classification_1;
   tData.form.classification_2 = data.classification_2;
-  tData.form.description = data.description;
+  tData.form.description = (data.description === null || data.description === undefined || data.description === "null") ? "" : data.description;
 }
 
 const modifyPassword = () => {

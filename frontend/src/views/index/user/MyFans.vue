@@ -144,6 +144,8 @@ const fillData = (list) => {
     data["uploaderId"] = item.merchant;
     data["uploaderName"] = item.merchant_name;
     data["pv"] = item.views;
+    data["off_shelve"] = item.off_shelve;
+    data["is_sold"] = item.is_sold;
     res.push(data);
   }
   return res;
