@@ -9,10 +9,10 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from sqlparse.sql import Case
 
-from ..models import User, Product, Classification1, Classification2, ProductImage, Comment, Reply, Order
+from ..models import User, Product, Classification1, Classification2, ProductImage, Comment, Reply, Order, Chat
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
     ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer, ReplyAllDetailSerializer, \
-    AdminUserCreateSerializer, OrderSerializer, UserAllDetailAndPermissionSerializer
+    AdminUserCreateSerializer, OrderSerializer, UserAllDetailAndPermissionSerializer, ChatAllDetailsSerializer
 from ..utils import APIResponse, make_error_log, dict_fetchall, getWeekDays
 
 
@@ -638,3 +638,120 @@ class OrderView(generics.ListAPIView):
             return APIResponse(code=1, msg='删除的订单不存在')
         orders.delete()
         return APIResponse(code=0, msg='订单删除成功')
+
+
+class ChatView(generics.ListAPIView):
+    permission_classes = [IsAdminUser]
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        # keyword = request.GET.get("keyword", None)
+        chats = Chat.objects.all().order_by('-create_time')
+
+        page = self.paginate_queryset(chats)
+        if page is not None:
+            serializer = ChatAllDetailsSerializer(page, many=True)
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = ChatAllDetailsSerializer(chats, many=True)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+    def put(self, request):
+        sender_id = request.data.get('sender', None)
+        product_id = request.data.get('product', None)
+        recipient_id = request.data.get('recipient', None)
+        if product_id is None or recipient_id is None or sender_id is None:
+            make_error_log(request, '私聊参数不全')
+            return APIResponse(code=1, msg='私聊参数不全')
+        try:
+            sender = User.objects.get(pk=sender_id)
+        except:
+            make_error_log(request, "私聊发送者不存在")
+            return APIResponse(code=1, msg='发送者不存在')
+        try:
+            recipient = User.objects.get(pk=recipient_id)
+        except:
+            make_error_log(request, "私聊接收者不存在")
+            return APIResponse(code=1, msg='接收者不存在')
+
+        try:
+            product = Product.objects.get(pk=product_id)
+        except:
+            make_error_log(request, "私聊商品不存在")
+            return APIResponse(code=1, msg='商品不存在')
+        if product.merchant.id != sender.id and product.merchant.id != recipient.id:
+            make_error_log(request, "私聊商品与用户不匹配")
+            return APIResponse(code=1, msg='私聊商品与用户不匹配')
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+
+        serializer = ChatAllDetailsSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='私聊创建成功', data=serializer.data)
+        make_error_log(request, '创建私聊失败')
+        return APIResponse(code=1, msg='私聊创建失败', data=serializer.errors)
+
+    def post(self, request):
+        try:
+            chat_id = request.GET.get('chat_id')
+            chat = Chat.objects.get(pk=chat_id)
+        except Chat.DoesNotExist:
+            make_error_log(request, '修改的私聊不存在')
+            return APIResponse(code=1, msg='私聊不存在')
+        sender_id = request.data.get('sender', None)
+        product_id = request.data.get('product', None)
+        recipient_id = request.data.get('recipient', None)
+        if product_id is None or recipient_id is None or sender_id is None:
+            make_error_log(request, '私聊参数不全')
+            return APIResponse(code=1, msg='私聊参数不全')
+        try:
+            sender = User.objects.get(pk=sender_id)
+        except:
+            make_error_log(request, "私聊发送者不存在")
+            return APIResponse(code=1, msg='发送者不存在')
+        try:
+            recipient = User.objects.get(pk=recipient_id)
+        except:
+            make_error_log(request, "私聊接收者不存在")
+            return APIResponse(code=1, msg='接收者不存在')
+
+        try:
+            product = Product.objects.get(pk=product_id)
+        except:
+            make_error_log(request, "私聊商品不存在")
+            return APIResponse(code=1, msg='商品不存在')
+        if product.merchant.id != sender.id and product.merchant.id != recipient.id:
+            make_error_log(request, "私聊商品与用户不匹配")
+            return APIResponse(code=1, msg='私聊商品与用户不匹配')
+        data = request.data.copy()
+        excluded_fields = ['id', ]
+        for field in excluded_fields:
+            data.pop(field, None)
+
+        serializer = ChatAllDetailsSerializer(chat, data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return APIResponse(code=0, msg='私聊更新成功', data=serializer.data)
+        make_error_log(request, '更新私聊失败')
+        return APIResponse(code=1, msg='私聊更新失败', data=serializer.errors)
+
+    def delete(self, request):
+        ids = request.GET.get('ids')
+        ids_arr = ids.split(',')
+        chats = Chat.objects.filter(id__in=ids_arr)
+        if chats.count() != len(ids_arr):
+            make_error_log(request, '删除的私聊不存在')
+            return APIResponse(code=1, msg='删除的私聊不存在')
+        chats.delete()
+        return APIResponse(code=0, msg='私聊删除成功')

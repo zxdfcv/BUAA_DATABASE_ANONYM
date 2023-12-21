@@ -15,6 +15,7 @@ import {
   TOKEN_EXPIRE_TIME,
   EXPIRE_FRESH_HOUR
 } from "/@/store/constants";
+import {useWebSocketStore} from "/@/store";
 
 /* 对外使用 UserStore 创建的异步方法，UserStore 再去调用登录相关 Api */
 export const useUserStore = defineStore('user', {
@@ -76,6 +77,8 @@ try {
       console.log('Storage state ==> ', this)
     });
     result = res1;
+    useWebSocketStore().attachSocket();
+    await useWebSocketStore().initMessages();
   }
 } catch (e) {
   delete admin.type;
@@ -94,6 +97,9 @@ try {
       console.log('Storage state ==> ', this)
     });
     result = res2;
+    useWebSocketStore().attachSocket();
+    await useWebSocketStore().initMessages();
+
   }
 }
 
@@ -123,6 +129,8 @@ try {
         }
       })
       localStorage.removeItem("user_avatar")
+      useWebSocketStore().detachSocket();
+      useWebSocketStore().discardMessages();
     },
 
     delete() {
@@ -139,6 +147,8 @@ try {
         state.is_admin          = undefined
       })
       localStorage.removeItem("user_avatar")
+      useWebSocketStore().detachSocket();
+      useWebSocketStore().discardMessages();
     },
 
     /* TODO: 管理员登录/退出未操作 Pinia */

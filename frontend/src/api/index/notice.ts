@@ -6,8 +6,8 @@ enum URL {
     mentionMessage = '/myapp/mention/notice',
 
     readComment = '/myapp/comment/read',
-    readReply = '',
-    readMention = '',
+    readReply = '/myapp/reply/read',
+    readMention = '/myapp/mention/read',
 }
 
 const getCommentMessageApi = async (params: any) => get<any>({url: URL.commentMessage, params: params, data: {}, headers: {}});

@@ -536,3 +536,16 @@ class ChatSerializer(serializers.ModelSerializer):
 
     def get_recipient_avatar(self, obj):
         return str(obj.recipient.avatar) if obj.recipient.avatar else ''
+
+
+class ChatAllDetailsSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    sender_name = serializers.ReadOnlyField(source='sender.username')
+    recipient_name = serializers.ReadOnlyField(source='recipient.username')
+
+
+    class Meta:
+        model = Chat
+        fields = '__all__'
+
