@@ -11,9 +11,36 @@
         type="error"
         shape="circle"
         icon="md-close"
-        style="position: absolute; right: 10px; top: 10px; width: fit-content"
+        style="position: absolute; right: 10px; top: 40px; width: fit-content"
         @click.stop="deleteCollect"
-        v-if="props.deletable">删除收藏</Button>
+        v-if="props.deletable">删除收藏
+    </Button>
+    <el-tag
+        type="warning"
+        class="mx-1"
+        effect="dark"
+        style="position: absolute; right: 10px; top: 10px; width: fit-content"
+        v-if="props.shopCard.off_shelve"
+    >
+      已下架
+    </el-tag>
+    <el-tag
+        type="info"
+        class="mx-1"
+        effect="dark"
+        style="position: absolute; right: 10px; top: 10px; width: fit-content"
+        v-else-if="props.shopCard.is_sold"
+    >
+      已卖出
+    </el-tag>
+    <el-tag
+        class="mx-1"
+        effect="dark"
+        style="position: absolute; right: 10px; top: 10px; width: fit-content"
+        v-else
+    >
+      可购买
+    </el-tag>
     <img
         v-if="props.shopCard.url"
         alt="example"
@@ -79,6 +106,15 @@ import {useUserStore} from "/@/store";
 import {openNotification} from "/@/utils/notice";
 import AddProduct from "/@/views/index/user/addProduct.vue";
 import {BASE_URL} from "/@/store/constants";
+
+import {
+  CheckCircleOutlined,
+  SyncOutlined,
+  CloseCircleOutlined,
+  ExclamationCircleOutlined,
+  ClockCircleOutlined,
+  MinusCircleOutlined,
+} from '@ant-design/icons-vue';
 
 const props = defineProps(['shopCard', 'loading', 'deletable', 'editable']);
 const emits = defineEmits(['deleteCollecter'])

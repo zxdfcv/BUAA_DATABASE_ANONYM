@@ -62,6 +62,8 @@ const fillData = (list) => {
     data["uploaderId"] = item.merchant;
     data["uploaderName"] = item.merchant_name;
     data["pv"] = item.views;
+    data["off_shelve"] = item.off_shelve;
+    data["is_sold"] = item.is_sold;
     res.push(data);
   }
   return res;
@@ -81,7 +83,7 @@ onMounted(() => {
 
 const getProduct = async () => {
   loading.value = true;
-  getProductList({user: appStore.view_user_id}).then(res => {
+  getProductList({user: appStore.view_user_id, sold: 2}).then(res => {
     const data = res.data;
     if (res.code === 0) {
       pageData.collectData = fillData(data);
