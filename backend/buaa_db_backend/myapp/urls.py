@@ -52,6 +52,12 @@ urlpatterns = [
     path("admin/order/create", admin.OrderView.as_view(), name="order_allCreate"),
     path("admin/order/update", admin.OrderView.as_view(), name="order_allUpdate"),
     path("admin/order/delete", admin.OrderView.as_view(), name="order_allDelete"),
+    path("admin/chat/list", admin.ChatView.as_view(), name="chat_allList"),
+    path("admin/chat/create", admin.ChatView.as_view(), name="chat_allCreate"),
+    path("admin/chat/update", admin.ChatView.as_view(), name="chat_allUpdate"),
+    path("admin/chat/delete", admin.ChatView.as_view(), name="chat_allDelete"),
+
+
 
     path("admin/statistics", admin.StatisticsView.as_view(), name="statistics"),
 
