@@ -213,7 +213,7 @@ class Order(models.Model):
         ('1', '已经支付'),
         ('2', '订单取消')
     ]
-    order_number = models.CharField(max_length=64,verbose_name="订单号")
+    order_number = models.CharField(max_length=64, verbose_name="订单号")
     merchant = models.ForeignKey(User, on_delete=models.CASCADE, related_name='merchant_order')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver_order')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_order')
@@ -225,3 +225,20 @@ class Order(models.Model):
     class Meta:
         db_table = "buaa_db_order"
         verbose_name = "订单"
+
+
+class Chat(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender_chat')
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipient_chat')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_chat')
+    content = models.TextField(max_length=1023)
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
+    image = models.ImageField(upload_to='chat_images/',null=True, blank=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'{self.sender} - {self.recipient} - {self.create_time}'
+
+    class Meta:
+        db_table = "buaa_db_chat"
+        verbose_name = "私聊评论"

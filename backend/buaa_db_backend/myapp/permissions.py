@@ -109,3 +109,14 @@ class CanBuyPermission(BasePermission):
                 and request.user.has_perm('myapp.delete_order')
         )
         return request.user.is_staff or has_permission
+
+
+class CanChatPermission(BasePermission):
+    def has_permission(self, request, view):
+        has_permission = (
+                request.user.has_perm('myapp.add_chat') and
+                request.user.has_perm('myapp.change_chat')
+                and request.user.has_perm('myapp.view_chat')
+            # and request.user.has_perm('myapp.delete_chat')
+        )
+        return request.user.is_staff or has_permission

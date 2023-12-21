@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group, Permission
 
 from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment, \
-    Reply, Order
+    Reply, Order, Chat
 
 User = get_user_model()
 
@@ -167,11 +167,14 @@ class UserAllDetailSerializer(serializers.ModelSerializer):
         extra_kwargs = {'id': {'read_only': True},
                         'last_login': {'read_only': True},
                         }
+
+
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Permission
         fields = ('id', 'name')
         # read_only_fields = ('id',)
+
 
 class GroupWithPermissionsSerializer(serializers.ModelSerializer):
     permissions = PermissionSerializer(many=True, read_only=True)
@@ -194,6 +197,7 @@ class GroupWithPermissionsSerializer(serializers.ModelSerializer):
     #         group.permissions.set(permissions)
     #
     #     return group
+
 
 class GroupSerializer(serializers.ModelSerializer):
     class Meta:
@@ -511,3 +515,24 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = '__all__'
+
+
+class ChatSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    sender_name = serializers.ReadOnlyField(source='sender.username')
+    sender_nickname = serializers.ReadOnlyField(source="sender.nickname")
+    sender_avatar = serializers.SerializerMethodField()
+    recipient_name = serializers.ReadOnlyField(source='recipient.username')
+    recipient_nickname = serializers.ReadOnlyField(source="recipient.nickname")
+    recipient_avatar = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Chat
+        fields = '__all__'
+
+    def get_sender_avatar(self, obj):
+        return str(obj.sender.avatar) if obj.sender.avatar else ''
+
+    def get_recipient_avatar(self, obj):
+        return str(obj.recipient.avatar) if obj.recipient.avatar else ''

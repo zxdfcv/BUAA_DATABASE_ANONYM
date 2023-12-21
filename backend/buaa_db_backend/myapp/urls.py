@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 
-from .views import user, log, admin, classification, product, comment, reply, order, permission
+from .views import user, log, admin, classification, product, comment, reply, order, permission, chat
 
 app_name = 'myapp'
 urlpatterns = [
@@ -108,6 +108,11 @@ urlpatterns = [
     path("order/cancel", order.EditOrderView.as_view(), name='order_cancel'),
     path("order/return", order.AliPayResultAPIView.as_view(), name='order_return'),
     path("order/list", order.OrderListView.as_view(), name='order_list'),
+
+
+    path("chat/list", chat.ChatView.as_view(), name='chat_list'),
+    path("chat/create", chat.ChatView.as_view(), name='chat_create'),
+    path("chat/notice", chat.ChatNoticeView.as_view(), name='chat_notice'),
 
     path("test/", user.TestView.as_view(), name="token_test"),
 ]

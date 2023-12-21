@@ -1,8 +1,11 @@
 import datetime
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
+from .models import User
 from .serializers import ErrorLogSerializer, LoginLogSerializer
 
 
@@ -115,3 +118,18 @@ def get_monday():
     now = datetime.datetime.now()
     monday = now - datetime.timedelta(now.weekday())
     return monday.strftime('%Y-%m-%d %H:%M:%S.%f')[:10]
+
+
+def send_notification(recipient_id, notification_type, content):
+    recipient = User.objects.get(pk=recipient_id)
+    channel_layer = get_channel_layer()
+    if channel_layer is None:
+        return
+    print(channel_layer)
+    async_to_sync(channel_layer.group_send)(
+        recipient.username,
+        {
+            "type": str(notification_type),
+            "content": str(content),
+        },
+    )

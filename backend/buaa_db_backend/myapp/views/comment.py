@@ -1,3 +1,5 @@
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.db.models import Count
 from rest_framework import generics
 from rest_framework.decorators import permission_classes, api_view
@@ -8,7 +10,7 @@ from rest_framework.views import APIView
 from ..models import Product, Comment, Reply
 from ..permissions import CanEditCommentPermission
 from ..serializers import CommentListSerializer, CommentNoticeSerializer
-from ..utils import APIResponse, make_error_log
+from ..utils import APIResponse, make_error_log, send_notification
 
 
 class CommentListView(generics.ListAPIView):
@@ -92,8 +94,17 @@ class MyCommentsView(generics.ListAPIView):
             data.pop(field, None)
         serializer = CommentListSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            # serializer.save()
+            # comment = serializer.save()
+
+            # 在评论成功后调用 send_comment_notification 函数
+            # send_comment_notification(comment.id, product_id)
+            comment = serializer.save()
+            # send_notification(comment.user, "comment", comment.content)
+            # send_comment_notification(serializer.instance.id, Product.objects.get(pk=product_id).merchant_id)
+            # self.send_notification_to_merchant(serializer.instance)
             return APIResponse(code=0, msg='评论成功', data=serializer.data)
+
         make_error_log(request, '评论失败')
         return APIResponse(code=1, msg='评论失败', data=serializer.errors)
 
@@ -116,6 +127,22 @@ class MyCommentsView(generics.ListAPIView):
 
         comments.delete()
         return APIResponse(code=0, msg='评论删除成功')
+
+    def send_notification_to_merchant(self, comment):
+        merchant_id = comment.product.merchant_id
+        comment_id = comment.id
+        message = f"New comment added with ID {comment_id}."
+
+        # 向 NotificationConsumer 发送消息
+        channel_layer = get_channel_layer()
+        merchant_notification_channel = "notification"
+        async_to_sync(channel_layer.group_send)(
+            merchant_notification_channel,
+            {
+                "type": "comment.notification",
+                "message": message,
+            },
+        )
 
 
 # 暂定:关于点赞？评论消息？
@@ -214,7 +241,6 @@ class EditLikesView(APIView):
         comment.save()
         serializer = CommentListSerializer(comment)
         return APIResponse(code=0, msg='点赞成功', data=serializer.data)
-
 
     def delete(self, request):
         user = request.user
