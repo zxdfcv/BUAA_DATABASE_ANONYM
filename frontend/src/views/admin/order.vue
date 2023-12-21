@@ -39,22 +39,101 @@
         </template>
       </a-table>
     </div>
+    <!--  弹窗区域 -->
+    <div>
+      <a-modal
+          :visible="modal.visile"
+          :forceRender="true"
+          :title="modal.title"
+          width="880px"
+          ok-text="确认"
+          cancel-text="取消"
+          @cancel="handleCancel"
+          @ok="handleOk"
+      >
+        <template #footer>
+          <a-button key="back" @click="handleCancel">取消</a-button>
+          <a-button key="submit" type="primary" :loading="submitting" @click="handleOk">确认</a-button>
+        </template>
+        <div style="padding-right: 16px; max-height:480px; overflow-x: hidden;overflow-y: auto;">
+          <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
+            <a-row :gutter="24">
+              <a-col span="24">
+                <a-form-item label="商品 id" name="title">
+                  <a-input placeholder="请输入" v-model:value="modal.form.product_id"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col span="24">
+                <a-form-item label="买家 id" name="title">
+                  <a-input placeholder="请输入" v-model:value="modal.form.merchant_id"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col span="24">
+                <a-form-item label="卖家 id" name="title">
+                  <a-input placeholder="请输入" v-model:value="modal.form.receiver_id"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col span="24">
+                <a-form-item label=金额>
+                  <a-input placeholder="请输入" v-model:value="modal.form.amount"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col span="12">
+                <a-form-item label="生成时间">
+                  <a-date-picker show-time placeholder="Select Time" v-model:value="modal.form.create_time" valueFormat="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss"/>
+                </a-form-item>
+              </a-col>
+              <a-col span="12">
+                <a-form-item label="支付时间">
+                  <a-date-picker show-time placeholder="Select Time" v-model:value="modal.form.pay_time" valueFormat="YYYY-MM-DD HH:mm:ss" format="YYYY-MM-DD HH:mm:ss"/>
+                </a-form-item>
+              </a-col>
+              <a-col span="8">
+                <a-form-item label="状态" name="status">
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.status">
+                    <a-select-option key="0" value="0">未支付</a-select-option>
+                    <a-select-option key="1" value="1">已支付</a-select-option>
+                    <a-select-option key="2" value="2">订单取消</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+        </div>
+      </a-modal>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import {listApi, createApi, updateApi, cancelApi, deleteApi} from '/@/api/admin/order'
 import {message} from "ant-design-vue";
+import {FileImageOutlined, VideoCameraOutlined} from "@ant-design/icons-vue";
 
 onMounted(() => {
   getDataList()
 })
+
+const onSearch = () => {
+  getDataList();
+}
+
+const onSearchChange = (e: Event) => {
+  data.keyword = e?.target?.value
+  console.log(data.keyword)
+}
 
 const columns = reactive([
   {
     title: '序号',
     dataIndex: 'id',
     key: 'id',
+    align: 'center'
+  },
+  {
+    title: '订单号',
+    dataIndex: 'order_number',
+    key: 'order_number',
     align: 'center'
   },
   {
@@ -104,12 +183,13 @@ const columns = reactive([
   {
     title: '操作',
     dataIndex: 'action',
+    key: 'operation',
     align: 'center',
     fixed: 'right',
     width: 140,
-    scopedSlots: {customRender: 'operation'}
-  }
+  },
 ])
+const submitting = ref<boolean>(false);
 
 // 页面数据
 const data = reactive({
@@ -128,7 +208,13 @@ const modal = reactive({
   title: '',
   form: {
     id: undefined,
-    title: undefined,
+    merchant_id: undefined,
+    receiver_id: undefined,
+    product_id: undefined,
+    status: undefined,
+    pay_time: undefined,
+    create_time: undefined,
+    amount: undefined
   },
   rules: {
     title: [{ required: true, message: '请输入', trigger: 'change' }],
@@ -279,8 +365,13 @@ const hideModal = () => {
   flex-direction: column;
 }
 
-.table-operation {
-  height: 50px;
+.table-operations {
+  margin-bottom: 16px;
   text-align: right;
 }
+
+.table-operations > button {
+  margin-right: 8px;
+}
+
 </style>

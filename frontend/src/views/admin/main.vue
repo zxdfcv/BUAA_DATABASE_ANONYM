@@ -2,6 +2,12 @@
   <a-layout id="components-layout-demo-custom-trigger">
     <a-layout-header style="background: #fff; padding: 0">
       <div class="header">
+        <menu-unfold-outlined
+            v-if="collapsed"
+            class="trigger"
+            @click="() => (collapsed = !collapsed)"
+        />
+        <menu-fold-outlined v-else class="trigger" @click="() => (collapsed = !collapsed)" />
         <img class="header-logo" :src="logo">
         <span class="header-title">北航闲鱼商城后台管理系统</span>
         <div class="empty"></div>
@@ -11,7 +17,7 @@
       </div>
     </a-layout-header>
     <a-layout>
-      <a-layout-sider v-model="collapsed" collapsible >
+      <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
         <a-menu style="overflow:auto; overflow-x: hidden;" v-model:selectedKeys="selectedKeys" theme="dark" mode="inline" @click="handleClick">
 
           <a-menu-item key="thing">
@@ -119,11 +125,13 @@ import {
   DollarOutlined,
   MessageOutlined,
   LayoutOutlined,
-  DatabaseOutlined
-} from '@ant-design/icons-vue';
+  DatabaseOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+} from '@ant-design/icons-vue'
 
-import {ref} from 'vue';
-import {useUserStore} from "/@/store";
+import {ref} from 'vue'
+import {useUserStore} from "/@/store"
 
 const userStore = useUserStore();
 
@@ -207,6 +215,27 @@ const handleLogout = () => {
   color: #1890ff;
 }
 
+#components-layout-demo-custom-trigger .trigger {
+  font-size: 18px;
+  line-height: 64px;
+  padding: 0 24px;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+#components-layout-demo-custom-trigger .trigger:hover {
+  color: #1890ff;
+}
+
+#components-layout-demo-custom-trigger .logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 16px;
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
 
 :deep(.ant-layout-content) {
   overflow-x: hidden;

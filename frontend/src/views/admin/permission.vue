@@ -13,7 +13,7 @@
           rowKey="id"
           :loading="data.loading"
           :columns="columns"
-          :data-source="data.tagList"
+          :data-source="data.groupList"
           :scroll="{ x: 'max-content' }"
           :row-selection="rowSelection"
           :pagination="{
@@ -68,7 +68,8 @@
 
 <script setup lang="ts">
 import { FormInstance, message } from 'ant-design-vue';
-import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/tag';
+import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/group';
+import { listApi as listPermApi } from '/@/api/admin/permission';
 
 
 const columns = reactive([
@@ -79,9 +80,15 @@ const columns = reactive([
     align: 'center'
   },
   {
-    title: '标签名称',
-    dataIndex: 'title',
-    key: 'title',
+    title: '权限组名称',
+    dataIndex: 'name',
+    key: 'name',
+    align: 'center'
+  },
+  {
+    title: '权限组包含权限',
+    dataIndex: 'permissions',
+    key: 'permissions',
     align: 'center'
   },
   {
@@ -96,7 +103,8 @@ const columns = reactive([
 
 // 页面数据
 const data = reactive({
-  tagList: [],
+  permList: [],
+  groupList: [],
   loading: false,
   keyword: '',
   selectedRowKeys: [] as any[],
@@ -122,7 +130,27 @@ const myform = ref<FormInstance>();
 
 onMounted(() => {
   getDataList();
+  gentPermList(); // 初始化
 });
+
+const gentPermList = () => {
+  data.loading = true;
+  listPermApi({
+    keyword: data.keyword,
+  })
+      .then((res) => {
+        data.loading = false;
+        console.log(res);
+        res.data.forEach((item: any, index: any) => {
+          item.index = index + 1;
+        });
+        data.permList = res.data;
+      })
+      .catch((err) => {
+        data.loading = false;
+        console.log(err);
+      });
+}
 
 const getDataList = () => {
   data.loading = true;
@@ -135,7 +163,7 @@ const getDataList = () => {
         res.data.forEach((item: any, index: any) => {
           item.index = index + 1;
         });
-        data.tagList = res.data;
+        data.groupList = res.data;
       })
       .catch((err) => {
         data.loading = false;

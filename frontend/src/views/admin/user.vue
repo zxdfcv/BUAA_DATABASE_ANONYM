@@ -5,7 +5,7 @@
       <div class="table-operations">
         <a-space>
           <a-button type="primary" @click="handleAdd">新增</a-button>
-          <a-button @click="handleBatchDelete">批量删除</a-button>
+          <a-button @click="handleBatchDelete">批量注销</a-button>
           <a-input-search addon-before="用户名" enter-button @search="onSearch" @change="onSearchChange" />
         </a-space>
       </div>
@@ -37,8 +37,8 @@
             <span>
               <a @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical" />
-              <a-popconfirm title="确定删除?" ok-text="是" cancel-text="否" @confirm="confirmDelete(record)">
-                <a href="#">删除</a>
+              <a-popconfirm title="确定注销?" ok-text="是" cancel-text="否" @confirm="confirmDelete(record)">
+                <a href="#">注销</a>
               </a-popconfirm>
             </span>
           </template>
@@ -328,12 +328,12 @@
     console.log(data.selectedRowKeys);
     if (data.selectedRowKeys.length <= 0) {
       console.log('hello');
-      message.warn('请勾选删除项');
+      message.warn('请勾选注销项');
       return;
     }
     deleteApi({ ids: data.selectedRowKeys.join(',') })
       .then((res) => {
-        message.success('删除成功');
+        message.success('注销成功');
         data.selectedRowKeys = [];
         getUserList();
       })
