@@ -40,6 +40,8 @@
                   </template>
                   <template v-else-if="column.key === 'action'">
                     <span>
+                      <a v-if="record.status === '0'" @click="push2pay(record)">前往支付</a>
+                      <a-divider v-if="record.status === '0'" type="vertical"/>
                       <a @click="viewOrderDetail(record)">查看订单详情</a>
                       <a-divider type="vertical"/>
                       <a @click="disableDelete">删除订单记录</a>
@@ -285,6 +287,11 @@ const disableDelete = () => {
     message: 'Oops!',
     description: '普通用户不允许删除订单记录！'
   })
+}
+
+const push2pay = (record) => {
+  console.log(record.value)
+  router.push({name: 'purchase', query: {product: record.id, order_number: record.order_number}});
 }
 
 const viewOrderDetail = (record) => {

@@ -8,7 +8,7 @@
     </a-steps>
     <div class="steps-content">
       <div v-if="current === 0 || current === 1">
-        <a-descriptions title="订单商品详情" bordered :column="1">
+        <a-descriptions title="订单商品详情" bordered :column="1"  v-if="from_detail">
           <a-descriptions-item label="商品名">{{ detailData.title }}</a-descriptions-item>
           <a-descriptions-item label="可提货地点">{{ detailData.addr }}</a-descriptions-item>
           <a-descriptions-item label="所属分类">{{ detailData.Class1 }} 、{{ detailData.Class2 }}</a-descriptions-item>
@@ -58,11 +58,20 @@ const order_number = ref(0);
 const loading = ref(false);
 let detailData = ref({})
 const createTime = ref('');
+const from_detail = ref(false);
 
 
 onMounted(() => {
   productId.value = route.query.product.trim();
-  getPostDetail();
+  if (route.query.order_number !== null && route.query.order_number !== undefined) {
+    /* 来自用户中心支付已有订单 */
+    order_number.value = route.query.order_number.trim();
+    current.value = 1;
+    raisePayment();
+  } else {
+    /* 来自商品详情页创建新订单 */
+    getPostDetail();
+  }
 })
 
 const getPostDetail = async () => {
@@ -88,6 +97,7 @@ const getPostDetail = async () => {
     detailData.value["C_1"] = res.data.classification_1;
     detailData.value["C_2"] = res.data.classification_2;
     detailData.value["createTime"] = res.data.create_time;
+    from_detail.value = true;
   }).catch(err => {
     console.log(err)
     openNotification({
@@ -144,6 +154,7 @@ const raiseOrder = () => {
 
 const raisePayment = () => {
   loading.value = true;
+  console.log(order_number.value)
   payOrderApi({'order_number': order_number.value}).then(res => {
     if (res.code === 0) {
       console.log(res.data)
