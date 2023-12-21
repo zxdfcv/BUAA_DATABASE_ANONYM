@@ -287,7 +287,7 @@ import {
 } from '/@/api/index/thing'
 import {
   listThingCommentsApi,
-  createApi as createCommentApi,
+  createCommentApi,
   likeApi,
   likeCommentApi,
   dislikeCommentApi, queryProductCommentApi, queryCommentReplyApi, createReplyApi, likeReplyApi, dislikeReplyApi
@@ -638,7 +638,6 @@ const sendComment = () => {
   }
   commentRef.value.value = ''
   if (userStore.user_access) {
-    spin.value = true;
     createCommentApi({ content: text, product: thingId.value, user: String(userStore.user_id) }).then(res => {
       getCommentList()
       if (res.data.code === 0) {
@@ -648,7 +647,6 @@ const sendComment = () => {
           description: ''
         })
       }
-      spin.value = false;
     }).catch(err => {
       console.log(err)
     })
