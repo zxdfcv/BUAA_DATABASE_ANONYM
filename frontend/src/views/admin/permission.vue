@@ -35,6 +35,22 @@
               </a-popconfirm>
             </span>
           </template>
+          <template v-if="column.key === 'permissions'">
+            <span>
+              <a-divider type="vertical"/>
+              <a-dropdown :trigger="['click']">
+                <a class="ant-dropdown-link" @click.prevent>
+                  点我
+                  <DownOutlined />
+                </a>
+                <template #overlay>
+                  <a-menu>
+                    <a-menu-item v-for="item in record.permissions" :key="item"> {{ item.id + ": "  + item.name }} </a-menu-item>
+                  </a-menu>
+                </template>
+              </a-dropdown>
+            </span>
+          </template>
         </template>
       </a-table>
     </div>
@@ -54,8 +70,8 @@
           <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
             <a-row :gutter="24">
               <a-col span="24">
-                <a-form-item label="标签名称" name="title">
-                  <a-input placeholder="请输入" v-model:value="modal.form.title"></a-input>
+                <a-form-item label="权限组名称" name="name">
+                  <a-input placeholder="请输入" v-model:value="modal.form.name"></a-input>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -70,6 +86,7 @@
 import { FormInstance, message } from 'ant-design-vue';
 import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/group';
 import { listApi as listPermApi } from '/@/api/admin/permission';
+import {DownOutlined} from "@ant-design/icons-vue";
 
 
 const columns = reactive([
@@ -119,12 +136,12 @@ const modal = reactive({
   title: '',
   form: {
     id: undefined,
-    title: undefined,
+    name: undefined
   },
   rules: {
-    title: [{ required: true, message: '请输入', trigger: 'change' }],
+    name: [{ required: true, message: '请输入', trigger: 'change' }],
   },
-});
+})
 
 const myform = ref<FormInstance>();
 
