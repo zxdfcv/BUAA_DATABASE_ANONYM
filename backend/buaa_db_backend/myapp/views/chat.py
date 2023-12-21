@@ -6,7 +6,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from ..models import User, Product, Chat
 from ..permissions import CanChatPermission
 from ..serializers import ChatSerializer
-from ..utils import make_error_log, APIResponse
+from ..utils import make_error_log, APIResponse, send_notification
 
 
 @permission_classes([CanChatPermission])
@@ -89,6 +89,7 @@ class ChatView(generics.ListAPIView):
         serializer = ChatSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            send_notification(recipient, "chat_notice", serializer.data)
             return APIResponse(code=0, msg='私聊成功', data=serializer.data)
         make_error_log(request, '私聊失败')
         return APIResponse(code=1, msg='私聊失败', data=serializer.errors)

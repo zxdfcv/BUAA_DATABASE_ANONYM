@@ -94,15 +94,9 @@ class MyCommentsView(generics.ListAPIView):
             data.pop(field, None)
         serializer = CommentListSerializer(data=data)
         if serializer.is_valid():
-            # serializer.save()
-            # comment = serializer.save()
-
-            # 在评论成功后调用 send_comment_notification 函数
-            # send_comment_notification(comment.id, product_id)
-            comment = serializer.save()
-            # send_notification(comment.user, "comment", comment.content)
-            # send_comment_notification(serializer.instance.id, Product.objects.get(pk=product_id).merchant_id)
-            # self.send_notification_to_merchant(serializer.instance)
+            serializer.save()
+            product = Product.objects.get(pk=product_id)
+            send_notification(product.merchant, "comment_notice", serializer.data)
             return APIResponse(code=0, msg='评论成功', data=serializer.data)
 
         make_error_log(request, '评论失败')

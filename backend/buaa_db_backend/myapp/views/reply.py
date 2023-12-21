@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 from ..models import Comment, Reply
 from ..permissions import CanEditReplyPermission
 from ..serializers import ReplyListSerializer, ReplyNoticeSerializer, MentionNoticeSerializer
-from ..utils import make_error_log, APIResponse
+from ..utils import make_error_log, APIResponse, send_notification
 
 
 class ReplyListView(generics.ListAPIView):
@@ -97,10 +97,13 @@ class MyRepliesView(generics.ListAPIView):
 
         serializer = ReplyListSerializer(data=data)
         if serializer.is_valid():
-            serializer.save()
+            reply=serializer.save()
             comment = Comment.objects.get(pk=comment_id)
             comment.reply_count += 1
             comment.save()
+            send_notification(comment.user,"reply_notice",serializer.data)
+            if reply.mentioned_user is not None:
+                send_notification(reply.mentioned_user, "mentioned_notice", serializer.data)
             return APIResponse(code=0, msg='回复成功', data=serializer.data)
         make_error_log(request, '回复失败')
         return APIResponse(code=1, msg='回复失败', data=serializer.errors)

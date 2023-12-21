@@ -120,16 +120,36 @@ def get_monday():
     return monday.strftime('%Y-%m-%d %H:%M:%S.%f')[:10]
 
 
-def send_notification(recipient_id, notification_type, content):
-    recipient = User.objects.get(pk=recipient_id)
+# def send_notification(recipient_id, sender_id, notification_type, content,create_time):
+#     sender = User.objects.get(pk=sender_id)
+#     recipient = User.objects.get(pk=recipient_id)
+#     channel_layer = get_channel_layer()
+#     if channel_layer is None:
+#         return
+#     print(channel_layer)
+#     async_to_sync(channel_layer.group_send)(
+#         recipient.username,
+#         {
+#             "type": str(notification_type),
+#             "sender_id": str(sender.id),
+#             "sender_name": str(sender.username),
+#             "content": str(content),
+#             "create_time":str(create_time)
+#         },
+#     )
+def send_notification(recipient, notification_type, data):
+    # recipient = User.objects.get(pk=recipient_id)
     channel_layer = get_channel_layer()
     if channel_layer is None:
         return
-    print(channel_layer)
+    # print(channel_layer)
+    user_id = str(recipient.id)
+    group_name = f"user_{user_id}"
     async_to_sync(channel_layer.group_send)(
-        recipient.username,
+        group_name,
         {
-            "type": str(notification_type),
-            "content": str(content),
+            "type": "receive",
+            "notification_type": notification_type,
+            "data": data
         },
     )
