@@ -1,4 +1,4 @@
-from django.db.models import Max
+from django.db.models import Max, Q
 from rest_framework import generics
 from rest_framework.decorators import permission_classes
 from rest_framework.pagination import LimitOffsetPagination
@@ -98,26 +98,51 @@ class ChatView(generics.ListAPIView):
 class ChatNoticeView(generics.ListAPIView):
     pagination_class = LimitOffsetPagination
 
+    # def get(self, request, *args, **kwargs):
+    #     recipient = request.user
+    #     latest_chats = (
+    #         Chat.objects
+    #         .filter(recipient=recipient)
+    #         .values('product', 'sender')
+    #         .annotate(latest_chat_time=Max('create_time'))
+    #         .order_by('product', 'sender')
+    #     )
+    #     chat_ids = []
+    #     for chat_info in latest_chats:
+    #         chat = Chat.objects.filter(
+    #             recipient=recipient,
+    #             product=chat_info['product'],
+    #             sender=chat_info['sender'],
+    #             create_time=chat_info['latest_chat_time']
+    #         ).first()
+    #         if chat:
+    #             chat_ids.append(chat.id)
+    #     final_chats = Chat.objects.filter(id__in=chat_ids).order_by('-create_time')
+    #     page = self.paginate_queryset(final_chats)
+    #     if page is not None:
+    #         serializer = ChatSerializer(page, many=True)
+    #         return APIResponse(
+    #             code=0,
+    #             msg='查询成功',
+    #             data={
+    #                 'count': self.paginator.count,
+    #                 'next': self.paginator.get_next_link(),
+    #                 'previous': self.paginator.get_previous_link(),
+    #                 'results': serializer.data,
+    #             }
+    #         )
+    #     serializer = ChatSerializer(final_chats, many=True)
+    #     return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
     def get(self, request, *args, **kwargs):
-        recipient = request.user
-        latest_chats = (
+        user = request.user
+        chat_ids = get_chats_ids(user)
+        print(chat_ids)
+        final_chats = (
             Chat.objects
-            .filter(recipient=recipient)
-            .values('product', 'sender')
-            .annotate(latest_chat_time=Max('create_time'))
-            .order_by('product', 'sender')
+            .filter(id__in=chat_ids)
+            .order_by('-create_time')
         )
-        chat_ids = []
-        for chat_info in latest_chats:
-            chat = Chat.objects.filter(
-                recipient=recipient,
-                product=chat_info['product'],
-                sender=chat_info['sender'],
-                create_time=chat_info['latest_chat_time']
-            ).first()
-            if chat:
-                chat_ids.append(chat.id)
-        final_chats = Chat.objects.filter(id__in=chat_ids).order_by('-create_time')
         page = self.paginate_queryset(final_chats)
         if page is not None:
             serializer = ChatSerializer(page, many=True)
@@ -133,3 +158,53 @@ class ChatNoticeView(generics.ListAPIView):
             )
         serializer = ChatSerializer(final_chats, many=True)
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+
+def get_chats_ids(user):
+    recipient_chats = (
+        Chat.objects
+        .filter(Q(sender=user) | Q(recipient=user))
+        .values('id', 'product', 'sender', 'recipient', 'create_time')
+    )
+
+    chat_categories = {}
+    for chat_info in recipient_chats:
+        id = chat_info['id']
+        product = chat_info['product']
+        sender = chat_info['sender']
+        recipient = chat_info['recipient']
+        create_time = chat_info['create_time']
+
+        if product not in chat_categories:
+            chat_categories[product] = {}
+        # print(sender)
+        # print(user)
+        if sender != user.id:
+            key = sender
+        else:
+            key = recipient
+
+        if key not in chat_categories[product]:
+            chat_categories[product][key] = {
+                'chats': [],
+                'latest_chat_time': None
+            }
+        chat_categories[product][key]['chats'].append({
+            'id': id,
+            'sender': sender,
+            'recipient': recipient,
+            'create_time': create_time,
+        })
+        if chat_categories[product][key]['latest_chat_time'] is None or create_time > chat_categories[product][key][ \
+                'latest_chat_time']:
+            chat_categories[product][key]['latest_chat_time'] = create_time
+
+    final_chat_ids = []
+    for product, product_categories in chat_categories.items():
+        for key, category_info in product_categories.items():
+            latest_chat_time = category_info['latest_chat_time']
+            for chat_info in category_info['chats']:
+                if chat_info['create_time'] == latest_chat_time:
+                    final_chat_ids.append(chat_info['id'])
+
+    return final_chat_ids
