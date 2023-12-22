@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 
 from ..models import Comment, Reply
 from ..permissions import CanEditReplyPermission
-from ..serializers import ReplyListSerializer, ReplyNoticeSerializer, MentionNoticeSerializer
+from ..serializers import ReplyListSerializer, ReplyNoticeSerializer, MentionNoticeSerializer, ReplyLikesListSerializer
 from ..utils import make_error_log, APIResponse, send_notification
 
 
@@ -48,6 +48,40 @@ class ReplyListView(generics.ListAPIView):
                 }
             )
         serializer = ReplyListSerializer(replies, many=True)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+
+class ReplyLikesView(generics.ListAPIView):
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        comment_id = request.GET.get('comment_id')
+        sort = request.GET.get('sort', 'create_time')
+        try:
+            comment = Comment.objects.get(pk=comment_id)
+        except Comment.DoesNotExist:
+            make_error_log(request, '评论不存在')
+            return APIResponse(code=1, msg='评论不存在')
+
+        replies = Reply.objects.filter(comment=comment)
+        if sort == 'hot':
+            replies = replies.annotate(likes_count=Count('likes')).order_by('-likes_count')
+        else:
+            replies = replies.order_by('-create_time')
+        page = self.paginate_queryset(replies)
+        if page is not None:
+            serializer = ReplyLikesListSerializer(page, many=True, context={'request': request})
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = ReplyLikesListSerializer(replies, many=True, context={'request': request})
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
 
@@ -97,11 +131,11 @@ class MyRepliesView(generics.ListAPIView):
 
         serializer = ReplyListSerializer(data=data)
         if serializer.is_valid():
-            reply=serializer.save()
+            reply = serializer.save()
             comment = Comment.objects.get(pk=comment_id)
             comment.reply_count += 1
             comment.save()
-            send_notification(comment.user,"reply_notice",serializer.data)
+            send_notification(comment.user, "reply_notice", serializer.data)
             if reply.mentioned_user is not None:
                 send_notification(reply.mentioned_user, "mentioned_notice", serializer.data)
             return APIResponse(code=0, msg='回复成功', data=serializer.data)

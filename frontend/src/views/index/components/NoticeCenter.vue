@@ -34,17 +34,17 @@
               <template #renderItem="{ item }">
                 <a-list-item
                     :class="item.is_read ? 'back_read' : 'back_unread'"
-                    @click="socketStore.refreshMessage(); readComment(item)"
+                    @click="comment_product(item)"
                     style="margin-right: 15px; margin-left: 10px; cursor: pointer">
                     <a-list-item-meta
                         :description="item.create_time"
                     >
                       <template #title>
-                        <a @click.stop="socketStore.refreshMessage(); router.push({name: 'usercenter', query: {id: item.user}});">评论者：{{ item.user_name }}</a>
+                        <a @click.stop="comment_user(item)">评论者：{{ item.user_name }}</a>
                       </template>
                       <template #avatar>
                         <a-avatar
-                            @click.stop="socketStore.refreshMessage(); router.push({name: 'usercenter', query: {id: item.user}});"
+                            @click.stop="comment_user(item)"
                             v-if="!(item.user_avatar === '' || item.user_avatar === null || item.user_avatar === undefined)"
                             :src="BASE_URL + '/upload/'+ item.user_avatar"/>
                         <a-avatar
@@ -80,17 +80,17 @@
               <template #renderItem="{ item }">
                 <a-list-item
                     :class="item.is_read ? 'back_read' : 'back_unread'"
-                    @click="socketStore.refreshMessage(); readReply(item)"
+                    @click="reply_product(item)"
                     style="margin-right: 15px; margin-left: 10px; cursor: pointer">
                   <a-list-item-meta
                       :description="item.create_time"
                   >
                     <template #title>
-                      <a @click.stop="socketStore.refreshMessage(); router.push({name: 'usercenter', query: {id: item.user}});">回复者：{{ item.user_name }}</a>
+                      <a @click.stop="reply_user(item)">回复者：{{ item.user_name }}</a>
                     </template>
                     <template #avatar>
                       <a-avatar
-                          @click.stop="socketStore.refreshMessage(); router.push({name: 'usercenter', query: {id: item.user}});"
+                          @click.stop="reply_user(item)"
                           v-if="!(item.user_avatar === '' || item.user_avatar === null || item.user_avatar === undefined)"
                           :src="BASE_URL + '/upload/'+ item.user_avatar"/>
                       <a-avatar
@@ -126,21 +126,21 @@
               <template #renderItem="{ item }">
                 <a-list-item
                     :class="item.comment_read ? 'back_read' : 'back_unread'"
-                    @click="socketStore.refreshMessage(); readMention(item)"
+                    @click="mention_product(item)"
                     style="margin-right: 15px; margin-left: 10px; cursor: pointer">
                   <a-list-item-meta
                       :description="item.create_time"
                   >
                     <template #title>
-                      <a @click.stop="socketStore.refreshMessage(); router.push({name: 'usercenter', query: {id: item.user}});">回复者：{{ item.user_name }}</a>
+                      <a @click.stop="mention_user(item)">回复者：{{ item.user_name }}</a>
                     </template>
                     <template #avatar>
                       <a-avatar
-                          @click.stop="socketStore.refreshMessage(); router.push({name: 'usercenter', query: {id: item.user}});"
+                          @click.stop="mention_user(item)"
                           v-if="!(item.user_avatar === '' || item.user_avatar === null || item.user_avatar === undefined)"
                           :src="BASE_URL + '/upload/'+ item.user_avatar"/>
                       <a-avatar
-                          @click.stop="router.push({name: 'usercenter', query: {id: item.user}})"
+                          @click.stop="mention_user(item)"
                           v-else
                           :src="AvatarIcon" />
                     </template>
@@ -232,25 +232,57 @@
     loading.value = false;
   }
 
-  const readComment = (item) => {
-    readCommentMessageApi({ids: item.id})
+  const readComment = async (item) => {
+    await readCommentMessageApi({ids: item.id})
         .then(res => console.log(res))
         .catch(err => console.log(err))
-    push2product(item.product)
   }
 
-  const readReply = (item) => {
-    readReplyMessageApi({ids: item.id})
+  const readReply = async (item) => {
+    await readReplyMessageApi({ids: item.id})
         .then(res => console.log(res))
         .catch(err => console.log(err))
     push2product(item.product_id)
   }
 
-  const readMention = (item) => {
-    readMentionMessageApi({ids: item.id})
+  const readMention = async (item) => {
+    await readMentionMessageApi({ids: item.id})
         .then(res => console.log(res))
         .catch(err => console.log(err))
     push2product(item.product_id)
+  }
+
+  const comment_product = async (item) => {
+    await readComment(item);
+    await socketStore.refreshMessage();
+    push2product(item.product);
+  }
+
+  const comment_user = async (item) => {
+    await socketStore.refreshMessage();
+    router.push({name: 'usercenter', query: {id: item.user}});
+  }
+
+  const reply_product = async (item) => {
+    await readReply(item);
+    await socketStore.refreshMessage();
+    push2product(item.product);
+  }
+
+  const reply_user = async (item) => {
+    await socketStore.refreshMessage();
+    router.push({name: 'usercenter', query: {id: item.user}});
+  }
+
+  const mention_product = async (item) => {
+    await readMention(item);
+    await socketStore.refreshMessage();
+    push2product(item.product);
+  }
+
+  const mention_user = async (item) => {
+    await socketStore.refreshMessage();
+    router.push({name: 'usercenter', query: {id: item.user}});
   }
 
   const push2product = (product) => {

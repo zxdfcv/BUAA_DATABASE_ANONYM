@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
 from django.db import models
-from ..models import Product, ProductImage, User, Classification1, Classification2
+from ..models import Product, ProductImage, User, Classification1, Classification2, Tag
 from ..permissions import CanEditProductPermission
 from ..serializers import ProductListSerializer, ProductCreateSerializer, ProductImageSerializer, \
     ProductUpdateSerializer
@@ -32,7 +32,7 @@ class ProductWithImagesView(generics.ListAPIView):
         addr = request.GET.get("addr", None)
         price = request.GET.get("price", None)
         sort = request.GET.get("sort", 'create_time')
-
+        tags = request.GET.getlist("tags", [])
         queryset = self.filter_queryset(self.get_queryset()).filter(off_shelve=False)
         # page = self.paginate_queryset(queryset).filter(off_shelve=False)
 
@@ -64,6 +64,20 @@ class ProductWithImagesView(generics.ListAPIView):
                 return APIResponse(code=1, msg='二级分类不存在')
             queryset = queryset.filter(classification_2_id=c_2)
             # page = page.filter(classification_2_id=c_2)
+
+        if tags and all(tag.strip() for tag in tags):
+            tag_ids = [int(tag) for tag in tags]
+            chose_tags = Tag.objects.filter(id__in=tag_ids)
+            print(tag_ids)
+            if chose_tags.count() != len(tag_ids):
+                make_error_log(request, '选择的tag不存在')
+                return APIResponse(code=1, msg='选择的tag不存在')
+
+            query = Q()
+            for tag_id in tag_ids:
+                query |= Q(tags__id=tag_id)
+
+            queryset = queryset.filter(query).distinct()
 
         if user:
             if not User.objects.filter(id=user).exists():
@@ -157,6 +171,10 @@ class EditProductView(APIView):
         for field in excluded_fields:
             data.pop(field, None)
 
+        tag_ids = data.getlist('tags', [])
+        if not tag_ids or all(not tag_id for tag_id in tag_ids):
+            data.pop('tags', None)
+
         if 'classification_1' in data and 'classification_2' in data:
             classification_1_id = data['classification_1']
             classification_2_id = data['classification_2']
@@ -208,15 +226,20 @@ class EditProductView(APIView):
             return APIResponse(code=1, msg='不是你的商品请不要修改')
 
         image_ids = request.data.getlist('remove_ids', [])
-        product_images = ProductImage.objects.filter(product=product, id__in=image_ids)
-        if len(product_images) != len(image_ids):
-            make_error_log(request, '修改商品时删除的图片不存在或不属于该商品')
-            return APIResponse(code=1, msg='删除的图片不存在或不属于该商品')
+        if image_ids and all(image_id for image_id in image_ids):
+            product_images = ProductImage.objects.filter(product=product, id__in=image_ids)
+            if len(product_images) != len(image_ids):
+                make_error_log(request, '修改商品时删除的图片不存在或不属于该商品')
+                return APIResponse(code=1, msg='删除的图片不存在或不属于该商品')
 
         data = request.data.copy()
         excluded_fields = ['id', ]
         for field in excluded_fields:
             data.pop(field, None)
+
+        tag_ids = data.getlist('tags', [])
+        if not tag_ids or all(not tag_id for tag_id in tag_ids):
+            data.pop('tags', None)
 
         if 'classification_1' in data and 'classification_2' in data:
             classification_1_id = data['classification_1']
@@ -243,9 +266,12 @@ class EditProductView(APIView):
             make_error_log(request, '更新商品失败')
             return APIResponse(code=1, msg='更新商品失败', data=product_serializer.errors)
 
-        for product_image in product_images:
-            product_image.image.delete()
-            product_image.delete()
+        image_ids = request.data.getlist('remove_ids', [])
+        if image_ids and all(image_id for image_id in image_ids):
+            product_images = ProductImage.objects.filter(product=product, id__in=image_ids)
+            for product_image in product_images:
+                product_image.image.delete()
+                product_image.delete()
 
         images_data = request.data.getlist('images', [])
         for image_data in images_data:
