@@ -68,8 +68,8 @@ export const useWebSocketStore = defineStore(
                     const message = JSON.parse(event.data);
                     switch (message.notification_type) {
                         case 'comment_notice': this.handleComment(message); break;
-                        case 'reply_notice': console.log('get reply socket', message); break;
-                        case 'mentioned_notice': console.log('get at socket', message); break;
+                        case 'reply_notice': this.handleReply(message); break;
+                        case 'mentioned_notice': this.handleMention(message); break;
                         case 'chat_notice': console.log('get chat socket', message); break;
                     }
                 };
