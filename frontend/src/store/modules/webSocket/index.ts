@@ -134,9 +134,9 @@ export const useWebSocketStore = defineStore(
             this.new_mention = 0;
         },
 
-        refreshMessage() {
+        async refreshMessage() {
             this.discardMessages();
-            this.initMessages();
+            await this.initMessages();
         },
 
         async fillComment(commentChoice: String) {
@@ -146,6 +146,7 @@ export const useWebSocketStore = defineStore(
                 offset: (commentChoice === '0') ? this.comment_count : this.comment_all_count}).then(res => {
                 if (commentChoice === "0") {
                     /* only get un_read message */
+                    console.log(this.new_comment)
                     this.new_comment = res.data.count;
                     this.comment_list = this.comment_list.concat(res.data.results);
                     this.comment_count += res.data.results.length;
