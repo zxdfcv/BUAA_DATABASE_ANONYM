@@ -6,7 +6,7 @@
         <a-space>
           <a-button type="primary" @click="handleAdd">新增</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
-          <a-input-search addon-before="名称" enter-button @search="onSearch" @change="onSearchChange" />
+          <a-input-search addon-before="订单号" enter-button @search="onSearch" @change="onSearchChange" />
         </a-space>
       </div>
       <a-table
@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import {listApi, createApi, updateApi, cancelApi, deleteApi} from '/@/api/admin/order'
-import {message} from "ant-design-vue";
+import {message, FormInstance} from "ant-design-vue";
 import {FileImageOutlined, VideoCameraOutlined} from "@ant-design/icons-vue";
 
 onMounted(() => {

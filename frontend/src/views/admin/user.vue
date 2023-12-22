@@ -390,9 +390,6 @@
         if (modal.form.is_active) {
           formData.append('is_active', modal.form.is_active === '1' ? 'true' : 'false')
         }
-        if (modal.form.cover) {
-          formData.append('cover', modal.form.cover);
-        }
         if (modal.form.phone) {
           formData.append('phone', modal.form.phone);
         }

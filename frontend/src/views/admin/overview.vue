@@ -48,13 +48,20 @@
 
       <a-row :gutter="[20,20]">
         <a-col :sm="24" :md="24" :lg="12">
-          <a-card title="销售数量排名" style="flex:1;">
-            <BarChartComponent :dataSource="tdata.data.classification_rank_data" :title="'热门商品排名'" :keyName="'title'" :valueName="'count'" :id="'5'" />
+          <a-card title="买家排名" style="flex:1;">
+            <BarChartComponent :dataSource="tdata.data.user_purchase_rank_data" :title="'买家排名'" :keyName="'username'" :valueName="'count'" :id="'5'" />
           </a-card>
         </a-col>
         <a-col :sm="24" :md="24" :lg="12">
-          <a-card title="销售金额排名" style="flex:1;">
-            <PieChartComponent :dataSource="tdata.data.classification_rank_data" :title="'销售金额排名'" :keyName="'title'" :valueName="'count'" />
+          <a-card title="卖家排名" style="flex:1;">
+            <PieChartComponent :dataSource="tdata.data.user_sell_rank_data" :title="'卖家排名'" :keyName="'username'" :valueName="'count'" />
+          </a-card>
+        </a-col>
+      </a-row>
+      <a-row :gutter="[20,20]">
+        <a-col :sm="24" :md="24" :lg="12">
+          <a-card title="标签排名" style="flex:1;">
+            <BarChartComponent :dataSource="tdata.data.tag_rank_data" :title="'标签排名'" :keyName="'name'" :valueName="'count'" :id="'6'" />
           </a-card>
         </a-col>
       </a-row>
@@ -83,6 +90,9 @@ const tdata = ref({ // 组合式 api，vue3 复习
     order_rank_data: {},
     product_rank_data: {},
     classification_rank_data: {}, // 后端得提供信息
+    user_sell_rank_data: {},
+    user_purchase_rank_data: {},
+    tag_rank_data: {},
     user_gender_rank_data: {},
     hot_classification_data: {},
     product_addr_rank_data: {},
@@ -209,6 +219,15 @@ const initCharts = () => {
           width: 1,
           type: 'solid'
         }
+      }
+    },
+    toolbox: {
+      show: true,
+      feature: {
+        mark: {show: true},
+        dataView: {show: true, readOnly: false},
+        restore: {show: true},
+        saveAsImage: {show: true}
       }
     },
     series: [

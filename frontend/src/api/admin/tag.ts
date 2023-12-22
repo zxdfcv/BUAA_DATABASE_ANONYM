@@ -1,10 +1,10 @@
 import {deletes, get, post, put} from '/@/utils/http/axios';
 
 enum URL {
-    list = '/myapp/admin/tag/list',
-    create = '/myapp/admin/tag/create',
-    update = '/myapp/admin/tag/update',
-    delete = '/myapp/admin/tag/delete',
+    list = '/myapp/tag/view',
+    create = '/myapp/tag/create',
+    update = '/myapp/tag/update',
+    delete = '/myapp/tag/delete',
 }
 
 const listApi = async (params: any) =>
