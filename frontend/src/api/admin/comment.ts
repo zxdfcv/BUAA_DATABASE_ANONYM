@@ -4,6 +4,7 @@ enum URL {
     list = '/myapp/admin/comment/list',
     create = '/myapp/admin/comment/create',
     delete = '/myapp/admin/comment/delete',
+    update = '/myapp/admin/comment/update',
     listThingComments = '/api/comment/listThingComments',
     listUserComments = '/api/comment/listUserComments',
     like = '/api/comment/like'
@@ -21,4 +22,6 @@ const listThingCommentsApi = async (params: any) => get<any>({url: URL.listThing
 const listUserCommentsApi = async (params: any) => get<any>({url: URL.listUserComments, params: params, data: {}, headers: {}});
 const likeApi = async (params: any) => post<any>({url: URL.like, params: params, headers: {}});
 
-export {listApi, createApi, deleteApi, listThingCommentsApi, listUserCommentsApi, likeApi};
+const updateApi = async (params: any, data: any) => post<any>({ url: URL.update, params: params, data: data, headers: { 'Content-Type': 'multipart/form-data;charset=utf-8' } });
+
+export {listApi, createApi, deleteApi, updateApi, listThingCommentsApi, listUserCommentsApi, likeApi};

@@ -388,6 +388,36 @@ class CommentListSerializer(serializers.ModelSerializer):
         return obj.likes.count()
 
 
+class CommentLikesListSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+    product_name = serializers.ReadOnlyField(source='product.name')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+    likes_count = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        exclude = ('is_read', 'likes')
+        extra_kwargs = {'id': {'read_only': True},
+                        # 'likes': {'read_only': True},
+                        }
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated:
+            # 检查用户是否点赞了评论
+            return obj.likes.filter(id=request.user.id).exists()
+        return False
+
+
 class CommentNoticeSerializer(serializers.ModelSerializer):
     create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
     product_name = serializers.ReadOnlyField(source='product.name')
@@ -448,6 +478,45 @@ class ReplyListSerializer(serializers.ModelSerializer):
 
     def get_likes_count(self, obj):
         return obj.likes.count()
+
+
+class ReplyLikesListSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    comment_content = serializers.ReadOnlyField(source='comment.content')
+    product_id = serializers.ReadOnlyField(source='comment.product.id')
+    product_name = serializers.ReadOnlyField(source='comment.product.name')
+
+    user_name = serializers.ReadOnlyField(source='user.username')
+    user_nickname = serializers.ReadOnlyField(source="user.nickname")
+    user_avatar = serializers.SerializerMethodField()
+
+    mentioned_name = serializers.ReadOnlyField(source="mentioned_user.username")
+    mentioned_nickname = serializers.ReadOnlyField(source="mentioned_user.nickname")
+    likes_count = serializers.SerializerMethodField()
+    liked = serializers.SerializerMethodField()
+
+    # mentioned_users_detail = MentionedUserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reply
+        exclude = ('is_read', 'comment_read', 'likes')
+        extra_kwargs = {'id': {'read_only': True},
+                        # 'likes': {'read_only': True},
+                        }
+
+    def get_user_avatar(self, obj):
+        return str(obj.user.avatar) if obj.user.avatar else ''
+
+    def get_likes_count(self, obj):
+        return obj.likes.count()
+
+    def get_liked(self, obj):
+        request = self.context.get('request')
+        if request and request.user and request.user.is_authenticated:
+            # 检查用户是否点赞了评论
+            return obj.likes.filter(id=request.user.id).exists()
+        return False
 
 
 class ReplyNoticeSerializer(serializers.ModelSerializer):
