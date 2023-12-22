@@ -544,7 +544,6 @@ class ChatAllDetailsSerializer(serializers.ModelSerializer):
     sender_name = serializers.ReadOnlyField(source='sender.username')
     recipient_name = serializers.ReadOnlyField(source='recipient.username')
 
-
     class Meta:
         model = Chat
         fields = '__all__'
@@ -556,3 +555,5 @@ class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = '__all__'
+        # exclude = ('id',)
+        extra_kwargs = {'id': {'read_only': True}}
