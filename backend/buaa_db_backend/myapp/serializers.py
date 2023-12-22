@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import Group, Permission
 
 from .models import LoginLog, OpLog, ErrorLog, Classification1, Classification2, Follow, ProductImage, Product, Comment, \
-    Reply, Order, Chat
+    Reply, Order, Chat, Tag
 
 User = get_user_model()
 
@@ -549,3 +549,10 @@ class ChatAllDetailsSerializer(serializers.ModelSerializer):
         model = Chat
         fields = '__all__'
 
+
+class TagSerializer(serializers.ModelSerializer):
+    create_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False, read_only=True)
+
+    class Meta:
+        model = Tag
+        fields = '__all__'

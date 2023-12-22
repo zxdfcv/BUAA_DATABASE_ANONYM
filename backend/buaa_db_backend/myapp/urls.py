@@ -58,7 +58,7 @@ urlpatterns = [
     path("admin/chat/delete", admin.ChatView.as_view(), name="chat_allDelete"),
 
 
-
+    path("admin/sysinfo", admin.SysInfoView.as_view(), name="sysinfo"),
     path("admin/statistics", admin.StatisticsView.as_view(), name="statistics"),
 
     path("admin/group/list", permission.GroupView.as_view(), name="group_allList"),
