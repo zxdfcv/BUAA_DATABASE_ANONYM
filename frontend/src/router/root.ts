@@ -56,6 +56,11 @@ const constantRouterMap = [
     component: () => import('/@/views/index/search.vue')
   },
   {
+    path: '/chatpage',
+    name: 'chatpage',
+    component: () => import('/@/views/index/chat.vue')
+  },
+  {
     path: '/welcome',
     name: 'welcome',
     component: () => import('/@/views/index/welcome.vue')

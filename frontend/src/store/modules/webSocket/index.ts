@@ -1,7 +1,13 @@
 import {defineStore} from 'pinia';
 import piniaStore, {useUserStore} from '/@/store/index';
 import {MESSAGE_PER_PAGE, WEBSOCKET_URL} from "/@/store/constants";
-import {getCommentMessageApi, getMentionMessageApi, getReplyMessageApi} from "/@/api/index/notice";
+import {
+    getChatDetailApi,
+    getChatListApi,
+    getCommentMessageApi,
+    getMentionMessageApi,
+    getReplyMessageApi
+} from "/@/api/index/notice";
 import {openNotification} from "/@/utils/notice";
 
 /**
@@ -43,6 +49,12 @@ export const useWebSocketStore = defineStore(
         new_comment: ref(0),
         new_reply: ref(0),
         new_mention: ref(0),
+        new_chat: ref(0), // 拿出去 computed
+
+        chat_list: ref([]),
+        message_list: ref([]),
+        sessionSelectId: 0,
+        chatScrollbar: undefined,
     }),
     getters: {},
     actions: {
@@ -70,7 +82,7 @@ export const useWebSocketStore = defineStore(
                         case 'comment_notice': this.handleComment(message); break;
                         case 'reply_notice': this.handleReply(message); break;
                         case 'mentioned_notice': this.handleMention(message); break;
-                        case 'chat_notice': console.log('get chat socket', message); break;
+                        case 'chat_notice': this.handleChat(message); break;
                     }
                 };
 
@@ -97,6 +109,7 @@ export const useWebSocketStore = defineStore(
                 await this.fillReply('1');
                 await this.fillMention('0');
                 await this.fillMention('1');
+                await this.fillChat();
                 this.init = true;
             }
         },
@@ -132,6 +145,7 @@ export const useWebSocketStore = defineStore(
             this.new_comment = 0;
             this.new_reply = 0;
             this.new_mention = 0;
+            this.new_chat = 0;
         },
 
         async refreshMessage() {
@@ -221,6 +235,27 @@ export const useWebSocketStore = defineStore(
             })
         },
 
+        async fillChat() {
+            getChatListApi({})
+                .then(res => this.chat_list = res.data)
+                .catch(err => console.log(err))
+        },
+
+        async fillMessage() {
+            const item = this.chat_list[this.sessionSelectId];
+            // @ts-ignore
+            getChatDetailApi({product_id: item.product, other_id: (item.sender === useUserStore().user_id) ? item.recipient : item.sender}).then(res => {
+                console.log(res.data)
+                this.message_list = res.data;
+                setTimeout(() => {
+                    // @ts-ignore
+                    this.chatScrollbar?.setScrollTop(9999);
+                }, 20);
+            }).catch(err => {
+                console.log(err);
+            })
+        },
+
         handleComment(message) {
             console.log('get comment socket', message);
             this.comment_list = [];
@@ -256,6 +291,13 @@ export const useWebSocketStore = defineStore(
             this.fillMention('0');
             this.fillMention('1');
         },
+
+        handleChat(message) {
+            console.log('get chat socket', message);
+            this.new_chat = 1;
+            this.fillChat();
+            this.fillMessage();
+        }
     },
     persist: {
         key: 'webSocket',
