@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';
-import piniaStore from './store';
+import piniaStore, {useWebSocketStore} from './store';
 import bootstrap from './core/bootstrap';
 
 import ViewUIPlus from 'view-ui-plus'
@@ -17,6 +17,12 @@ import 'view-ui-plus/dist/styles/viewuiplus.css'
 
 
 const app = createApp(App)
+
+/* 注销 webSocket */
+window.addEventListener('beforeunload', () => {
+    const socketStore = useWebSocketStore();
+    socketStore.detachSocket();
+});
 
 app.use(UndrawUi).use(Antd).use(ElementPlus).use(ViewUIPlus).
 use(piniaStore).use(router).use(bootstrap).

@@ -1,5 +1,6 @@
 const BASE_URL = 'http://127.0.0.1:8000'
 // const BASE_URL = 'http://118.178.121.33:80'
+const WEBSOCKET_URL = 'ws://127.0.0.1:8000/ws/notification/'
 
 const USER_ID = 'user_id'
 const USER_NAME = 'user_name'
@@ -17,10 +18,12 @@ const REMEMBER_ME = 'remember_me'
 const EXPIRE_MINUTE = 30 /* ACCESS TOKEN 过期需要的时间，以 minute 计算 */
 const EXPIRE_FRESH_HOUR = 3; /* REFRESH TOKEN 过期需要的时间，以 hour 计算 */
 
+const MESSAGE_PER_PAGE = 5; /* 单次刷新返回的数据量 */
 
 export {
-    BASE_URL, 
+    BASE_URL, WEBSOCKET_URL,
     USER_ACCESS, USER_NAME, USER_ID, USER_AVATAR, USER_REFRESH, TOKEN_EXPIRE_TIME,
     ADMIN_USER_ID,ADMIN_USER_NAME,ADMIN_USER_TOKEN, ADMIN_USER_AVATAR,
-    REMEMBER_ME, EXPIRE_MINUTE, EXPIRE_FRESH_HOUR
+    REMEMBER_ME, EXPIRE_MINUTE, EXPIRE_FRESH_HOUR,
+    MESSAGE_PER_PAGE,
 }

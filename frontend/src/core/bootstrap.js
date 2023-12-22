@@ -1,6 +1,6 @@
 // Remove: 已实现 pinia 持久化，项目中已经不再需要 localStorage
 
-import {useAppStore, useUserStore} from "/@/store";
+import {useAppStore, useUserStore, useWebSocketStore} from "/@/store";
 import {USER_ID, TOKEN_EXPIRE_TIME, USER_ACCESS, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN, USER_AVATAR, ADMIN_USER_AVATAR} from "/@/store/constants";
 
 export default function Initializer () {
@@ -30,4 +30,13 @@ export default function Initializer () {
     console.log('恢复AppStore完毕 ==> ', state)
   })
 
+  const webSocketStore = useWebSocketStore()
+  webSocketStore.$patch((state)=>{
+    console.log('恢复WebSocketStore完毕 ==> ', state)
+  })
+
+  if (userStore.user_access) {
+    webSocketStore.attachSocket();
+    webSocketStore.initMessages();
+  }
 }
