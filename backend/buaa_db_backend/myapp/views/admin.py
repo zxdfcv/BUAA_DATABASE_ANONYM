@@ -295,6 +295,10 @@ class EditProductDetailView(APIView):
         if not user_ids or all(not user_id for user_id in user_ids):
             data.pop('collectors', None)
 
+        tag_ids = data.getlist('tags', [])
+        if not tag_ids or all(not tag_id for tag_id in tag_ids):
+            data.pop('tags', None)
+
         if 'classification_1' in data and 'classification_2' in data:
             classification_1_id = data['classification_1']
             classification_2_id = data['classification_2']
@@ -365,6 +369,10 @@ class EditProductDetailView(APIView):
         user_ids = data.getlist('collectors', [])
         if not user_ids or all(not user_id for user_id in user_ids):
             data.pop('collectors', None)
+
+        tag_ids = data.getlist('tags', [])
+        if not tag_ids or all(not tag_id for tag_id in tag_ids):
+            data.pop('tags', None)
         images_data = request.data.getlist('images', [])
         # images_data = [image_id for image_id in images_data if image_id]
 
@@ -607,7 +615,7 @@ class OrderView(generics.ListAPIView):
         keyword = request.GET.get("keyword", None)
         orders = Order.objects.all().order_by('-create_time')
         if keyword:
-            orders = orders.filter(order_number=keyword)
+            orders = orders.filter(order_number__contains=keyword)
         page = self.paginate_queryset(orders)
         if page is not None:
             serializer = OrderSerializer(page, many=True)
