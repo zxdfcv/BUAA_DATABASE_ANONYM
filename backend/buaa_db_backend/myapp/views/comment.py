@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from ..models import Product, Comment, Reply
 from ..permissions import CanEditCommentPermission
-from ..serializers import CommentListSerializer, CommentNoticeSerializer
+from ..serializers import CommentListSerializer, CommentNoticeSerializer, CommentLikesListSerializer
 from ..utils import APIResponse, make_error_log, send_notification
 
 
@@ -50,6 +50,42 @@ class CommentListView(generics.ListAPIView):
                 }
             )
         serializer = CommentListSerializer(comments, many=True)
+        return APIResponse(code=0, msg='查询成功', data=serializer.data)
+
+
+class CommentLikesView(generics.ListAPIView):
+    pagination_class = LimitOffsetPagination
+
+    def get(self, request, *args, **kwargs):
+        # user = request.user
+        product_id = request.GET.get('product_id')
+        sort = request.GET.get('sort', 'create_time')
+        try:
+            product = Product.objects.get(pk=product_id)
+        except Product.DoesNotExist:
+            make_error_log(request, '商品不存在')
+            return APIResponse(code=1, msg='商品不存在')
+
+        comments = Comment.objects.filter(product=product)
+        if sort == 'hot':
+            comments = comments.annotate(likes_count=Count('likes')).order_by('-likes_count')
+        else:
+            comments = comments.order_by('-create_time')
+
+        page = self.paginate_queryset(comments)
+        if page is not None:
+            serializer = CommentLikesListSerializer(page, many=True, context={'request': request})
+            return APIResponse(
+                code=0,
+                msg='查询成功',
+                data={
+                    'count': self.paginator.count,
+                    'next': self.paginator.get_next_link(),
+                    'previous': self.paginator.get_previous_link(),
+                    'results': serializer.data,
+                }
+            )
+        serializer = CommentLikesListSerializer(comments, many=True, context={'request': request})
         return APIResponse(code=0, msg='查询成功', data=serializer.data)
 
 

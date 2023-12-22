@@ -87,6 +87,8 @@ urlpatterns = [
     path("product/collector/remove", product.EditProductCollectorView.as_view(), name='collector_remove'),
 
     path("comment/list", comment.CommentListView.as_view(), name='comment_list'),
+    path("comment/likeList", comment.CommentLikesView.as_view(), name='comment_likeList'),
+
     path("comment/my_list", comment.MyCommentsView.as_view(), name='comment_my_list'),
     path("comment/create", comment.MyCommentsView.as_view(), name='comment_create'),
     path("comment/delete", comment.MyCommentsView.as_view(), name='comment_delete'),
@@ -96,6 +98,8 @@ urlpatterns = [
     path("comment/dislike", comment.EditLikesView.as_view(), name='comment_dislike'),
 
     path("reply/list", reply.ReplyListView.as_view(), name='reply_list'),
+    path("reply/likeList", reply.ReplyLikesView.as_view(), name='reply_likeList'),
+
     path("reply/my_list", reply.MyRepliesView.as_view(), name='reply_my_list'),
     path("reply/create", reply.MyRepliesView.as_view(), name='reply_create'),
     path("reply/delete", reply.MyRepliesView.as_view(), name='reply_delete'),

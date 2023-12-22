@@ -44,6 +44,16 @@ class StatisticsView(APIView):
             cursor.execute(sql_str)
             classification2_rank_data = dict_fetchall(cursor)
 
+        sql_str = """SELECT t.name, COUNT(t.name) AS count
+                    FROM buaa_db_product_tags AS pt
+                    JOIN buaa_db_tag AS t ON pt.tag_id = t.id
+                    GROUP BY t.name
+                    ORDER BY count DESC
+                    LIMIT 5;"""
+        with connection.cursor() as cursor:
+            cursor.execute(sql_str)
+            tag_rank_data = dict_fetchall(cursor)
+
         sql_str = "select gender, count(gender) as count from buaa_db_user group by gender order by " \
                   "count desc;"
 
@@ -111,6 +121,7 @@ class StatisticsView(APIView):
             'product_rank_data': product_rank_data,
             'classification1_rank_data': classification1_rank_data,
             'classification2_rank_data': classification2_rank_data,
+            'tag_rank_data': tag_rank_data,
             'user_gender_rank_data': user_gender_rank_data,
             'product_addr_rank_data': product_addr_rank_data,
             'product_price_rank_data': product_price_rank_data,
