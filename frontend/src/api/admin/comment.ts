@@ -1,4 +1,4 @@
-import {get, post} from '/@/utils/http/axios';
+import {get, post, put, deletes} from '/@/utils/http/axios';
 
 enum URL {
     list = '/myapp/admin/comment/list',
@@ -10,13 +10,13 @@ enum URL {
 }
 
 const listApi = async (params: any) => get<any>({url: URL.list, params: params, data: {}, headers: {}});
-const createApi = async (data: any) => post<any>({
+const createApi = async (data: any) => put<any>({
     url: URL.create,
     params: {},
     data: data,
     headers: {'Content-Type': 'multipart/form-data;charset=utf-8'}
 });
-const deleteApi = async (params: any) => post<any>({url: URL.delete, params: params, headers: {}});
+const deleteApi = async (params: any) => deletes<any>({url: URL.delete, params: params, headers: {}});
 const listThingCommentsApi = async (params: any) => get<any>({url: URL.listThingComments, params: params, data: {}, headers: {}});
 const listUserCommentsApi = async (params: any) => get<any>({url: URL.listUserComments, params: params, data: {}, headers: {}});
 const likeApi = async (params: any) => post<any>({url: URL.like, params: params, headers: {}});

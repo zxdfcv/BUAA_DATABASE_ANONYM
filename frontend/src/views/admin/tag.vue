@@ -13,7 +13,7 @@
         rowKey="id"
         :loading="data.loading"
         :columns="columns"
-        :data-source="data.tagList"
+        :data-source="data.groupList"
         :scroll="{ x: 'max-content' }"
         :row-selection="rowSelection"
         :pagination="{
@@ -96,7 +96,7 @@
 
   // 页面数据
   const data = reactive({
-    tagList: [],
+    groupList: [],
     loading: false,
     keyword: '',
     selectedRowKeys: [] as any[],
@@ -135,7 +135,7 @@
         res.data.forEach((item: any, index: any) => {
           item.index = index + 1;
         });
-        data.tagList = res.data;
+        data.groupList = res.data;
       })
       .catch((err) => {
         data.loading = false;

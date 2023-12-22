@@ -83,8 +83,8 @@
                       v-model:file-list="fileList"
                   >
                     <p class="ant-upload-drag-icon">
-                      <template v-if="modal.form.coverUrl">
-                        <img :src="modal.form.coverUrl"  style="width: 60px;height: 80px;"/>
+                      <template v-if="modal.form.imageUrl">
+                        <img :src="modal.form.imageUrl" :style="{ width: `${160 * modal.form.imageWidth / modal.form.imageHeight}px`, height: '160px' }"/>
                       </template>
                       <template v-else>
                         <file-image-outlined />
@@ -114,7 +114,7 @@ import { FormInstance, message, SelectProps } from 'ant-design-vue';
 import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/classification2';
 import {listApi as listClassification1Api} from '/@/api/admin/classification1'
 import {BASE_URL} from "/@/store/constants";
-  import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
+import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
 
 
 const columns = reactive([
@@ -156,6 +156,25 @@ const beforeUpload = (file: File) => {
   const copyFile = new File([file], fileName);
   console.log(copyFile);
   modal.form.imageFile = copyFile;
+  const reader = new FileReader();
+
+  reader.onload = (event) => {
+    const img = new Image();
+    img.onload = () => {
+      // 获取图片的宽高
+      const width = img.width
+      const height = img.height
+      modal.form.imageWidth = width
+      modal.form.imageHeight = height
+      console.log(modal.form.imageWidth)
+      console.log(modal.form.imageHeight)
+    }
+
+    // 将文件的内容设置给图片对象
+    img.src = event.target.result as string
+  }
+
+  reader.readAsDataURL(copyFile)
   return false;
 };
 // 文件列表
@@ -186,9 +205,11 @@ const modal = reactive({
     name: undefined,
     description: '',
     classification_1: undefined,
-    cover: undefined,
-    coverUrl: '',
+    image: undefined,
+    imageUrl: '',
     imageFile: undefined,
+    imageWidth: undefined,
+    imageHeight: undefined
   },
   rules: {
     name: [{ required: true, message: '请输入', trigger: 'change' }],
@@ -244,7 +265,7 @@ const handleAdd = () => {
   for (const key in modal.form) {
     modal.form[key] = undefined;
   }
-  modal.form.cover = undefined
+  modal.form.image = undefined
 };
 const handleEdit = (record: any) => {
   resetModal();
@@ -258,9 +279,9 @@ const handleEdit = (record: any) => {
   for (const key in record) {
     modal.form[key] = record[key];
   }
-  if(modal.form.cover) {
-    modal.form.coverUrl = BASE_URL + modal.form.cover
-    modal.form.cover = undefined
+  if(modal.form.image) {
+    modal.form.imageUrl = BASE_URL + modal.form.image
+    modal.form.image = undefined
   }
 };
 
@@ -307,7 +328,7 @@ const handleOk = () => {
           formData.append('classification_1', modal.form.classification_1)
         }
         if (modal.form.imageFile) {
-          formData.append('cover', modal.form.imageFile)
+          formData.append('image', modal.form.imageFile)
         }
         formData.append('description', modal.form.description || '')
         console.log(modal.form)
@@ -339,7 +360,6 @@ const handleOk = () => {
                 submitting.value = false
                 console.log(err);
                 message.error(err.msg || '操作失败');
-                
               });
         }
       })
