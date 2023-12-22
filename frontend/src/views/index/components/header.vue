@@ -58,7 +58,7 @@
         <Button type="primary" shape="circle" icon="md-log-in" @click="goLogin">登录</Button>
       </template>
 
-      <div class="right-icon">
+      <div class="right-icon" v-if="userStore.user_access">
         <NoticeCenter />
       </div>
       <div>

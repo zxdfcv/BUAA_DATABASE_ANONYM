@@ -1,4 +1,4 @@
-import {get, post} from '/@/utils/http/axios';
+import { get, post, put } from "/@/utils/http/axios";
 
 enum URL {
     commentMessage = '/myapp/comment/notice',
@@ -24,7 +24,7 @@ const readMentionMessageApi = async (params: any) => post<any>({url: URL.readMen
 
 const getChatListApi = async (params: any) => get<any>({url: URL.chatList, params: params, data: {}, headers: {}});
 const getChatDetailApi = async (params: any) => get<any>({url: URL.chatContent, params: params, data: {}, headers: {}});
-const sendChatMessageApi = async (data: any) => post<any>({url: URL.chatCreate, params: {}, data: data, headers: {}});
+const sendChatMessageApi = async (data: any) => put<any>({url: URL.chatCreate, params: {}, data: data, headers: {}});
 
 
 

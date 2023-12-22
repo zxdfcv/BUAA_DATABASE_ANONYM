@@ -154,6 +154,7 @@
         <a-tab-pane key="4" tab="私聊消息" style="height: 400px">
           <el-scrollbar>
             <div style="margin: 30px; text-align: center">
+              <div style="margin-bottom: 10px" v-if="newChat === 1">你有新的私聊消息哦，快来聊天室看看吧！</div>
               <a-button type="primary" @click="push2chat">前往聊天室</a-button>
             </div>
           </el-scrollbar>
@@ -186,9 +187,18 @@
   const newComment = socketStore.new_comment;
   const newReply = socketStore.new_reply;
   const newMention = socketStore.new_mention;
+  const newChat = computed(() => {
+    let lists = socketStore.chat_list;
+    for (let i = 0; i < lists.length; i++) {
+      if (lists[i].is_read === false) {
+        return 1;
+      }
+    }
+    return 0;
+  });
   const newMessageCount = computed(() => {
     console.log(newComment + newReply + newMention)
-    return socketStore.new_comment + socketStore.new_reply + socketStore.new_mention;
+    return socketStore.new_comment + socketStore.new_reply + socketStore.new_mention + newChat.value;
   });
 
   const activeKey = ref('1');
@@ -291,7 +301,7 @@
 
   const push2chat = () => {
     openNotification({type: 'error', message: '哈哈，太着急了吧！'})
-    // router.push({name: 'detail', query: {id: product}})
+    router.push({name: 'chatpage'})
   }
 </script>
 
