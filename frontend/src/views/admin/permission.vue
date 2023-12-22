@@ -75,6 +75,23 @@
                 </a-form-item>
               </a-col>
             </a-row>
+            <a-col offset="1" span="23">
+              <p slot="title">修改权限组</p>
+              <a-form :label-width="40">
+                <a-form-item>
+                  <a-transfer
+                      :rowKey="record => record.id"
+                      :list-style="{ width: '300px' }"
+                      :dataSource="data.permList"
+                      v-model:selected-keys="selectedKeys"
+                      v-model:target-keys="modal.form.selectedKeys"
+                      :render="item => item.name"
+                      :titles="['可用分组', '当前分组']"
+                      filterable
+                  />
+                </a-form-item>
+              </a-form>
+            </a-col>
           </a-form>
         </div>
       </a-modal>
@@ -88,6 +105,7 @@ import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/group';
 import { listApi as listPermApi } from '/@/api/admin/permission';
 import {DownOutlined} from "@ant-design/icons-vue";
 
+const selectedKeys = ref<string[]>([]);
 
 const columns = reactive([
   {
@@ -120,7 +138,7 @@ const columns = reactive([
 
 // 页面数据
 const data = reactive({
-  permList: [],
+  permList: <string[]>[],
   groupList: [],
   loading: false,
   keyword: '',
@@ -136,7 +154,9 @@ const modal = reactive({
   title: '',
   form: {
     id: undefined,
-    name: undefined
+    permissions: <string[]>[], // arr
+    name: undefined,
+    selectedKeys: <string[]>[]
   },
   rules: {
     name: [{ required: true, message: '请输入', trigger: 'change' }],
@@ -157,11 +177,12 @@ const gentPermList = () => {
   })
       .then((res) => {
         data.loading = false;
-        console.log(res);
-        res.data.forEach((item: any, index: any) => {
-          item.index = index + 1;
-        });
-        data.permList = res.data;
+        console.log(res.data);
+        data.permList = res.data
+        data.permList.forEach((item) => {
+          item['id'] = String(item['id']) as String
+        })
+        console.log(data.permList)
       })
       .catch((err) => {
         data.loading = false;
@@ -177,9 +198,6 @@ const getDataList = () => {
       .then((res) => {
         data.loading = false;
         console.log(res);
-        res.data.forEach((item: any, index: any) => {
-          item.index = index + 1;
-        });
         data.groupList = res.data;
       })
       .catch((err) => {
@@ -213,6 +231,9 @@ const handleAdd = () => {
   for (const key in modal.form) {
     modal.form[key] = undefined;
   }
+  modal.form.permissions.forEach((item) => {
+    item['id'] = String(item['id']) as String
+  })
 };
 const handleEdit = (record: any) => {
   resetModal();
@@ -226,6 +247,19 @@ const handleEdit = (record: any) => {
   for (const key in record) {
     modal.form[key] = record[key];
   }
+
+  modal.form.permissions.forEach((item) => {
+    item['id'] = String(item['id']) as String
+  })
+
+  console.log(modal.form.permissions)
+
+  const tempArr = []
+
+  for (let i = 0; i < modal.form.permissions.length; ++i) {
+    tempArr.push(String(modal.form.permissions[i]['id'] as String))
+  }
+  modal.form.selectedKeys = tempArr
 };
 
 const confirmDelete = (record: any) => {
@@ -261,8 +295,23 @@ const handleOk = () => {
   myform.value
       ?.validate()
       .then(() => {
+        const formData = new FormData();
+        if (modal.form.name) {
+          formData.append('name', modal.form.name)
+        }
+        if (modal.form.permissions) {
+          // const descArray: { id: string; name: string }[] = []
+          console.log(modal.form.permissions)
+          console.log(data.permList)
+          modal.form.selectedKeys.forEach(item => {
+            formData.append('permissions', item)
+            console.log(item)
+          })
+          // let descJson = JSON.stringify(descArray);
+          // formData.append('permissions', descJson)
+        }
         if (modal.editFlag) {
-          updateApi({ id: modal.form.id }, modal.form)
+          updateApi({ group_id: modal.form.id }, formData)
               .then((res) => {
                 hideModal();
                 getDataList();
