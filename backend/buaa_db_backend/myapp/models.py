@@ -67,6 +67,18 @@ class Classification2(models.Model):
         verbose_name = "二级分类"
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=100, unique=True, default="fc")
+    create_time = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = "buaa_db_tag"
+        verbose_name = "商品标签"
+
+
 class Product(models.Model):
     STATUS_CHOICES = [
         ('A', '全新'),
@@ -97,6 +109,7 @@ class Product(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True)
 
     collectors = models.ManyToManyField(User, blank=True, related_name='collect_products')
+    tags = models.ManyToManyField(Tag, blank=True, related_name='tag_products')
 
     def __str__(self):
         return self.name
@@ -222,6 +235,9 @@ class Order(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, null=True)
     pay_time = models.DateTimeField(null=True, blank=True)
 
+    def __str__(self):
+        return self.order_number
+
     class Meta:
         db_table = "buaa_db_order"
         verbose_name = "订单"
@@ -233,7 +249,7 @@ class Chat(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_chat')
     content = models.TextField(max_length=1023)
     create_time = models.DateTimeField(auto_now_add=True, null=True)
-    image = models.ImageField(upload_to='chat_images/',null=True, blank=True)
+    image = models.ImageField(upload_to='chat_images/', null=True, blank=True)
     is_read = models.BooleanField(default=False)
 
     def __str__(self):

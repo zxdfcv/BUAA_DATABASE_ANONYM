@@ -65,12 +65,22 @@
                 </a-form-item>
               </a-col>
               <a-col span="12">
-                <a-form-item label="二级分类" name="classification">
+                <a-form-item label="一级分类" name="classification1">
                   <a-select placeholder="请选择"
                             allowClear
-                            :options="modal.cData"
-                            :field-names="{ label: 'name', value: 'id',}"
-                            v-model:value="modal.form.classification1">
+                            :options="appStore.classificationTree"
+                            :field-names="{ label: 'label', value: 'id',}"
+                            v-model:value="modal.form.classification_1">
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col span="12">
+                <a-form-item label="二级分类" name="classification2">
+                  <a-select placeholder="请选择"
+                            allowClear
+                            :options="option2"
+                            :field-names="{ label: 'label', value: 'id',}"
+                            v-model:value="modal.form.classification_2">
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -145,10 +155,10 @@
                 </a-form-item>
               </a-col>
               <a-col span="12">
-                <a-form-item label="状态" name="status">
-                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.status">
-                    <a-select-option key="0" value="0">上架</a-select-option>
-                    <a-select-option key="1" value="1">下架</a-select-option>
+                <a-form-item label="是否下架" name="status">
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.off_shelf">
+                    <a-select-option key="0" value="false">是</a-select-option>
+                    <a-select-option key="1" value="true">否</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -168,6 +178,11 @@ import {listApi as listClassification2Api} from '/@/api/admin/classification2'
 import {listApi as listTagApi} from '/@/api/admin/tag'
 import {BASE_URL} from "/@/store/constants";
 import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
+import {useAppStore, useUserStore} from "/@/store";
+
+const userStore = useUserStore()
+const appStore = useAppStore()
+const isFirst = ref(true)
 
 const columns = reactive([
 
@@ -183,10 +198,10 @@ const columns = reactive([
     key: 'name'
   },
   {
-    title: '状态',
-    dataIndex: 'status',
+    title: '是否下架',
+    dataIndex: 'off',
     key: 'status',
-    customRender: ({ text, record, index, column }) => text === '0' ? '上架' : '下架'
+    customRender: ({ text, record, index, column }) => text === "true" ? '是' : '否'
   },
   {
     title: '所属一级分类',
@@ -258,14 +273,20 @@ const modal = reactive({
   bData: [],
   tagData: [{}],
   form: {
-    id: undefined,
+    product_id: undefined,
     name: undefined,
     classification1: undefined,
     classification2: undefined,
+    classification_1: undefined,
+    classification_2: undefined,
+    merchant: undefined,
+    addr: undefined,
     tag: [],
     repertory: undefined,
     price: undefined,
     status: undefined,
+    off_shelf: undefined,
+    is_sold: undefined,
     cover: undefined,
     coverUrl: undefined,
     imageFile: undefined,
@@ -274,22 +295,43 @@ const modal = reactive({
   },
   rules: {
     name: [{ required: true, message: '请输入名称', trigger: 'change' }],
-    classification1: [{ required: true, message: '请选择一级分类', trigger: 'change' }],
-    classification2: [{ required: true, message: '请选择二级级分类', trigger: 'change' }],
+    classification_1: [{ required: true, message: '请选择一级分类', trigger: 'change' }],
+    classification_2: [{ required: true, message: '请选择二级分类', trigger: 'change' }],
     repertory: [{ required: true, message: '请输入库存', trigger: 'change' }],
     price: [{ required: true, message: '请输入定价', trigger: 'change' }],
     status: [{ required: true, message: '请选择状态', trigger: 'change' }],
   },
-});
+})
 
-const myform = ref<FormInstance>();
+const myform = ref<FormInstance>()
 
 onMounted(() => {
   getDataList();
   getCDataList();
   getBDataList();
   getTagDataList();
-});
+  appStore.setViewId(userStore.user_id);
+})
+
+let option2 = computed(() => {
+  console.log(modal.form)
+  for (let i = 0; i < appStore.classificationTree.length; i++) {
+    if (modal.form.classification_1 === appStore.classificationTree[i].id) {
+      console.log(appStore.classificationTree[i].children)
+      return appStore.classificationTree[i].children;
+    }
+  }
+  return null;
+})
+
+watch(option2, val => {
+  console.log(val)
+  if (isFirst.value) { // 后面改
+    isFirst.value = false;
+  } else {
+    modal.form.classification_2 = val[0].id;
+  }
+})
 
 const getDataList = () => {
   data.loading = true;
@@ -297,28 +339,28 @@ const getDataList = () => {
     keyword: data.keyword,
   })
       .then((res) => {
-        data.loading = false;
-        console.log(res);
+        data.loading = false
+        console.log(res)
         res.data.forEach((item: any, index: any) => {
-          item.index = index + 1;
-        });
-        data.dataList = res.data;
+          item.index = index + 1
+        })
+        data.dataList = res.data
       })
       .catch((err) => {
-        data.loading = false;
-        console.log(err);
-      });
+        data.loading = false
+        console.log(err)
+      })
 }
 
 const getCDataList = () => {
-  listClassification1Api({}).then(res => {
+  listClassification2Api({}).then(res => {
     modal.cData = res.data
     console.log(res.data)
   })
   console.log(modal.cData)
 }
 const getBDataList = () => {
-  listClassification2Api({}).then(res => {
+  listClassification1Api({}).then(res => {
     modal.bData = res.data
   })
 }
@@ -332,20 +374,20 @@ const getTagDataList = ()=> {
 }
 
 const onSearchChange = (e: Event) => {
-  data.keyword = e?.target?.value;
-  console.log(data.keyword);
+  data.keyword = e?.target?.value
+  console.log(data.keyword)
 };
 
 const onSearch = () => {
   getDataList();
-};
+}
 
 const rowSelection = ref({
   onChange: (selectedRowKeys: (string | number)[], selectedRows: DataItem[]) => {
     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     data.selectedRowKeys = selectedRowKeys;
   },
-});
+})
 
 const handleAdd = () => {
   resetModal();
@@ -374,6 +416,7 @@ const handleEdit = (record: any) => {
       modal.form[key] = record[key];
     }
   }
+  modal.form.product_id = record['id']
   if(modal.form.cover) {
     modal.form.coverUrl = BASE_URL + modal.form.cover
     modal.form.cover = undefined
@@ -389,7 +432,7 @@ const confirmDelete = (record: any) => {
       .catch((err) => {
         message.error(err.msg || '操作失败');
       });
-};
+}
 
 const handleBatchDelete = () => {
   console.log(data.selectedRowKeys);
@@ -407,7 +450,7 @@ const handleBatchDelete = () => {
       .catch((err) => {
         message.error(err.msg || '操作失败');
       });
-};
+}
 
 const handleOk = () => {
   myform.value
@@ -415,14 +458,20 @@ const handleOk = () => {
       .then(() => {
         const formData = new FormData();
         if(modal.editFlag) {
-          formData.append('id', modal.form.id)
+          formData.append('product_id', modal.form.product_id || "")
         }
-        formData.append('title', modal.form.name)
-        if (modal.form.classification1) {
-          formData.append('classification1', modal.form.classification1)
+        formData.append('name', modal.form.name || "")
+        if (modal.form.classification_1) {
+          formData.append('classification_1', modal.form.classification_1 || "")
         }
-        if (modal.form.classification2) {
-          formData.append('canteen', modal.form.classification2)
+        if (modal.form.classification_2) {
+          formData.append('classification_2', modal.form.classification_2 || "")
+        }
+        if (modal.form.addr) {
+          formData.append('addr', modal.form.addr || "")
+        }
+        if (modal.form.merchant) {
+          formData.append('merchant', modal.form.merchant || "")
         }
         if (modal.form.tag) {
           modal.form.tag.forEach(function (value) {
@@ -439,7 +488,6 @@ const handleOk = () => {
         }
         formData.append('description', modal.form.description || '')
         formData.append('price', modal.form.price || '')
-        formData.append('canteen', modal.form.canteen || '')
         if (modal.form.repertory >= 0) {
           formData.append('repertory', modal.form.repertory)
         }
@@ -449,7 +497,7 @@ const handleOk = () => {
         if (modal.editFlag) {
           submitting.value = true
           updateApi({
-            id: modal.form.id
+            product_id: modal.form.product_id
           },formData)
               .then((res) => {
                 submitting.value = false
@@ -477,25 +525,25 @@ const handleOk = () => {
         }
       })
       .catch((err) => {
-        console.log('不能为空');
-      });
-};
+        console.log('不能为空')
+      })
+}
 
 const handleCancel = () => {
-  hideModal();
-};
+  hideModal()
+}
 
 // 恢复表单初始状态
 const resetModal = () => {
-  myform.value?.resetFields();
+  myform.value?.resetFields()
   fileList.value = []
   fileList1.value = []
-};
+}
 
 // 关闭弹窗
 const hideModal = () => {
   modal.visile = false;
-};
+}
 </script>
 
 <style scoped lang="less">

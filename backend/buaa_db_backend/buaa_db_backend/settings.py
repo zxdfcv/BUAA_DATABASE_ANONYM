@@ -199,3 +199,4 @@ ALIAPY_CONFIG = {
     "return_url": "http://127.0.0.1:8000/myapp/order/return",  # 同步回调地址
     "notify_url": "http://127.0.0.1:8000/myapp/order/return",  # 异步结果通知
 }
+DATA_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 36

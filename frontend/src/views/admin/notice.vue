@@ -257,12 +257,12 @@ const handleCancel = () => {
 // 恢复表单初始状态
 const resetModal = () => {
   myform.value?.resetFields();
-};
+}
 
 // 关闭弹窗
 const hideModal = () => {
   modal.visile = false;
-};
+}
 </script>
 
 <style scoped lang="less">

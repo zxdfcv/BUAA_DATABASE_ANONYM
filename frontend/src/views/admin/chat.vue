@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import {FormInstance, message} from 'ant-design-vue';
-import {createApi, listApi, deleteApi} from '/@/api/admin/comment';
+import {createApi, listApi, deleteApi} from '/@/api/admin/chat';
 import {BASE_URL} from "/@/store/constants";
 import {getFormatTime} from "/@/utils";
 
@@ -54,15 +54,21 @@ const columns = reactive([
     align: 'center'
   },
   {
-    title: '用户',
-    dataIndex: 'username',
-    key: 'username',
+    title: '商品名称',
+    dataIndex: 'product_name',
+    key: 'product_name',
     align: 'center'
   },
   {
-    title: '名称',
-    dataIndex: 'title',
-    key: 'title',
+    title: '发送者',
+    dataIndex: 'sender_name',
+    key: 'sender_name',
+    align: 'center'
+  },
+  {
+    title: '接收者',
+    dataIndex: 'recipient_name',
+    key: 'recipient_name',
     align: 'center'
   },
   {
@@ -72,9 +78,21 @@ const columns = reactive([
     align: 'center'
   },
   {
-    title: '评论时间',
-    dataIndex: 'comment_time',
-    key: 'comment_time',
+    title: '创建时间',
+    dataIndex: 'create_time',
+    key: 'create_time',
+    align: 'center',
+  },
+  {
+    title: '是否已读',
+    dataIndex: 'is_read',
+    key: 'is_read',
+    align: 'center',
+  },
+  {
+    title: '内容',
+    dataIndex: 'create_time',
+    key: 'create_time',
     align: 'center',
   },
   {
@@ -126,14 +144,11 @@ const getList = () => {
         data.loading = false;
         console.log(res);
         res.data.forEach((item: any, index: any) => {
-          item.index = index + 1;
+          item.index = index + 1
+          item.is_read =  item.is_read ? '1' : '0'
           if (item.image) {
             item.image = BASE_URL + item.image
-          }
-          if (item.canteen_title !== undefined) {
-            item.title = item.canteen_title
-          } else if (item.classification_title != undefined) {
-            item.title = item.classification_title
+            console.log(item.image)
           }
         });
         data.list = res.data;

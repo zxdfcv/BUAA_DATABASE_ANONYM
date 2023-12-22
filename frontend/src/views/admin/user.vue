@@ -5,7 +5,7 @@
       <div class="table-operations">
         <a-space>
           <a-button type="primary" @click="handleAdd">新增</a-button>
-          <a-button @click="handleBatchDelete">批量删除</a-button>
+          <a-button @click="handleBatchDelete">批量注销</a-button>
           <a-input-search addon-before="用户名" enter-button @search="onSearch" @change="onSearchChange" />
         </a-space>
       </div>
@@ -29,7 +29,7 @@
         <template #bodyCell="{ text, record, index, column }"> <!-- slot 插槽的时使用 -->
           <template v-if="column.key === 'is_staff'">
             <span>
-              <span v-if="text === true">管理员</span>
+              <span v-if="text === '1'">管理员</span>
               <span v-else>普通用户</span>
             </span>
           </template>
@@ -37,8 +37,8 @@
             <span>
               <a @click="handleEdit(record)">编辑</a>
               <a-divider type="vertical" />
-              <a-popconfirm title="确定删除?" ok-text="是" cancel-text="否" @confirm="confirmDelete(record)">
-                <a href="#">删除</a>
+              <a-popconfirm title="确定注销?" ok-text="是" cancel-text="否" @confirm="confirmDelete(record)">
+                <a href="#">注销</a>
               </a-popconfirm>
             </span>
           </template>
@@ -78,17 +78,16 @@
               <a-col span="24">
                 <a-form-item label="角色" name="is_staff">
                   <a-select placeholder="请选择" allowClear v-model:value="modal.form.is_staff">
-                    <template v-for="item in modal.roleData"> <!-- 角色数据 -->
-                      <a-select-option :value="item.id">{{ item.title }}</a-select-option>
-                    </template>
+                    <a-select-option key="0" :value="'1'">管理员</a-select-option>
+                    <a-select-option key="1" :value="'0'">普通用户</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col span="24">
                 <a-form-item label="状态" name="is_active">
                   <a-select placeholder="请选择" allowClear v-model:value="modal.form.is_active">
-                    <a-select-option key="0" :value="true">正常</a-select-option>
-                    <a-select-option key="1" :value="false">封号</a-select-option>
+                    <a-select-option key="0" :value="'0'">封号</a-select-option>
+                    <a-select-option key="1" :value="'1'">正常</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -107,9 +106,12 @@
                 <a-form :label-width="40">
                   <a-form-item>
                     <a-transfer
+                        :rowKey="record => record.name"
                         :list-style="{ width: '300px' }"
-                        :data="allGroups"
-                        :target-keys="modal.group"
+                        :dataSource="data.allGroups"
+                        v-model:selected-keys="selectedKeys"
+                        v-model:target-keys="modal.form.groups"
+                        :render="item => item.name"
                         :titles="['可用分组', '当前分组']"
                         filterable
                     />
@@ -127,6 +129,7 @@
 <script setup lang="ts">
   import { FormInstance, message } from 'ant-design-vue';
   import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/user';
+  import { listApi as listGroupApi } from '/@/api/admin/group'
   import {getFormatTime} from "/@/utils";
 
 
@@ -160,7 +163,7 @@
       dataIndex: 'is_active',
       key: 'is_active',
       align: 'center',
-      customRender: ({ text, record, index, column }) => (text === true ? '正常' : '封号'),
+      customRender: ({ text, record, index, column }) => (text === '1' ? '正常' : '封号'),
     },
     {
       title: '邮箱',
@@ -201,11 +204,14 @@
 
   const fileList = ref([]);
 
-  const allGroups = ref([])
+  const targetKeys = ref<string[]>([]);
+
+  const selectedKeys = ref<string[]>([]);
 
   // 页面数据
   const data = reactive({
     userList: [],
+    allGroups: [],
     loading: false,
     currentAdminUserName: '',
     keyword: '',
@@ -219,7 +225,6 @@
     visile: false,
     editFlag: false,
     title: '',
-    group: [],
     roleData: [
       {
         id: true,
@@ -239,6 +244,7 @@
       nickname: undefined,
       email: undefined,
       phone: undefined,
+      groups: [],
     },
     rules: {
       username: [{ required: true, message: '请输入', trigger: 'change' }],
@@ -251,31 +257,53 @@
   const myform = ref<FormInstance>();
 
   onMounted(() => {
-    getUserList();
-  });
+    getUserList()
+    getGroups()
+  })
+
+  const getGroups = () => {
+    data.loading = true
+    listGroupApi({})
+        .then((res) => {
+          data.loading = false
+          console.log(res)
+          res.data.forEach((item: any, index: any) => {
+            item.index = index + 1
+          });
+          data.allGroups = res.data
+          console.log(data.allGroups)
+        })
+        .catch((err) => {
+          data.loading = false
+          console.log(err)
+        })
+  }
 
   const getUserList = () => {
-    data.loading = true;
+    data.loading = true
     listApi({
-      keyword: data.keyword,
+      keyword: data.keyword
     })
       .then((res) => {
-        data.loading = false;
-        console.log(res);
+        data.loading = false
+        console.log(res)
         res.data.forEach((item: any, index: any) => {
-          item.index = index + 1;
-        });
-        data.userList = res.data;
+          item.index = index + 1
+          item.is_active = item.is_active ? '1' : '0'
+          item.is_staff = item.is_staff ? '1' : '0'
+          console.log(item.is_active)
+        })
+        data.userList = res.data
       })
       .catch((err) => {
-        data.loading = false;
-        console.log(err);
-      });
-  };
+        data.loading = false
+        console.log(err)
+      })
+  }
 
   const onSearchChange = (e: Event) => {
-    data.keyword = e?.target?.value;
-    console.log(data.keyword);
+    data.keyword = e?.target?.value
+    console.log(data.keyword)
   };
 
   const onSearch = () => {
@@ -328,12 +356,12 @@
     console.log(data.selectedRowKeys);
     if (data.selectedRowKeys.length <= 0) {
       console.log('hello');
-      message.warn('请勾选删除项');
+      message.warn('请勾选注销项');
       return;
     }
     deleteApi({ ids: data.selectedRowKeys.join(',') })
       .then((res) => {
-        message.success('删除成功');
+        message.success('注销成功');
         data.selectedRowKeys = [];
         getUserList();
       })
@@ -357,10 +385,10 @@
           formData.append('nickname', modal.form.nickname);
         }
         if (modal.form.is_staff) {
-          formData.append('is_staff', modal.form.is_staff);
+          formData.append('is_staff', modal.form.is_staff === '1' ? 'true' : 'false')
         }
         if (modal.form.is_active) {
-          formData.append('is_active', modal.form.is_active);
+          formData.append('is_active', modal.form.is_active === '1' ? 'true' : 'false')
         }
         if (modal.form.cover) {
           formData.append('cover', modal.form.cover);
@@ -370,6 +398,11 @@
         }
         if (modal.form.email) {
           formData.append('email', modal.form.email);
+        }
+        if (modal.form.groups) {
+          modal.form.groups.forEach(value => {
+            formData.append('groups', value);
+          });
         }
         if (modal.editFlag) {
           updateApi({

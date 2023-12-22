@@ -1,5 +1,10 @@
+import locale
+import platform
+import time
 from datetime import datetime
 from random import random
+
+import psutil as psutil
 from django.db import connection
 from django.db.models import When, Count, Max
 from django.forms import IntegerField
@@ -8,7 +13,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from sqlparse.sql import Case
-
+from multiprocessing import cpu_count
 from ..models import User, Product, Classification1, Classification2, ProductImage, Comment, Reply, Order, Chat
 from ..serializers import UserAllDetailSerializer, UserListSerializer, ProductAllDetailSerializer, \
     ProductImageSerializer, ProductCreateSerializer, CommentAllDetailSerializer, ReplyAllDetailSerializer, \
@@ -111,6 +116,41 @@ class StatisticsView(APIView):
             'product_price_rank_data': product_price_rank_data,
             'visit_data': visit_data
         }
+        return APIResponse(code=0, msg='查询成功', data=data)
+
+
+class SysInfoView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        pyVersion = platform.python_version()
+        osBuild = platform.architecture()
+        node = platform.node()
+        pf = platform.platform()
+        processor = platform.processor()
+        pyComp = platform.python_compiler()
+        osName = platform.system()
+        memory = psutil.virtual_memory()
+
+        data = {
+            'sysName': '北航闲鱼后台管理平台',
+            'versionName': '6.3.0',
+            'osName': osName,
+            'pyVersion': pyVersion,
+            'osBuild': osBuild,
+            'node': node,
+            'pf': pf,
+            'processor': processor,
+            'cpuCount': cpu_count(),
+            'pyComp': pyComp,
+            'cpuLoad': round((psutil.cpu_percent(1)), 2),
+            'memory': round((float(memory.total) / 1024 / 1024 / 1024), 2),
+            'usedMemory': round((float(memory.used) / 1024 / 1024 / 1024), 2),
+            'percentMemory': round((float(memory.used) / float(memory.total) * 100), 2),
+            'sysLan': locale.getdefaultlocale(),
+            'sysZone': time.strftime('%Z', time.localtime())
+        }
+
         return APIResponse(code=0, msg='查询成功', data=data)
 
 

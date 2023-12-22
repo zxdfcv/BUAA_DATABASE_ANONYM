@@ -1,4 +1,4 @@
-import {get, post} from '/@/utils/http/axios';
+import {get, post, put, deletes} from '/@/utils/http/axios';
 
 enum URL {
     list = '/myapp/admin/order/list',
@@ -16,7 +16,7 @@ const userOrderListApi = async (params: any) =>
     get<any>({url: URL.userOrderList, params: params, data: {}, headers: {}});
 
 const createApi = async (data: any) =>
-    post<any>({
+    put<any>({
         url: URL.create,
         params: {},
         data: data,
@@ -30,7 +30,7 @@ const updateApi = async (params: any, data: any) =>
         headers: {'Content-Type': 'multipart/form-data;charset=utf-8'}
     });
 const deleteApi = async (params: any) =>
-    post<any>({url: URL.delete, params: params, headers: {}});
+    deletes<any>({url: URL.delete, params: params, headers: {}});
 
 const cancelApi = async (params: any) =>
     post<any>({url: URL.cancel, params: params, headers: {}});
