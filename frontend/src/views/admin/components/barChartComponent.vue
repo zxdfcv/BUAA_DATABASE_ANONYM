@@ -138,16 +138,23 @@ const initBarChart = () => {
         saveAsImage: {show: true}
       }
     },
+    color: ['#70B0EA', '#B3A3DA', '#88DEE2', '#62C4C8', '#58A3A1'],
     series: [
       {
         data: yData,
         type: 'bar',
         itemStyle: {
-          color: function (params) {
-            // 柱图颜色
-            return '#70B0EA'
+          normal: {
+            color: function (params) {
+              const colorList = ['#70B0EA', '#B3A3DA', '#88DEE2', '#62C4C8', '#58A3A1']
+              let index = params.dataIndex
+              if (params.dataIndex >= colorList.length) {
+                index = params.dataIndex - colorList.length
+              }
+              return colorList[index]
+            }
           }
-        }
+        },
       }
     ]
   }

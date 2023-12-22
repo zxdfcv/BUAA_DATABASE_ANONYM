@@ -20,7 +20,7 @@
       <a-layout-sider v-model:collapsed="collapsed" :trigger="null" collapsible>
         <a-menu style="overflow:auto; overflow-x: hidden;" v-model:selectedKeys="selectedKeys" theme="dark" mode="inline" @click="handleClick">
 
-          <a-menu-item key="thing">
+          <a-menu-item key="product">
             <database-outlined/>
             <span>商品管理</span>
           </a-menu-item>
@@ -28,11 +28,11 @@
             <database-outlined/>
             <span>订单管理</span>
           </a-menu-item>
-          <a-menu-item key="canteen">
+          <a-menu-item key="classification1">
             <layout-outlined/>
             <span>一级分类管理</span>
           </a-menu-item>
-          <a-menu-item key="classification">
+          <a-menu-item key="classification2">
             <layout-outlined/>
             <span>二级分类管理</span>
           </a-menu-item>
