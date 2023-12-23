@@ -87,9 +87,9 @@
               </a-col>
               <a-col span="12">
                 <a-form-item label="标签">
-                  <a-select mode="multiple" placeholder="请选择" allowClear v-model:value="modal.form.tag">
+                  <a-select mode="multiple" placeholder="请选择" allowClear v-model:value="modal.form.tags">
                     <template v-for="item in modal.tagData">
-                      <a-select-option :value="item.id">{{ item.title }}</a-select-option>
+                      <a-select-option :value="item.id">{{ item.name }}</a-select-option>
                     </template>
                   </a-select>
                 </a-form-item>
@@ -115,8 +115,8 @@
                       name="file"
                       accept="image/*"
                       :multiple="true"
-                      :before-upload="beforeUpload"
                       :max-count="9"
+                      :before-upload="beforeUpload"
                       @remove="removeImage"
                       v-model:file-list="fileList"
                   >
@@ -158,12 +158,32 @@
                   <a-textarea placeholder="请输入" v-model:value="modal.form.description"></a-textarea>
                 </a-form-item>
               </a-col>
+
               <a-col span="12">
-                <a-form-item label="是否下架" name="status">
+                <a-form-item label="是否下架" name="off_shelf">
                   <a-select placeholder="请选择" allowClear v-model:value="modal.form.off_shelf">
-                    <a-select-option key="0" value="false">是</a-select-option>
-                    <a-select-option key="1" value="true">否</a-select-option>
+                    <a-select-option key="0" value="0">是</a-select-option>
+                    <a-select-option key="1" value="1">否</a-select-option>
                   </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col span="12">
+                <a-form-item label="是否已售出" name="is_sold">
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.off_shelf">
+                    <a-select-option key="0" value="0">是</a-select-option>
+                    <a-select-option key="1" value="1">否</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col span="24">
+                <a-form-item label="商品状态" name="is_sold">
+                  <a-radio-group v-model:value="modal.form.status" button-style="solid">
+                    <a-radio-button value="A">全新</a-radio-button>
+                    <a-radio-button value="B">几乎全新</a-radio-button>
+                    <a-radio-button value="C">轻微使用痕迹</a-radio-button>
+                    <a-radio-button value="D">明显使用痕迹</a-radio-button>
+                    <a-radio-button value="E">有一定问题</a-radio-button>
+                  </a-radio-group>
                 </a-form-item>
               </a-col>
             </a-row>
@@ -175,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import {FormInstance, message, SelectProps} from 'ant-design-vue';
+import {FormInstance, message, SelectProps, Upload} from 'ant-design-vue';
 import {createApi, listApi, updateApi, deleteApi} from '/@/api/admin/product';
 import {listApi as listClassification1Api} from '/@/api/admin/classification1'
 import {listApi as listClassification2Api} from '/@/api/admin/classification2'
@@ -235,13 +255,12 @@ const columns = reactive([
   },
 ]);
 
-const beforeUpload = (file: File) => {
-  // 改图片文件名
+const beforeUpload = (file) => {
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
   const copyFile = new File([file], fileName);
-  fileList.value = [...(fileList.value || []), copyFile];
-  return false
-};
+  fileList.value = [...(fileList.value || []), copyFile]
+  return Upload.LIST_IGNORE;
+}
 
 const removeImage = (file) => {
   console.log(fileList.value);
@@ -294,7 +313,7 @@ const modal = reactive({
     classification_2: undefined,
     merchant: undefined,
     addr: undefined,
-    tag: [],
+    tags: [],
     repertory: undefined,
     price: undefined,
     status: undefined,
@@ -356,6 +375,8 @@ const getDataList = () => {
         console.log(res)
         res.data.forEach((item: any, index: any) => {
           item.index = index + 1
+          item.is_sold = item.is_sold ? '1' : '0'
+          item.off_shelf = item.off_shelf ? '1' : '0'
         })
         data.dataList = res.data
       })
@@ -489,10 +510,10 @@ const handleOk = () => {
         if (modal.form.merchant) {
           formData.append('merchant', modal.form.merchant || "")
         }
-        if (modal.form.tag) {
-          modal.form.tag.forEach(function (value) {
+        if (modal.form.tags) {
+          modal.form.tags.forEach(function (value) {
             if (value) {
-              formData.append('tag', value)
+              formData.append('tags', value)
             }
           })
         }
@@ -508,9 +529,10 @@ const handleOk = () => {
         if (modal.form.repertory >= 0) {
           formData.append('repertory', modal.form.repertory)
         }
-        if (modal.form.status) {
-          formData.append('status', modal.form.status)
-        }
+        formData.append('status', modal.form.status)
+        formData.append('is_sold', modal.form.is_sold === '1' ? "true" : "false")
+        formData.append('off_shelf', modal.form.off_shelf === '1' ? "true" : "false")
+
         if (modal.editFlag) {
           submitting.value = true
           updateApi({
