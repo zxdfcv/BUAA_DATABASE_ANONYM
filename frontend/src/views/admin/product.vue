@@ -4,9 +4,10 @@
     <div class="page-view">
       <div class="table-operations">
         <a-space>
+          <a-button type="primary" @click="exportData">导出 CSV</a-button>
           <a-button type="primary" @click="handleAdd">新增</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
-          <a-input-search addon-before="名称" enter-button @search="onSearch" @change="onSearchChange" />
+          <a-input-search addon-before="名称" enter-button @search="onSearch" @change="onSearchChange"/>
         </a-space>
       </div>
       <a-table
@@ -30,7 +31,7 @@
           <template v-if="column.key === 'operation'">
             <span>
               <a @click="handleEdit(record)">编辑</a>
-              <a-divider type="vertical" />
+              <a-divider type="vertical"/>
               <a-popconfirm title="确定删除?" ok-text="是" cancel-text="否" @confirm="confirmDelete(record)">
                 <a href="#">删除</a>
               </a-popconfirm>
@@ -88,7 +89,7 @@
                 <a-form-item label="标签">
                   <a-select mode="multiple" placeholder="请选择" allowClear v-model:value="modal.form.tag">
                     <template v-for="item in modal.tagData">
-                      <a-select-option :value="item.id">{{item.title}}</a-select-option>
+                      <a-select-option :value="item.id">{{ item.title }}</a-select-option>
                     </template>
                   </a-select>
                 </a-form-item>
@@ -109,24 +110,26 @@
                 </a-form-item>
               </a-col>
               <a-col span="24">
-                <a-form-item label="封面">
+                <a-form-item label="新增图片">
                   <a-upload-dragger
                       name="file"
                       accept="image/*"
-                      :multiple="false"
+                      :multiple="true"
                       :before-upload="beforeUpload"
+                      :max-count="9"
+                      @remove="removeImage"
                       v-model:file-list="fileList"
                   >
                     <p class="ant-upload-drag-icon">
                       <template v-if="modal.form.coverUrl">
-                        <img :src="modal.form.coverUrl"  style="width: 60px;height: 80px;"/>
+                        <img :src="modal.form.coverUrl" style="width: 60px;height: 80px;"/>
                       </template>
                       <template v-else>
-                        <file-image-outlined />
+                        <file-image-outlined/>
                       </template>
                     </p>
                     <p class="ant-upload-text">
-                      请选择要上传的封面图片
+                      请选择要新增的图片
                     </p>
                   </a-upload-dragger>
                 </a-form-item>
@@ -138,10 +141,11 @@
                       accept=".mp4"
                       :multiple="false"
                       :before-upload="beforeUpload1"
+                      :max-count="1"
                       v-model:file-list="fileList1"
                   >
                     <p class="ant-upload-drag-icon">
-                      <video-camera-outlined />
+                      <video-camera-outlined/>
                     </p>
                     <p class="ant-upload-text">
                       请选择要上传的文件（mp4格式）
@@ -171,14 +175,15 @@
 </template>
 
 <script setup lang="ts">
-import { FormInstance, message, SelectProps } from 'ant-design-vue';
-import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/product';
+import {FormInstance, message, SelectProps} from 'ant-design-vue';
+import {createApi, listApi, updateApi, deleteApi} from '/@/api/admin/product';
 import {listApi as listClassification1Api} from '/@/api/admin/classification1'
 import {listApi as listClassification2Api} from '/@/api/admin/classification2'
 import {listApi as listTagApi} from '/@/api/admin/tag'
 import {BASE_URL} from "/@/store/constants";
-import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
+import {FileImageOutlined, VideoCameraOutlined} from '@ant-design/icons-vue';
 import {useAppStore, useUserStore} from "/@/store";
+import {exportCsv} from "/@/utils/exportCsv";
 
 const userStore = useUserStore()
 const appStore = useAppStore()
@@ -201,7 +206,7 @@ const columns = reactive([
     title: '是否下架',
     dataIndex: 'off',
     key: 'status',
-    customRender: ({ text, record, index, column }) => text === "true" ? '是' : '否'
+    customRender: ({text, record, index, column}) => text === "true" ? '是' : '否'
   },
   {
     title: '所属一级分类',
@@ -217,7 +222,7 @@ const columns = reactive([
     title: '简介',
     dataIndex: 'description',
     key: 'description',
-    customRender: ({ text, record, index, column }) => text ? text.substring(0, 40) + '...' : '--',
+    customRender: ({text, record, index, column}) => text ? text.substring(0, 40) + '...' : '--',
     width: 600,
   },
   {
@@ -231,12 +236,20 @@ const columns = reactive([
 ]);
 
 const beforeUpload = (file: File) => {
-  // 改封面文件名
+  // 改图片文件名
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
   const copyFile = new File([file], fileName);
-  console.log(copyFile);
-  modal.form.imageFile = copyFile;
-  return false;
+  fileList.value = [...(fileList.value || []), copyFile];
+  return false
+};
+
+const removeImage = (file) => {
+  console.log(fileList.value);
+  const index = fileList.value.indexOf(file);
+  const newFileList = fileList.value.slice();
+  newFileList.splice(index, 1);
+  fileList.value = newFileList;
+  console.log(fileList.value)
 };
 
 const beforeUpload1 = (file: File) => {
@@ -249,8 +262,8 @@ const beforeUpload1 = (file: File) => {
 };
 
 // 文件列表
-const fileList = ref<any[]>([]);
-const fileList1 = ref<any[]>([]);
+const fileList = ref([]);
+const fileList1 = ref([]);
 
 const submitting = ref<boolean>(false);
 
@@ -294,12 +307,12 @@ const modal = reactive({
     description: undefined
   },
   rules: {
-    name: [{ required: true, message: '请输入名称', trigger: 'change' }],
-    classification_1: [{ required: true, message: '请选择一级分类', trigger: 'change' }],
-    classification_2: [{ required: true, message: '请选择二级分类', trigger: 'change' }],
-    repertory: [{ required: true, message: '请输入库存', trigger: 'change' }],
-    price: [{ required: true, message: '请输入定价', trigger: 'change' }],
-    status: [{ required: true, message: '请选择状态', trigger: 'change' }],
+    name: [{required: true, message: '请输入名称', trigger: 'change'}],
+    classification_1: [{required: true, message: '请选择一级分类', trigger: 'change'}],
+    classification_2: [{required: true, message: '请选择二级分类', trigger: 'change'}],
+    repertory: [{required: true, message: '请输入库存', trigger: 'change'}],
+    price: [{required: true, message: '请输入定价', trigger: 'change'}],
+    status: [{required: true, message: '请选择状态', trigger: 'change'}],
   },
 })
 
@@ -364,7 +377,7 @@ const getBDataList = () => {
     modal.bData = res.data
   })
 }
-const getTagDataList = ()=> {
+const getTagDataList = () => {
   listTagApi({}).then(res => {
     res.data.forEach((item, index) => {
       item.index = index + 1
@@ -389,6 +402,9 @@ const rowSelection = ref({
   },
 })
 
+const exportData = () => {
+  exportCsv(data.dataList, '商品信息')
+}
 const handleAdd = () => {
   resetModal();
   modal.visile = true;
@@ -412,12 +428,12 @@ const handleEdit = (record: any) => {
     modal.form[key] = undefined;
   }
   for (const key in record) {
-    if(record[key]) {
+    if (record[key]) {
       modal.form[key] = record[key];
     }
   }
   modal.form.product_id = record['id']
-  if(modal.form.cover) {
+  if (modal.form.cover) {
     modal.form.coverUrl = BASE_URL + modal.form.cover
     modal.form.cover = undefined
   }
@@ -425,7 +441,7 @@ const handleEdit = (record: any) => {
 
 const confirmDelete = (record: any) => {
   console.log('delete', record);
-  deleteApi({ ids: record.id })
+  deleteApi({ids: record.id})
       .then((res) => {
         getDataList();
       })
@@ -441,7 +457,7 @@ const handleBatchDelete = () => {
     message.warn('请勾选删除项');
     return;
   }
-  deleteApi({ ids: data.selectedRowKeys.join(',') })
+  deleteApi({ids: data.selectedRowKeys.join(',')})
       .then((res) => {
         message.success('删除成功');
         data.selectedRowKeys = [];
@@ -457,7 +473,7 @@ const handleOk = () => {
       ?.validate()
       .then(() => {
         const formData = new FormData();
-        if(modal.editFlag) {
+        if (modal.editFlag) {
           formData.append('product_id', modal.form.product_id || "")
         }
         formData.append('name', modal.form.name || "")
@@ -475,16 +491,17 @@ const handleOk = () => {
         }
         if (modal.form.tag) {
           modal.form.tag.forEach(function (value) {
-            if(value){
+            if (value) {
               formData.append('tag', value)
             }
           })
         }
-        if (modal.form.imageFile) {
-          formData.append('cover', modal.form.imageFile)
-        }
-        if(modal.form.rawFile) {
-          formData.append('raw', modal.form.rawFile)
+        fileList.value.forEach((item) => {
+          formData.append('images', item)
+        })
+        console.log(fileList.value)
+        if (modal.form.rawFile) {
+          formData.append('video', modal.form.rawFile)
         }
         formData.append('description', modal.form.description || '')
         formData.append('price', modal.form.price || '')
@@ -498,7 +515,7 @@ const handleOk = () => {
           submitting.value = true
           updateApi({
             product_id: modal.form.product_id
-          },formData)
+          }, formData)
               .then((res) => {
                 submitting.value = false
                 hideModal();

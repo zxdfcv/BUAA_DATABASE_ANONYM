@@ -199,7 +199,7 @@ const columns = reactive([
     const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
     const copyFile = new File([file], fileName);
     console.log(copyFile);
-    modal.form.cover = copyFile;
+    modal.form.image = copyFile;
     return false;
   };
 
@@ -247,8 +247,12 @@ const columns = reactive([
       nickname: undefined,
       email: undefined,
       phone: undefined,
-      image: undefined,
       groups: [],
+      image: undefined,
+      imageUrl: undefined,
+      imageFile: undefined,
+      imageWidth: undefined,
+      imageHeight: undefined
     },
     rules: {
       username: [{ required: true, message: '请输入', trigger: 'change' }],

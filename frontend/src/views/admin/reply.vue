@@ -4,6 +4,7 @@
     <div class="page-view">
       <div class="table-operations">
         <a-space>
+          <a-button type="primary" @click="exportData">导出 CSV</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
         </a-space>
       </div>
@@ -62,6 +63,7 @@ import {createApi, listApi, deleteApi} from '/@/api/admin/reply';
 import {BASE_URL} from "/@/store/constants";
 import {getFormatTime} from "/@/utils";
 import { DownOutlined } from '@ant-design/icons-vue'
+import {exportCsv} from "/@/utils/exportCsv";
 
 const columns = reactive([
   {
@@ -179,6 +181,9 @@ const getList = () => {
       });
 };
 
+const exportData = () => {
+  exportCsv(data.list, '回复信息.csv')
+};
 
 const rowSelection = ref({
   onChange: (selectedRowKeys: (string | number)[], selectedRows: DataItem[]) => {

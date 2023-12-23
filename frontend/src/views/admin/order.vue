@@ -4,6 +4,7 @@
     <div class="page-view">
       <div class="table-operations">
         <a-space>
+          <a-button type="primary" @click="exportData">导出 CSV</a-button>
           <a-button type="primary" @click="handleAdd">新增</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
           <a-input-search addon-before="订单号" enter-button @search="onSearch" @change="onSearchChange" />
@@ -109,6 +110,7 @@
 import {listApi, createApi, updateApi, cancelApi, deleteApi} from '/@/api/admin/order'
 import {message, FormInstance} from "ant-design-vue";
 import {FileImageOutlined, VideoCameraOutlined} from "@ant-design/icons-vue";
+import {exportCsv} from "/@/utils/exportCsv";
 
 onMounted(() => {
   getDataList()
@@ -249,6 +251,10 @@ const rowSelection = ref({
     data.selectedRowKeys = selectedRowKeys;
   },
 });
+
+const exportData = () => {
+  exportCsv(data.dataList, '订单信息.csv')
+};
 
 const handleAdd = () => {
   resetModal();
