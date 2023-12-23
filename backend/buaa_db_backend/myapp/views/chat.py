@@ -59,7 +59,7 @@ class ChatView(generics.ListAPIView):
 
     def put(self, request):
         sender = request.user
-        data = request.data.copy()
+        # data = request.data.copy()
         product_id = request.data.get('product', None)
         recipient_id = request.data.get('recipient', None)
         if product_id is None or recipient_id is None:
@@ -84,9 +84,9 @@ class ChatView(generics.ListAPIView):
 
         excluded_fields = ['id', 'is_read']
         for field in excluded_fields:
-            data.pop(field, None)
-        data['sender'] = str(sender.id)
-        serializer = ChatSerializer(data=data)
+            request.data.pop(field, None)
+        request.data['sender'] = str(sender.id)
+        serializer = ChatSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             send_notification(recipient, "chat_notice", serializer.data)

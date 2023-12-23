@@ -166,18 +166,18 @@ class ProductWithImagesView(generics.ListAPIView):
 @permission_classes([CanEditProductPermission])
 class EditProductView(APIView):
     def put(self, request):
-        data = request.data.copy()
-        excluded_fields = ['id', ]
-        for field in excluded_fields:
-            data.pop(field, None)
+        # data = request.data.copy()
+        # excluded_fields = ['id', ]
+        # for field in excluded_fields:
+        #     data.pop(field, None)
 
-        tag_ids = data.getlist('tags', [])
+        tag_ids = request.data.getlist('tags', [])
         if not tag_ids or all(not tag_id for tag_id in tag_ids):
-            data.pop('tags', None)
+            request.data.pop('tags', None)
 
-        if 'classification_1' in data and 'classification_2' in data:
-            classification_1_id = data['classification_1']
-            classification_2_id = data['classification_2']
+        if 'classification_1' in request.data and 'classification_2' in request.data:
+            classification_1_id = request.data['classification_1']
+            classification_2_id = request.data['classification_2']
 
             try:
                 classification_1 = Classification1.objects.get(pk=classification_1_id)
@@ -192,7 +192,7 @@ class EditProductView(APIView):
                 make_error_log(request, "创建商品时指定二级分类不存在")
                 return APIResponse(code=1, msg='二级分类不存在')
 
-        product_serializer = ProductCreateSerializer(data=data,
+        product_serializer = ProductCreateSerializer(data=request.data,
                                                      # partial=True
                                                      )
         if product_serializer.is_valid():
@@ -232,18 +232,18 @@ class EditProductView(APIView):
                 make_error_log(request, '修改商品时删除的图片不存在或不属于该商品')
                 return APIResponse(code=1, msg='删除的图片不存在或不属于该商品')
 
-        data = request.data.copy()
-        excluded_fields = ['id', ]
-        for field in excluded_fields:
-            data.pop(field, None)
+        # data = request.data.copy()
+        # excluded_fields = ['id', ]
+        # for field in excluded_fields:
+        #     data.pop(field, None)
 
-        tag_ids = data.getlist('tags', [])
+        tag_ids = request.data.getlist('tags', [])
         if not tag_ids or all(not tag_id for tag_id in tag_ids):
-            data.pop('tags', None)
+            request.data.pop('tags', None)
 
-        if 'classification_1' in data and 'classification_2' in data:
-            classification_1_id = data['classification_1']
-            classification_2_id = data['classification_2']
+        if 'classification_1' in request.data and 'classification_2' in request.data:
+            classification_1_id = request.data['classification_1']
+            classification_2_id = request.data['classification_2']
             try:
                 classification_1 = Classification1.objects.get(pk=classification_1_id)
                 classification_2 = Classification2.objects.get(pk=classification_2_id)
@@ -257,7 +257,7 @@ class EditProductView(APIView):
                 make_error_log(request, "更新商品时指定二级分类不存在")
                 return APIResponse(code=1, msg='二级分类不存在')
 
-        product_serializer = ProductUpdateSerializer(product, data=data,
+        product_serializer = ProductUpdateSerializer(product, data=request.data,
                                                      # partial=True
                                                      )
         if product_serializer.is_valid():

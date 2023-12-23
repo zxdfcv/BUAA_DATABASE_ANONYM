@@ -10,6 +10,7 @@ from django.db.models import When, Count, Max
 from django.forms import IntegerField
 from rest_framework import generics
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.parsers import MultiPartParser, FormParser, FileUploadParser
 from rest_framework.permissions import IsAdminUser
 from rest_framework.views import APIView
 from sqlparse.sql import Case
@@ -207,11 +208,11 @@ class UserAllDetailView(APIView):
         except User.DoesNotExist:
             make_error_log(request, '用户不存在')
             return APIResponse(code=1, msg='用户不存在')
-        data = request.data.copy()
+        # data = request.data.copy()
         # excluded_fields = ['id', 'order_number', 'status', 'create_time', 'pay_time']
         # for field in excluded_fields:
         #     data.pop(field, None)
-        serializer = UserAllDetailSerializer(user, data=data,
+        serializer = UserAllDetailSerializer(user, data=request.data,
                                              # partial=True
                                              )
         if serializer.is_valid():
@@ -221,11 +222,11 @@ class UserAllDetailView(APIView):
         return APIResponse(code=1, msg='更新失败', data=serializer.errors)
 
     def put(self, request):
-        data = request.data.copy()
-        groups = data.getlist('groups', [])
+        # data = request.data.copy()
+        groups = request.data.getlist('groups', [])
         if not groups or all(not group for group in groups):
-            data.pop('groups', None)
-        serializer = AdminUserCreateSerializer(data=data)
+            request.data.pop('groups', None)
+        serializer = AdminUserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return APIResponse(code=0, msg='创建成功', data=serializer.data)
@@ -314,27 +315,28 @@ class ProductDetailListView(generics.ListAPIView):
 
 
 class EditProductDetailView(APIView):
+    parser_classes = [MultiPartParser, FormParser, FileUploadParser]
     permission_classes = [IsAdminUser]
 
     def put(self, request):
-        data = request.data.copy()
+        # data = request.data.copy()
         # user_ids = data.getlist('collectors', [])
         excluded_fields = ['id', ]
 
         for field in excluded_fields:
-            data.pop(field, None)
+            request.data.pop(field, None)
 
-        user_ids = data.getlist('collectors', [])
+        user_ids = request.data.getlist('collectors', [])
         if not user_ids or all(not user_id for user_id in user_ids):
-            data.pop('collectors', None)
+            request.data.pop('collectors', None)
 
-        tag_ids = data.getlist('tags', [])
+        tag_ids = request.data.getlist('tags', [])
         if not tag_ids or all(not tag_id for tag_id in tag_ids):
-            data.pop('tags', None)
+            request.data.pop('tags', None)
 
-        if 'classification_1' in data and 'classification_2' in data:
-            classification_1_id = data['classification_1']
-            classification_2_id = data['classification_2']
+        if 'classification_1' in request.data and 'classification_2' in request.data:
+            classification_1_id = request.data['classification_1']
+            classification_2_id = request.data['classification_2']
             try:
                 classification_1 = Classification1.objects.get(pk=classification_1_id)
                 classification_2 = Classification2.objects.get(pk=classification_2_id)
@@ -353,7 +355,7 @@ class EditProductDetailView(APIView):
         #         make_error_log(request, '用户不存在')
         #         return APIResponse(code=1, msg='用户不存在')
 
-        product_serializer = ProductAllDetailSerializer(data=data,
+        product_serializer = ProductAllDetailSerializer(data=request.data,
                                                         # partial=True
                                                         )
         if product_serializer.is_valid():
@@ -390,22 +392,23 @@ class EditProductDetailView(APIView):
         except Product.DoesNotExist:
             make_error_log(request, '修改商品时商品不存在')
             return APIResponse(code=1, msg='商品不存在')
-        data = request.data.copy()
-        excluded_fields = ['id', ]
-        for field in excluded_fields:
-            data.pop(field, None)
+        # data = request.data.copy()
+        # print(data)
+        # excluded_fields = ['id', ]
+        # for field in excluded_fields:
+        #     data.pop(field, None)
 
-        remove_images_ids = data.getlist('remove_images_ids', [])
+        remove_images_ids = request.data.getlist('remove_images_ids', [])
         remove_images_ids = [image_id for image_id in remove_images_ids if image_id]
 
         # remove_collectors_ids = request.data.getlist('remove_collectors_ids', [])
-        user_ids = data.getlist('collectors', [])
+        user_ids = request.data.getlist('collectors', [])
         if not user_ids or all(not user_id for user_id in user_ids):
-            data.pop('collectors', None)
+            request.data.pop('collectors', None)
 
-        tag_ids = data.getlist('tags', [])
+        tag_ids = request.data.getlist('tags', [])
         if not tag_ids or all(not tag_id for tag_id in tag_ids):
-            data.pop('tags', None)
+            request.data.pop('tags', None)
         images_data = request.data.getlist('images', [])
         # images_data = [image_id for image_id in images_data if image_id]
 
@@ -425,9 +428,9 @@ class EditProductDetailView(APIView):
         #         make_error_log(request, '用户不存在')
         #         return APIResponse(code=1, msg='用户不存在')
 
-        if 'classification_1' in data and 'classification_2' in data:
-            classification_1_id = data['classification_1']
-            classification_2_id = data['classification_2']
+        if 'classification_1' in request.data and 'classification_2' in request.data:
+            classification_1_id = request.data['classification_1']
+            classification_2_id = request.data['classification_2']
             try:
                 classification_1 = Classification1.objects.get(pk=classification_1_id)
                 classification_2 = Classification2.objects.get(pk=classification_2_id)
@@ -441,7 +444,7 @@ class EditProductDetailView(APIView):
                 make_error_log(request, "更新商品时指定二级分类不存在")
                 return APIResponse(code=1, msg='二级分类不存在')
 
-        product_serializer = ProductAllDetailSerializer(product, data=data,
+        product_serializer = ProductAllDetailSerializer(product, data=request.data,
                                                         # partial=True
                                                         )
         if product_serializer.is_valid():
@@ -771,12 +774,12 @@ class ChatView(generics.ListAPIView):
         if product.merchant.id != sender.id and product.merchant.id != recipient.id:
             make_error_log(request, "私聊商品与用户不匹配")
             return APIResponse(code=1, msg='私聊商品与用户不匹配')
-        data = request.data.copy()
-        excluded_fields = ['id', ]
-        for field in excluded_fields:
-            data.pop(field, None)
+        # data = request.data.copy()
+        # excluded_fields = ['id', ]
+        # for field in excluded_fields:
+        #     data.pop(field, None)
 
-        serializer = ChatAllDetailsSerializer(data=data)
+        serializer = ChatAllDetailsSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return APIResponse(code=0, msg='私聊创建成功', data=serializer.data)
@@ -815,12 +818,12 @@ class ChatView(generics.ListAPIView):
         if product.merchant.id != sender.id and product.merchant.id != recipient.id:
             make_error_log(request, "私聊商品与用户不匹配")
             return APIResponse(code=1, msg='私聊商品与用户不匹配')
-        data = request.data.copy()
-        excluded_fields = ['id', ]
-        for field in excluded_fields:
-            data.pop(field, None)
+        # data = request.data.copy()
+        # excluded_fields = ['id', ]
+        # for field in excluded_fields:
+        #     data.pop(field, None)
 
-        serializer = ChatAllDetailsSerializer(chat, data=data)
+        serializer = ChatAllDetailsSerializer(chat, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return APIResponse(code=0, msg='私聊更新成功', data=serializer.data)
