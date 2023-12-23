@@ -235,11 +235,13 @@ const beforeCSVUpload = (file) => {
           console.log(item)
           batchCreate(item)
         });
+      }).then(() =>{
+        message.success("操作成功")
       })
       .catch((error) => {
-        console.error('Error importing CSV:', error);
+        message.warn(error.msg || "操作失败, 请检查数据")
       });
-  return false
+  return Upload.LIST_IGNORE;
 }
 
 // 页面数据
