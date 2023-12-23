@@ -4,6 +4,7 @@
     <div class="page-view">
       <div class="table-operations">
         <a-space>
+          <a-button type="primary" @click="exportData">导出 CSV</a-button>
           <a-button type="primary" @click="handleAdd">新增</a-button>
           <a-button @click="handleBatchDelete">批量注销</a-button>
           <a-input-search addon-before="用户名" enter-button @search="onSearch" @change="onSearchChange" />
@@ -12,6 +13,7 @@
       <a-table
         size="middle"
         rowKey="id"
+        ref="tableRef"
         :loading="data.loading"
         :columns="columns"
         :data-source="data.userList"
@@ -127,13 +129,12 @@
 </template>
 
 <script setup lang="ts">
-  import { FormInstance, message } from 'ant-design-vue';
-  import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/user';
-  import { listApi as listGroupApi } from '/@/api/admin/group'
-  import {getFormatTime} from "/@/utils";
+import {FormInstance, message} from 'ant-design-vue';
+import {createApi, deleteApi, listApi, updateApi} from '/@/api/admin/user';
+import {listApi as listGroupApi} from '/@/api/admin/group'
 
 
-  const columns = reactive([
+const columns = reactive([
     {
       title: '序号',
       dataIndex: 'id',
@@ -202,6 +203,8 @@
     return false;
   };
 
+  const tableRef = ref([])
+
   const fileList = ref([]);
 
   const targetKeys = ref<string[]>([]);
@@ -244,6 +247,7 @@
       nickname: undefined,
       email: undefined,
       phone: undefined,
+      image: undefined,
       groups: [],
     },
     rules: {
@@ -316,6 +320,39 @@
       data.selectedRowKeys = selectedRowKeys;
     },
   });
+
+  const exportData = () => {
+    const csvContent = generateCsv(data.userList);
+    downloadCsv(csvContent, '用户信息.csv');
+  };
+
+  const generateCsv = (data) => {
+    const bom = '\uFEFF';
+    const header = Object.keys(data[0]).join(',') + '\n';
+    const rows = data.map(entry => {
+      const values = Object.values(entry).map(value => {
+        // 如果值包含逗号或数组，使用双引号括起来
+        if (Array.isArray(value) || typeof value === 'string' && value.includes(',')) {
+          return `"${value}"`;
+        }
+        return value;
+      });
+      return values.join(',');
+    }).join('\n');
+
+    return bom + header + rows;
+  };
+
+  const downloadCsv = (content, fileName) => {
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const handleAdd = () => {
     resetModal();

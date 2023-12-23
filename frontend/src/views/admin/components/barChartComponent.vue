@@ -138,7 +138,6 @@ const initBarChart = () => {
         saveAsImage: {show: true}
       }
     },
-    color: ['#70B0EA', '#B3A3DA', '#88DEE2', '#62C4C8', '#58A3A1'],
     series: [
       {
         data: yData,
