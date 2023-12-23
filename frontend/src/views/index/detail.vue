@@ -108,9 +108,18 @@
                             </a-descriptions-item>
 
                             <a-descriptions-item label="分类所属">
+                              <a-space direction="vertical">
                               <a-space wrap>
                                 <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class1, type:'C_1'}});">{{ detailData.Class1 }}</a-button>
                                 <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {keyword: detailData.Class2, type:'C_2'}});">{{ detailData.Class2 }}</a-button>
+                              </a-space>
+                              <a-space wrap>
+                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {
+                                  keyword: detailData.addr,
+                                  type:'addr'}});">{{ detailData.addr }}</a-button>
+                                <a-button type="primary" shape="round" @click="router.push({name: 'search', query: {
+                                  keyword: detailData.status, type:'status'}});">{{ detailData.status }}</a-button>
+                              </a-space>
                               </a-space>
                             </a-descriptions-item>
                             <a-descriptions-item label="浏览量">
@@ -425,15 +434,19 @@ const getPostDetail = async () => {
       detailData.value['cover'][i] = BASE_URL + detailData.value['cover'][i].image;
     }
     let collecter = [];
-    getCollectList({}).then(res2 => {
-      const collect = res2.data;
-      if (res2.code === 0) {
-        for (var i = 0; i < collect.length; i++) {
-          collecter.push(collect[i].id);
+    if (userStore.user_access) {
+      getCollectList({}).then(res2 => {
+        const collect = res2.data;
+        if (res2.code === 0) {
+          for (var i = 0; i < collect.length; i++) {
+            collecter.push(collect[i].id);
+          }
         }
-      }
-      detailData.value['isCollected'] = (userStore.user_access) ? (collecter.includes(Number(res.data.id))) : false;
-    })
+        detailData.value['isCollected'] = (userStore.user_access) ? (collecter.includes(Number(res.data.id))) : false;
+      })
+    } else {
+      detailData.value['isCollected'] = false;
+    }
     detailData.value['isWanted'] = (userStore.user_access) ? false : false;
     detailData.value['onSale'] = true;
     detailData.value["uploaderId"] = res.data.merchant;
@@ -444,6 +457,8 @@ const getPostDetail = async () => {
     detailData.value["C_1"] = res.data.classification_1;
     detailData.value["C_2"] = res.data.classification_2;
     detailData.value["createTime"] = res.data.create_time;
+    detailData.value['addr'] = res.data.addr;
+    detailData.value['status'] = res.data.status;
   }).catch(err => {
     openNotification({
       type: 'error',
