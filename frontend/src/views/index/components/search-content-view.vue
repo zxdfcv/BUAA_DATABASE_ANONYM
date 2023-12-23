@@ -99,8 +99,17 @@ const search = () => {
     params['classification1'] = useAppStore().checkC_1[tData.keyword];
   } else if (route.query.type === 'C_2') {
     params['classification2'] = useAppStore().checkC_2[tData.keyword];
+  } else if (route.query.type === 'addr') {
+    params['addr'] = (tData.keyword === '学院路校区' ? 1 : tData.keyword === '沙河校区' ? 2 : 3)
+  } else if (route.query.type === 'status') {
+
+    params['status'] = (tData.keyword === '全新') ? 'A' :
+                       (tData.keyword === '几乎全新') ? 'B' :
+                       (tData.keyword === '轻微使用痕迹') ? 'C' :
+                       (tData.keyword === '明显使用痕迹') ? 'D' : 'E';
   } else {
     params['keyword'] = tData.keyword;
+
   }
   params['offset'] = tData.pageSize * (tData.page - 1);
   getProductList(params).then(res => {
