@@ -225,10 +225,10 @@ class UserAllDetailView(APIView):
         # data = request.data.copy()
         groups = request.data.getlist('groups', [])
         if not groups or all(not group for group in groups):
-            # request.data.pop('groups', None)
-            request.data._mutable = True
             request.data.pop('groups', None)
-            request.data._mutable = False
+            # request.data._mutable = True
+            # request.data.pop('groups', None)
+            # request.data._mutable = False
         serializer = AdminUserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -327,24 +327,24 @@ class EditProductDetailView(APIView):
         excluded_fields = ['id', ]
 
         for field in excluded_fields:
-            # request.data.pop(field, None)
-            request.data._mutable = True
             request.data.pop(field, None)
-            request.data._mutable = False
+            # request.data._mutable = True
+            # request.data.pop(field, None)
+            # request.data._mutable = False
 
         user_ids = request.data.getlist('collectors', [])
         if not user_ids or all(not user_id for user_id in user_ids):
-            # request.data.pop('collectors', None)
-            request.data._mutable = True
             request.data.pop('collectors', None)
-            request.data._mutable = False
+            # request.data._mutable = True
+            # request.data.pop('collectors', None)
+            # request.data._mutable = False
 
         tag_ids = request.data.getlist('tags', [])
         if not tag_ids or all(not tag_id for tag_id in tag_ids):
-            # request.data.pop('tags', None)
-            request.data._mutable = True
             request.data.pop('tags', None)
-            request.data._mutable = False
+            # request.data._mutable = True
+            # request.data.pop('tags', None)
+            # request.data._mutable = False
 
         if 'classification_1' in request.data and 'classification_2' in request.data:
             classification_1_id = request.data['classification_1']
