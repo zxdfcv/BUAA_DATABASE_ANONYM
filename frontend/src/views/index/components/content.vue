@@ -24,7 +24,7 @@
               <div>
                 <Card style="max-height: 360px; min-height: 150px;
                           margin: 24px 0 12px;">
-                  <h3>热门标签</h3>
+                  <h3>分类标签</h3>
                   <div style="margin-top: 12px; margin-bottom: 12px">
                     <!-- TODO: use a-tag to rewrite it -->
                     <a-space :size="[0, 8]" wrap>
@@ -67,18 +67,19 @@
             <a-spin :spinning="contentData.loading" style="min-height: 200px;">
               <div class="pc-thing-list flex-view">
                 <ShopItemCard
-                  v-for="item in contentData.pageData"
+                  v-for="item in contentData.thingData"
                   :key="item.id"
                   :shop-card="item"
                   :loading="contentData.loading"
                   style="width: 30%; height: 400%; margin: 1%;" />
 
-                <div v-if="contentData.pageData.length <= 0 && !contentData.loading" class="no-data" style="">暂无数据</div>
+                <div v-if="contentData.thingData.length <= 0 && !contentData.loading" class="no-data" style="">暂无数据</div>
               </div>
             </a-spin>
             <div class="page-view" style="">
-              <a-pagination v-model="contentData.page" size="small" @change="changePage" :hideOnSinglePage="true"
+              <a-pagination v-model:current="contentData.page" size="small" @change="changePage"
                             :defaultPageSize="contentData.pageSize" :total="contentData.total"
+                            show-quick-jumper
                             :showSizeChanger="false"/>
             </div>
           </div>
@@ -152,12 +153,13 @@ const searchParams = reactive({
   addr: "",
   price: "",
   sort: "",
+  limit: 6,
 });
 
 const fillData = (list) => {
   var res = [];
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i];
+  for (var i = 0; i < list.results.length; i++) {
+    var item = list.results[i];
     console.log(item)
     var data = {};
     data['name'] = item.name;
@@ -172,7 +174,7 @@ const fillData = (list) => {
     data["is_sold"] = item.is_sold;
     res.push(data);
   }
-  return [res, res.length];
+  return [res, list.count];
 }
 
 const handleChange = (index, checked) => {
@@ -203,14 +205,19 @@ const handleChange = (index, checked) => {
       searchParams.price = '';
     }
   }
-  searchData();
+  changePage(1);
 };
-const searchData = async () => {
+
+const searchData = () => {
+  contentData.page = 1;
+  fetchData();
+}
+const fetchData = async () => {
   contentData.loading = true;
+  searchParams['offset'] = (contentData.page - 1) * contentData.pageSize;
   getProductList(searchParams).then(res => {
     if (res.code === 0) {
       [ contentData.thingData, contentData.total ] = fillData(res.data);
-      changePage(1);
     } else {
       openNotification({
         type: 'error',
@@ -235,8 +242,7 @@ const initSide = async () => {
                           '0~49元', '50~99元', '100~199元', '200~499元', '500~999元', '1000~元'];
   contentData.selectData = [false, false, false, false, false, false, false, false, false, false];
   /* TODO: 从接口返回的数据数量尚未控制，需要调整 params */
-  await searchData();
-
+  await changePage(1);
   console.log(contentData.total);
 }
 
@@ -263,7 +269,7 @@ const clickTag = (index) => {
     searchParams.classification1 = ""
     searchParams.classification2 = appStore.checkC_2[index.label];
   }
-  searchData()
+  changePage(1);
 }
 
 const selectTab = () => {
@@ -274,7 +280,7 @@ const selectTab = () => {
     case 3: searchParams.addr = "2"; break;
     case 4: searchParams.addr = "3"; break;
   }
-  searchData();
+  changePage(1);
 }
 const handleDetail = (item, index) => {
   // 跳转新页面
@@ -290,10 +296,9 @@ const handleDetail = (item, index) => {
   }
 }
 // 分页事件
-const changePage = (page) => {
+const changePage = async (page) => {
   contentData.page = page
-  let start = (contentData.page - 1) * contentData.pageSize
-  contentData.pageData = contentData.thingData.slice(start, start + contentData.pageSize)
+  await fetchData();
   console.log('第' + contentData.page + '页')
 }
 

@@ -3,9 +3,9 @@
 import {useAppStore, useUserStore, useWebSocketStore} from "/@/store";
 import {USER_ID, TOKEN_EXPIRE_TIME, USER_ACCESS, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN, USER_AVATAR, ADMIN_USER_AVATAR} from "/@/store/constants";
 
-export default function Initializer () {
+export default async function Initializer() {
   const userStore = useUserStore()
-  userStore.$patch((state)=>{
+  userStore.$patch((state) => {
     // state.token_expire_time = localStorage.getItem(TOKEN_EXPIRE_TIME)
     // state.user_name = localStorage.getItem(USER_NAME)
     // state.user_access = localStorage.getItem(USER_ACCESS)
@@ -18,7 +18,7 @@ export default function Initializer () {
   })
 
   const appStore = useAppStore()
-  appStore.$patch((state)=>{
+  appStore.$patch((state) => {
     // state.token_expire_time = localStorage.getItem(TOKEN_EXPIRE_TIME)
     // state.user_name = localStorage.getItem(USER_NAME)
     // state.user_access = localStorage.getItem(USER_ACCESS)
@@ -31,12 +31,11 @@ export default function Initializer () {
   })
 
   const webSocketStore = useWebSocketStore()
-  webSocketStore.$patch((state)=>{
+  webSocketStore.$patch((state) => {
     console.log('恢复WebSocketStore完毕 ==> ', state)
   })
 
   if (userStore.user_access) {
-    webSocketStore.attachSocket();
-    webSocketStore.initMessages();
+    await webSocketStore.attachSocket();
   }
 }

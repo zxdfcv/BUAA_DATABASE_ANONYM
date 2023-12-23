@@ -15,19 +15,19 @@
         <a-spin :spinning="tData.loading" style="min-height: 200px;">
           <div class="pc-thing-list">
             <ShopItemCard
-                v-for="(item, index) in tData.pageData"
+                v-for="(item, index) in tData.thingData"
                 :key="index"
                 :shop-card="item"
                 :loading="tData.loading"
                 style="width: 30%; margin: 1%;"
             />
 
-            <div v-if="tData.pageData.length <= 0 && !tData.loading" class="no-data" style="">暂无数据</div>
+            <div v-if="tData.thingData.length <= 0 && !tData.loading" class="no-data" style="">暂无数据</div>
           </div>
         </a-spin>
 
         <div class="page-view" style="">
-          <a-pagination v-model:value="tData.page" size="small" @change="changePage" :hideOnSinglePage="true"
+          <a-pagination v-model:current="tData.page" size="small" @change="changePage" :hideOnSinglePage="true"
                         :defaultPageSize="tData.pageSize" :total="tData.total"/>
         </div>
       </div>
@@ -56,11 +56,11 @@ const tData = reactive({
 
   page: 1,
   total: 0,
-  pageSize: 20,
+  pageSize: 12,
 })
 
 onMounted(() => {
-  search()
+  changePage(1);
 })
 
 // 监听query参数
@@ -70,8 +70,8 @@ watch(useRoute(), (to, from) => {
 
 const fillData = (list) => {
   var res = [];
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i];
+  for (var i = 0; i < list.results.length; i++) {
+    var item = list.results[i];
     console.log(item)
     var data = {};
     data['name'] = item.name;
@@ -86,13 +86,14 @@ const fillData = (list) => {
     data["is_sold"] = item.is_sold;
     res.push(data);
   }
-  return [res, res.length];
+  return [res, list.count];
 }
 
 const search = () => {
   tData.keyword = route.query.keyword?.trim()
   tData.loading = true
   const params = {
+    limit: tData.pageSize,
   };
   if (route.query.type === 'C_1') {
     params['classification1'] = useAppStore().checkC_1[tData.keyword];
@@ -101,12 +102,12 @@ const search = () => {
   } else {
     params['keyword'] = tData.keyword;
   }
+  params['offset'] = tData.pageSize * (tData.page - 1);
   getProductList(params).then(res => {
     if (res.code === 0) {
       [ tData.thingData, tData.total ] = fillData(res.data);
     }
     console.log(tData.thingData)
-    changePage(1)
     tData.loading = false
   }).catch(err => {
     console.log(err)
@@ -116,10 +117,8 @@ const search = () => {
 
 // 分页事件
 const changePage = (page) => {
-  tData.page = page
-  let start = (tData.page - 1) * tData.pageSize
-  tData.pageData = tData.thingData.slice(start, start + tData.pageSize)
-  console.log('第' + tData.page + '页')
+  tData.page = page;
+  search();
 }
 const handleDetail = (item) => {
   // 跳转新页面
