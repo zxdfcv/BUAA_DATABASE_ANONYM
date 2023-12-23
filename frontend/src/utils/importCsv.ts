@@ -1,7 +1,7 @@
 // src/utils/importCsv.ts
 
 interface CsvRow {
-    [key: string]: string;
+    [key: string]: string | string[];
 }
 
 export function importCsv(file: File): Promise<CsvRow[]> {
@@ -21,7 +21,19 @@ export function importCsv(file: File): Promise<CsvRow[]> {
                 .map((row) => {
                     const entry: CsvRow = {};
                     header.forEach((col, index) => {
-                        entry[col.trim()] = row[index].trim();
+                        console.log(row[index])
+                        let value = row[index].trim();
+                        console.log(value)
+                        // Check if the value is enclosed in quotes and contains commas
+                        if (value.startsWith('"') && value.endsWith('"')) {
+                            // Remove quotes and split the value by commas
+                            value = value.slice(1, -1);
+                            const arrayValues = value.split(' ').map((v) => v.trim());
+                            console.log(arrayValues)
+                            entry[col.trim()] = arrayValues;
+                        } else {
+                            entry[col.trim()] = value;
+                        }
                     });
                     return entry;
                 });

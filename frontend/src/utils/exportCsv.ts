@@ -6,7 +6,8 @@ export function exportCsv(data, fileName) {
         const values = Object.values(entry).map(value => {
             // 如果值是字符串并且包含逗号，使用双引号括起来
             if (Array.isArray(value) || typeof value === 'string' && value.includes(',')) {
-                return `"${value}"`;
+
+                return `"${value}"`.replace(/,/g, ' ');
             }
             return value;
         });

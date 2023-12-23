@@ -517,48 +517,42 @@ const handleOk = () => {
 };
 
 const batchCreate = (item: Object) => {
-  myform.value
-      ?.validate()
-      .then(() => {
-        const formData = new FormData();
-        if (item['username']) {
-          formData.append('username', item['username']);
-        }
-        if (item['password']) {
-          formData.append('password', item['password']);
-        }
-        if (item['nickname']) {
-          formData.append('nickname', item['nickname']);
-        }
-        if (item['is_staff']) {
-          formData.append('is_staff', item['is_staff'] === '1' ? 'true' : 'false')
-        }
-        if (item['is_active']) {
-          formData.append('is_active', item['is_active'] === '1' ? 'true' : 'false')
-        }
-        if (item['phone']) {
-          formData.append('phone', item['phone']);
-        }
-        if (item['email']) {
-          formData.append('email', item['email']);
-        }
-        if (item['groups']) {
-          item['groups'].forEach(value => {
-            formData.append('groups', value);
-          });
-        }
-        createApi(formData)
-            .then((res) => {
-              hideModal();
-              getUserList();
-            })
-            .catch((err) => {
-              console.log(err);
-              message.warn(err.msg || "操作失败")
-            });
+  const formData = new FormData();
+  console.log(item)
+  if (item['username']) {
+    formData.append('username', item['username']);
+  }
+  if (item['password']) {
+    formData.append('password', item['password']);
+  }
+  if (item['nickname']) {
+    formData.append('nickname', item['nickname']);
+  }
+  if (item['is_staff']) {
+    formData.append('is_staff', item['is_staff'] === '1' ? 'true' : 'false')
+  }
+  if (item['is_active']) {
+    formData.append('is_active', item['is_active'] === '1' ? 'true' : 'false')
+  }
+  if (item['phone']) {
+    formData.append('phone', item['phone']);
+  }
+  if (item['email']) {
+    formData.append('email', item['email']);
+  }
+  if (item['groups']) {
+    item['groups'].forEach(value => {
+      formData.append('groups', value);
+    });
+  }
+  createApi(formData)
+      .then((res) => {
+        hideModal();
+        getUserList();
       })
       .catch((err) => {
-        console.log('不能为空');
+        console.log(err);
+        message.warn(err.msg || "操作失败")
       });
 };
 
