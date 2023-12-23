@@ -705,7 +705,7 @@ class OrderView(generics.ListAPIView):
         serializer = OrderSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return APIResponse(code=1, msg='创建成功', data=serializer.data)
+            return APIResponse(code=0, msg='创建成功', data=serializer.data)
 
         make_error_log(request, '管理员创建订单失败')
         return APIResponse(code=1, msg='创建失败', data=serializer.errors)
