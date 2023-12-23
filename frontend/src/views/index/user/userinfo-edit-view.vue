@@ -235,7 +235,6 @@ const modifyPassword = () => {
         message: '修改密码成功！',
         description: res.msg
       });
-      userStore.setPassword(password.new1);
         }
     ).catch(err => {
       console.log(err)

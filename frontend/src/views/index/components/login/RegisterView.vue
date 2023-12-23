@@ -7,21 +7,21 @@
       <div class="login">
         <a-form @submit.prevent="doRegister" :rules="rules" :model="formState" class="register-form sign-up-form">
           <a-form-item label="Username" name="username"
-            :rules="[{ required: true, message: 'Please input username' }, { min: 5, max: 15, message: 'Length should be 5 to 15' }]">
+            :rules="[{ required: true, message: 'Please input username' }, { min: 5, max: 15, message: '长度需要介于 5~15 个字符' }]">
             <a-input v-model:value="formState.username" autocomplete="off" />
           </a-form-item>
 
           <a-form-item label="Password" name="password"
-            :rules="[{ required: true, message: 'Please input password' }, { min: 6, max: 16, message: 'Length should be 6 to 16' }]">
+            :rules="[{ required: true, message: 'Please input password' }, { min: 6, max: 16, message: '长度需要介于 6~16 个字符' }, { validator: handlePassword }]">
             <a-input-password v-model:value="formState.password" autocomplete="off" />
           </a-form-item>
           <a-form-item label="Repeat Password" name="confirm_password"
-            :rules="[{ required: true, message: 'Please repeat password' }, { min: 6, max: 16, message: 'Length should be 6 to 16' }, { validator: handlePasswordCheck }]">
+            :rules="[{ required: true, message: 'Please repeat password' }, { min: 6, max: 16, message: '长度需要介于 6~16 个字符' }, { validator: handlePasswordCheck }]">
             <a-input-password v-model:value="formState.confirm_password" autocomplete="off" />
           </a-form-item>
           <a-form-item label="Email" name="email" :rules="[{ required: true, message: 'Please input email' }, {
             pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
-            message: 'Email format invalid!'
+            message: '无效的邮箱格式'
           }]">
             <a-input-password v-model:value="formState.email" autocomplete="off" />
           </a-form-item>
@@ -93,10 +93,18 @@ const refreshIdentifyCode = () => {
   makeIdentifyCode(4)
 };
 
+const handlePassword = (rule, value, callback) => {
+  if (!/(?=.*[0-9])(?=.*[a-zA-Z])/.test(value)) {
+    callback('密码必须包含数字和字母');
+    return;
+  }
+  callback();
+};
+
 const handlePasswordCheck = (rule, value, callback) => {
   let password = formState['password']
   if (value && password && value.trim() !== password.trim()) {
-    callback(new Error('Passwords have diff!'))
+    callback(new Error('两次输入的密码不一致'))
   }
   callback()
 };
@@ -135,7 +143,6 @@ const doRegister = () => {
       description: '用户 ' + res.data.user.username + ' 创建成功！'
     })
     userStore.remember_me = true;
-    userStore.user_password = formState.password;
     emits('toLogin');
   }).catch(err => {
     console.log(err);
