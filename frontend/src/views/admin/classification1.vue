@@ -70,6 +70,7 @@
                       accept="image/*"
                       :multiple="false"
                       :before-upload="beforeUpload"
+                      :max-count="1"
                       v-model:file-list="fileList"
                   >
                     <p class="ant-upload-drag-icon">
@@ -146,6 +147,8 @@ const beforeUpload = (file: File) => {
     const img = new Image();
     img.onload = () => {
       // 获取图片的宽高
+      modal.form.imageUrl = event.target.result
+      console.log(modal.form.imageUrl)
       const width = img.width
       const height = img.height
       modal.form.imageWidth = width
@@ -255,10 +258,14 @@ const handleEdit = (record: any) => {
   for (const key in record) {
     modal.form[key] = record[key];
   }
-  if (modal.form.image) {
-    modal.form.imageUrl = BASE_URL + modal.form.image
-    modal.form.image = undefined
-  }
+  modal.form.imageUrl = BASE_URL + modal.form.image;
+  const img = new Image();
+  img.onload = () => {
+    modal.form.imageWidth = img.width;
+    modal.form.imageHeight = img.height;
+  };
+  img.src = modal.form.imageUrl;
+  modal.form.image = undefined;
 };
 
 const confirmDelete = (record: any) => {

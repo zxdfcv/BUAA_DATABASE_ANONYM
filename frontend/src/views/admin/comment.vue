@@ -4,6 +4,7 @@
     <div class="page-view">
       <div class="table-operations">
         <a-space>
+          <a-button type="primary" @click="exportData">导出 CSV</a-button>
           <a-button type="primary" @click="handleAdd">新增</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
         </a-space>
@@ -112,6 +113,7 @@ import {createApi, listApi, deleteApi, updateApi} from '/@/api/admin/comment';
 import {listApi as listUserApi} from '/@/api/admin/user'
 import {BASE_URL} from "/@/store/constants";
 import {getFormatTime} from "/@/utils";
+import {exportCsv} from "/@/utils/exportCsv";
 
 const submitting = ref<boolean>(false);
 
@@ -250,6 +252,10 @@ const rowSelection = ref({
     data.selectedRowKeys = selectedRowKeys;
   },
 });
+
+const exportData = () => {
+  exportCsv(data.list, '评论信息.csv')
+};
 
 const handleAdd = () => {
   resetModal();

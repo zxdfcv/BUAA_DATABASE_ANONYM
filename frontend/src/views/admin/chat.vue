@@ -4,6 +4,7 @@
     <div class="page-view">
       <div class="table-operations">
         <a-space>
+          <a-button type="primary" @click="exportData">导出 CSV</a-button>
           <a-button @click="handleBatchDelete">批量删除</a-button>
         </a-space>
       </div>
@@ -45,6 +46,7 @@ import {FormInstance, message} from 'ant-design-vue';
 import {createApi, listApi, deleteApi} from '/@/api/admin/chat';
 import {BASE_URL} from "/@/store/constants";
 import {getFormatTime} from "/@/utils";
+import {exportCsv} from "/@/utils/exportCsv";
 
 const columns = reactive([
   {
@@ -159,6 +161,9 @@ const getList = () => {
       });
 };
 
+const exportData = () => {
+  exportCsv(data.list, '私聊信息.csv')
+};
 
 const rowSelection = ref({
   onChange: (selectedRowKeys: (string | number)[], selectedRows: DataItem[]) => {
