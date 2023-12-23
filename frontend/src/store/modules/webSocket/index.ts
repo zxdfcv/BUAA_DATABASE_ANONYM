@@ -95,10 +95,14 @@ export const useWebSocketStore = defineStore(
 
         detachSocket() {
             if (this.web_socket) {
-                (this.web_socket as WebSocket).close();
-                this.web_socket = undefined;
+                try {
+                    (this.web_socket as WebSocket).close();
+                } catch (e) {
+                    this.web_socket = undefined;
+                }
                 console.log("注销 webSocket 实例")
             }
+            this.web_socket = undefined;
         },
 
         async initMessages() {
@@ -115,6 +119,7 @@ export const useWebSocketStore = defineStore(
         },
 
         discardMessages() {
+            console.log("discardMessage");
             this.init = false;
 
             this.comment_list = [];
@@ -149,7 +154,7 @@ export const useWebSocketStore = defineStore(
         },
 
         async refreshMessage() {
-            this.discardMessages();
+            await this.discardMessages();
             await this.initMessages();
         },
 

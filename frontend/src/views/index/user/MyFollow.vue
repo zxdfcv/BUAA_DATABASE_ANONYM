@@ -68,20 +68,28 @@ const pageData = reactive({
   collectData: []
 })
 let listData = reactive([]);
+let pages = ref(1);
 
 const pagination = {
-  pageSize: 5,
+  onChange: (page) => {
+    console.log(page);
+    pages.value = page;
+    queryFollow();
+  },
+  pageSize: 4,
+  total: 0,
 };
 
 const loading = ref(false)
 
 const queryFollow = async () => {
   loading.value = true;
-  const res = await userFollowersApi({user_id: appStore.view_user_id});
+  const res = await userFollowersApi({user_id: appStore.view_user_id, limit: pagination.pageSize, offset: (pages.value - 1) * pagination.pageSize});
   listData.length = 0;
-  for (let i = 0; i < res.data.length; i++) {
-    listData.push(res.data[i]);
+  for (let i = 0; i < res.data.results.length; i++) {
+    listData.push(res.data.results[i]);
   }
+  pagination.total = res.data.count;
   loading.value = false;
 }
 

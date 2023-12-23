@@ -77,8 +77,7 @@ try {
       console.log('Storage state ==> ', this)
     });
     result = res1;
-    useWebSocketStore().attachSocket();
-    await useWebSocketStore().initMessages();
+    await useWebSocketStore().attachSocket();
   }
 } catch (e) {
   delete admin.type;
@@ -97,8 +96,7 @@ try {
       console.log('Storage state ==> ', this)
     });
     result = res2;
-    useWebSocketStore().attachSocket();
-    await useWebSocketStore().initMessages();
+    await useWebSocketStore().attachSocket();
 
   }
 }
