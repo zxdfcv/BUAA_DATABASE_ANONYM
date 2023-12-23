@@ -173,10 +173,10 @@ class EditProductView(APIView):
 
         tag_ids = request.data.getlist('tags', [])
         if not tag_ids or all(not tag_id for tag_id in tag_ids):
-            request.data.pop('tags', None)
-            # request.data._mutable = True
             # request.data.pop('tags', None)
-            # request.data._mutable = False
+            request.data._mutable = True
+            request.data.pop('tags', None)
+            request.data._mutable = False
 
         if 'classification_1' in request.data and 'classification_2' in request.data:
             classification_1_id = request.data['classification_1']

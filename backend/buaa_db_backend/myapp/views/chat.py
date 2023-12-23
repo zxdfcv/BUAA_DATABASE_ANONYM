@@ -82,9 +82,9 @@ class ChatView(generics.ListAPIView):
             make_error_log(request, "私聊商品与用户不匹配")
             return APIResponse(code=1, msg='私聊商品与用户不匹配')
 
-        excluded_fields = ['id', 'is_read']
-        for field in excluded_fields:
-            request.data.pop(field, None)
+        # excluded_fields = ['id', 'is_read']
+        # for field in excluded_fields:
+        #     request.data.pop(field, None)
             # request.data._mutable = True
             # request.data.pop(field, None)
             # request.data._mutable = False

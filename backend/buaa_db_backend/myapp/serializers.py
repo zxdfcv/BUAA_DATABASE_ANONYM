@@ -137,6 +137,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'nickname', 'gender', 'avatar',
                   'description', 'date_joined', 'following_count', 'follower_count', 'is_active']
+        extra_kwargs = {'id': {'read_only': True},
+                        'is_active': {'read_only': True},
+                        }
 
     # def update(self, instance, validated_data):
     #     # 自定义 update 方法，处理更新逻辑
@@ -605,7 +608,8 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = '__all__'
-        extra_kwargs = {'id': {'read_only': True}}
+        extra_kwargs = {'id': {'read_only': True},
+                        'is_read': {'read_only': True}}
 
     def get_sender_avatar(self, obj):
         return str(obj.sender.avatar) if obj.sender.avatar else ''
