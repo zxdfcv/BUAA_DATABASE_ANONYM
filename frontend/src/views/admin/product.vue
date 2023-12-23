@@ -186,6 +186,19 @@
                   </a-radio-group>
                 </a-form-item>
               </a-col>
+              <a-col span="24">
+                <a-form-item label="删除图片" name="clear_image">
+                  <a-select
+                      v-model:value="modal.form.remove_images_ids"
+                      mode="multiple"
+                      style="width: 100%"
+                      placeholder="Please select"
+                      :options="modal.form.images"
+                      :field-names="{ label: 'product', value: 'id'}"
+                      :render="item => item.id"
+                  />
+                </a-form-item>
+              </a-col>
             </a-row>
           </a-form>
         </div>
@@ -281,6 +294,7 @@ const modal = reactive({
   bData: [],
   tagData: [{}],
   form: {
+    remove_images_ids: [],
     product_id: undefined,
     name: undefined,
     classification1: undefined,
@@ -296,6 +310,7 @@ const modal = reactive({
     off_shelf: undefined,
     is_sold: undefined,
     image: undefined,
+    images: undefined,
     imageUrl: undefined,
     imageHeight: undefined,
     imageWidth: undefined,
@@ -551,6 +566,11 @@ const handleOk = () => {
         console.log(fileList.value)
         if (modal.form.rawFile) {
           formData.append('video', modal.form.rawFile)
+        }
+        if (modal.form.remove_images_ids) {
+          modal.form.remove_images_ids.forEach((item) => {
+            formData.append('remove_images_ids', item)
+          })
         }
         formData.append('description', modal.form.description || '')
         formData.append('price', modal.form.price || '')

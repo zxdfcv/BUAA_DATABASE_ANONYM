@@ -59,7 +59,7 @@
           <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
             <a-row :gutter="24">
               <a-col span="24">
-                <a-form-item label="一级分类名称" name="title">
+                <a-form-item label="一级分类" name="title">
                   <a-input placeholder="请输入" v-model:value="modal.form.name"></a-input>
                 </a-form-item>
               </a-col>
@@ -114,7 +114,7 @@ const columns = reactive([
     width: 60
   },
   {
-    title: '一级分类名称',
+    title: '一级分类',
     dataIndex: 'name',
     key: 'name',
   },

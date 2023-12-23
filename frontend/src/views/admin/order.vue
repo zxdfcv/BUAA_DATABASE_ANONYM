@@ -60,18 +60,18 @@
           <a-form ref="myform" :label-col="{ style: { width: '80px' } }" :model="modal.form" :rules="modal.rules">
             <a-row :gutter="24">
               <a-col span="24">
-                <a-form-item label="商品 id" name="product_id">
-                  <a-input placeholder="请输入" v-model:value="modal.form.product_id"></a-input>
+                <a-form-item label="商品 id" name="product">
+                  <a-input placeholder="请输入" v-model:value="modal.form.product"></a-input>
                 </a-form-item>
               </a-col>
               <a-col span="24">
-                <a-form-item label="买家 id" name="receiver_id">
-                  <a-input placeholder="请输入" v-model:value="modal.form.merchant_id"></a-input>
+                <a-form-item label="买家 id" name="receiver">
+                  <a-input placeholder="请输入" v-model:value="modal.form.merchant"></a-input>
                 </a-form-item>
               </a-col>
               <a-col span="24">
-                <a-form-item label="卖家 id" name="merchant_id">
-                  <a-input placeholder="请输入" v-model:value="modal.form.receiver_id"></a-input>
+                <a-form-item label="卖家 id" name="merchant">
+                  <a-input placeholder="请输入" v-model:value="modal.form.receiver"></a-input>
                 </a-form-item>
               </a-col>
               <a-col span="24">
@@ -210,9 +210,9 @@ const modal = reactive({
   title: '',
   form: {
     id: undefined,
-    merchant_id: undefined,
-    receiver_id: undefined,
-    product_id: undefined,
+    merchant: undefined,
+    receiver: undefined,
+    product: undefined,
     status: undefined,
     pay_time: undefined,
     create_time: undefined,
