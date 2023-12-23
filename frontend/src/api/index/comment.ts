@@ -7,6 +7,7 @@ enum URL {
     queryUserComment = '/myapp/comment/my_list',
     likeComment = '/myapp/comment/like',
     dislikeComment = '/myapp/comment/dislike',
+    queryLoggedProductComment = '/myapp/comment/likeList',
 
     createReply = '/myapp/reply/create',
     deleteReply = '/myapp/reply/delete',
@@ -14,6 +15,7 @@ enum URL {
     queryUserReply = '/myapp/reply/my_list',
     likeReply = '/myapp/reply/like',
     dislikeReply = '/myapp/reply/dislike',
+    queryLoggedCommentReply = '/myapp/reply/likeList',
 
     create = '/myapp/index/comment/create',
     listThingComments = '/myapp/index/comment/list',
@@ -29,6 +31,7 @@ const queryProductCommentApi = async (params: any) => get<any>({url: URL.queryPr
 const queryUserCommentApi = async (params: any) => get<any>({url: URL.queryUserComment, params: params, data: {}, headers: {}})
 const likeCommentApi = async (params: any) => post<any>({url: URL.likeComment, params: params, data: {}, headers: {}})
 const dislikeCommentApi = async (params: any) => deletes<any>({url: URL.dislikeComment, params: params, data: {}, headers: {}})
+const queryLoggedProductCommentApi = async (params: any) => get<any>({url: URL.queryLoggedProductComment, params: params, data: {}, headers: {}})
 
 
 const createReplyApi = async (data: any) => put<any>({url: URL.createReply, params: {}, data: data, headers: {}})
@@ -37,6 +40,7 @@ const queryCommentReplyApi = async (params: any) => get<any>({url: URL.queryComm
 const queryUserReplyApi = async (params: any) => get<any>({url: URL.queryUserReply, params: params, data: {}, headers: {}})
 const likeReplyApi = async (params: any) => post<any>({url: URL.likeReply, params: params, data: {}, headers: {}})
 const dislikeReplyApi = async (params: any) => deletes<any>({url: URL.dislikeReply, params: params, data: {}, headers: {}})
+const queryLoggedCommentReplyApi = async (params: any) => get<any>({url: URL.queryLoggedCommentReply, params: params, data: {}, headers: {}})
 
 
 const createApi = async (data: any, data1: any) => post<any>({
@@ -53,5 +57,6 @@ const SetStateToReadedApi = async (params: any) => post<any>({url: URL.SetStateT
 export {
     createCommentApi, deleteCommentApi, likeCommentApi, dislikeCommentApi, queryProductCommentApi, queryUserCommentApi, /* comment */
     createReplyApi, deleteReplyApi, likeReplyApi, dislikeReplyApi, queryCommentReplyApi, queryUserReplyApi,             /*  reply  */
-    createApi, listThingCommentsApi,listUserCommentsApi, likeApi, listReceiveCommentsApi, SetStateToReadedApi /* old */
+    createApi, listThingCommentsApi,listUserCommentsApi, likeApi, listReceiveCommentsApi, SetStateToReadedApi, /* old */
+    queryLoggedProductCommentApi, queryLoggedCommentReplyApi,
 };

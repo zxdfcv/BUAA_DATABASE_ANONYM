@@ -186,7 +186,7 @@
                             <div class="float-right">
                               <ButtonGroup>
                                 <Button @click="toggleIsShow(item.id, item.id)"  style="width: 80px"><Icon type="md-chatboxes" style="margin-left: -3px"/> 回复&nbsp;&nbsp;&nbsp;</Button>
-                                <Button type="primary" v-if="item.isLiked" @click="dislike(item.id)" style="width: 80px"><Icon type="md-thumbs-up" /> {{ item.likes_count }}</Button>
+                                <Button type="primary" v-if="item.liked" @click="dislike(item.id)" style="width: 80px"><Icon type="md-thumbs-up" /> {{ item.likes_count }}</Button>
                                 <Button v-else @click="like(item.id)" style="width: 80px"><Icon type="md-thumbs-up" /> {{ item.likes_count }}</Button>
                               </ButtonGroup>
                             </div>
@@ -214,7 +214,7 @@
                                   <div class="float-right">
                                     <ButtonGroup>
                                       <Button @click="toggleIsShow(item.id, reply.id)"  style="width: 70px"><Icon type="md-chatboxes" style="font-size: 10px"/> 回复&nbsp;&nbsp;&nbsp;</Button>
-                                      <Button type="primary" v-if="reply.isLiked" @click="dislikeReply(reply.id)" style="width: 70px"><Icon type="md-thumbs-up" /> {{ reply.likes_count }}</Button>
+                                      <Button type="primary" v-if="reply.liked" @click="dislikeReply(reply.id)" style="width: 70px"><Icon type="md-thumbs-up" /> {{ reply.likes_count }}</Button>
                                       <Button v-else @click="likeReply(reply.id)" style="width: 70px"><Icon type="md-thumbs-up" /> {{ reply.likes_count }}</Button>
                                     </ButtonGroup>
                                     <span class="num">{{ reply.like_count }}</span>
@@ -290,8 +290,14 @@ import {
   createCommentApi,
   likeApi,
   likeCommentApi,
-  dislikeCommentApi, queryProductCommentApi, queryCommentReplyApi, createReplyApi, likeReplyApi, dislikeReplyApi
-} from '/@/api/index/comment'
+  dislikeCommentApi,
+  queryProductCommentApi,
+  queryCommentReplyApi,
+  createReplyApi,
+  likeReplyApi,
+  dislikeReplyApi,
+  queryLoggedProductCommentApi, queryLoggedCommentReplyApi
+} from "/@/api/index/comment";
 import { addWishUserApi } from '/@/api/index/thing'
 import { addCollectUserApi } from '/@/api/index/thing'
 import { BASE_URL } from "/@/store/constants";
@@ -763,39 +769,75 @@ const dislikeReply = async (replyId) => {
 }
 
 const getCommentList = () => {
-  queryProductCommentApi({ product_id: thingId.value, sort: order.value })
-    .then((res) => {
-      const commentDataCopy = [...res.data]; // Make a copy of the original data
-      const promises = commentDataCopy.map((item) =>
-        // Use map to return an array of promises for fetching replies
-        queryCommentReplyApi({ comment_id: item.id, sort: order.value })
-      );
+  if (userStore.user_access) {
+    queryLoggedProductCommentApi({ product_id: thingId.value, sort: order.value })
+      .then((res) => {
+        const commentDataCopy = [...res.data]; // Make a copy of the original data
+        const promises = commentDataCopy.map((item) =>
+          // Use map to return an array of promises for fetching replies
+          queryLoggedCommentReplyApi({ comment_id: item.id, sort: order.value })
+        );
 
-      // Wait for all promises to resolve using Promise.all
-      return Promise.all(promises)
-        .then((repliesData) => {
-          // Merge repliesData with the original commentDataCopy
-          repliesData.forEach((replies, index) => {
-            commentDataCopy[index].replies = replies.data;
-            for (let i = 0; i < commentDataCopy[index].replies.length; i++) {
-              commentDataCopy[index].replies[i]['isLiked'] = !!commentDataCopy[index].replies[i].likes.includes(userStore.user_id);
-            }
+        // Wait for all promises to resolve using Promise.all
+        return Promise.all(promises)
+          .then((repliesData) => {
+            // Merge repliesData with the original commentDataCopy
+            repliesData.forEach((replies, index) => {
+              commentDataCopy[index].replies = replies.data;
+              // for (let i = 0; i < commentDataCopy[index].replies.length; i++) {
+              //   commentDataCopy[index].replies[i]['isLiked'] = !!commentDataCopy[index].replies[i].likes.includes(userStore.user_id);
+              // }
+            });
+
+            // Now update commentData.value with the modified data
+            commentData.value = commentDataCopy;
+            // for (let i = 0; i < commentData.value.length; i++) {
+            //   commentData.value[i]['isLiked'] = !!commentData.value[i].likes.includes(userStore.user_id);
+            // }
+            console.log(commentData.value)
+          })
+          .catch((err) => {
+            console.log(err);
           });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  } else {
+    queryProductCommentApi({ product_id: thingId.value, sort: order.value })
+      .then((res) => {
+        const commentDataCopy = [...res.data]; // Make a copy of the original data
+        const promises = commentDataCopy.map((item) =>
+          // Use map to return an array of promises for fetching replies
+          queryCommentReplyApi({ comment_id: item.id, sort: order.value })
+        );
 
-          // Now update commentData.value with the modified data
-          commentData.value = commentDataCopy;
-          for (let i = 0; i < commentData.value.length; i++) {
-            commentData.value[i]['isLiked'] = !!commentData.value[i].likes.includes(userStore.user_id);
-          }
-          console.log(commentData.value)
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+        // Wait for all promises to resolve using Promise.all
+        return Promise.all(promises)
+          .then((repliesData) => {
+            // Merge repliesData with the original commentDataCopy
+            repliesData.forEach((replies, index) => {
+              commentDataCopy[index].replies = replies.data;
+              // for (let i = 0; i < commentDataCopy[index].replies.length; i++) {
+              //   commentDataCopy[index].replies[i]['isLiked'] = !!commentDataCopy[index].replies[i].likes.includes(userStore.user_id);
+              // }
+            });
+
+            // Now update commentData.value with the modified data
+            commentData.value = commentDataCopy;
+            // for (let i = 0; i < commentData.value.length; i++) {
+            //   commentData.value[i]['isLiked'] = !!commentData.value[i].likes.includes(userStore.user_id);
+            // }
+            console.log(commentData.value)
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }
 const sortCommentList = (sortType) => {
   if (sortType === 'recent') {
