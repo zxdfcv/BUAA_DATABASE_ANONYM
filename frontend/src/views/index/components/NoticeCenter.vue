@@ -300,7 +300,7 @@
   }
 
   const push2chat = () => {
-    openNotification({type: 'error', message: '哈哈，太着急了吧！'})
+    // openNotification({type: 'error', message: '哈哈，太着急了吧！'})
     router.push({name: 'chatpage'})
   }
 </script>

@@ -25,7 +25,6 @@ export const useUserStore = defineStore('user', {
     user_access: undefined,
     user_avatar: undefined,
     user_refresh: undefined,
-    user_password: undefined,
     token_expire_time: undefined,
 
     admin_user_id: undefined,
@@ -122,7 +121,6 @@ try {
         state.is_admin          = undefined
         if (state.remember_me !== true) {
           state.user_name         = undefined
-          state.user_password     = undefined
           state.remember_me       = undefined
         }
       })
@@ -139,7 +137,6 @@ try {
         state.user_refresh      = undefined
         state.token_expire_time = undefined
         state.user_name         = undefined
-        state.user_password     = undefined
         state.remember_me       = undefined
         state.user_avatar       = undefined
         state.is_admin          = undefined
@@ -187,18 +184,6 @@ try {
         state.admin_user_avatar = undefined
       })
     },
-
-    getPassword() {
-      /* TODO: 解密密码读取 */
-      return this.$state.user_password;
-    },
-
-    setPassword(password) {
-      /* TODO: 加密密码存储 */
-      this.$patch((state) => {
-        state.user_password = password;
-      })
-    }
   },
   persist: true,
 });

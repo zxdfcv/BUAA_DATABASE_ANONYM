@@ -92,7 +92,6 @@ const formState = reactive({
 const fillUserInfo = () => {
   if (userStore.remember_me === true) {
     formState.username = userStore.user_name;
-    formState.password = userStore.user_password;
     formState.remember = userStore.remember_me;
   }
 };
@@ -112,7 +111,6 @@ const doLogin = () => {
       description: '你好，' + ((userStore.is_admin) ? '管理员' : '用户') + ' ' + res.data.username + '！'
     })
     userStore.remember_me = formState.remember;
-    userStore.user_password = formState.password;
     router.push({ name: 'portal' });
   }).catch(err => {
     console.log(err);
