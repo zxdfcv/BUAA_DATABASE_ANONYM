@@ -19,7 +19,6 @@ export interface UserState {
   user_access: any;
   user_avatar: any;
   user_refresh: any;
-  user_password: any;
   token_expire_time: any;
 
   is_admin: any
