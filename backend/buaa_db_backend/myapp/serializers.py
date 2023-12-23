@@ -283,6 +283,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
         fields = '__all__'
+        extra_kwargs = {'id': {'read_only': True}}
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -312,6 +313,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('collectors',)
+        extra_kwargs = {'id': {'read_only': True}}
 
     def get_collectors_count(self, obj):
         return obj.collectors.count()
@@ -327,6 +329,7 @@ class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('views', 'wants', 'is_sold', 'off_shelve', 'collectors')
+        extra_kwargs = {'id': {'read_only': True}}
 
 
 class ProductUpdateSerializer(serializers.ModelSerializer):
@@ -336,6 +339,7 @@ class ProductUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         exclude = ('views', 'wants', 'collectors')
+        extra_kwargs = {'id': {'read_only': True}}
 
 
 class ProductAllDetailSerializer(serializers.ModelSerializer):
@@ -364,6 +368,7 @@ class ProductAllDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = '__all__'
+        extra_kwargs = {'id': {'read_only': True}, }
 
 
 class CommentListSerializer(serializers.ModelSerializer):
@@ -599,6 +604,7 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = '__all__'
+        extra_kwargs = {'id': {'read_only': True}}
 
     def get_sender_avatar(self, obj):
         return str(obj.sender.avatar) if obj.sender.avatar else ''
@@ -616,6 +622,7 @@ class ChatAllDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = '__all__'
+        extra_kwargs = {'id': {'read_only': True}}
 
 
 class TagSerializer(serializers.ModelSerializer):

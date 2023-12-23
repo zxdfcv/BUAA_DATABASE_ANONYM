@@ -88,12 +88,12 @@ class EditUserView(APIView):
     def post(self, request):
         user_id = request.GET.get('user_id')
         user = User.objects.get(pk=user_id)
-        data = request.data.copy()
+        # data = request.data.copy()
 
         excluded_fields = ['is_active', 'id']
         for field in excluded_fields:
-            data.pop(field, None)
-        serializer = UserDetailSerializer(user, data=data,
+            request.data.pop(field, None)
+        serializer = UserDetailSerializer(user, data=request.data,
                                           # partial=True
                                           )
         if serializer.is_valid():
