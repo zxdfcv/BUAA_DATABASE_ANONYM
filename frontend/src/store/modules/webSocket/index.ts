@@ -334,10 +334,13 @@ export const useWebSocketStore = defineStore(
                 recipient_avatar: product.avatarUrl,
                 sender_avatar: "",
             };
+            this.chat_list = this.chat_list.filter(chat => chat.id !== -114514);
+            console.log(this.chat_list);
             // @ts-ignore
             this.chat_list.unshift(item);
             this.message_list = [];
             this.sessionSelectId = 0;
+            console.log(this.chat_list);
         }
     },
     persist: {
