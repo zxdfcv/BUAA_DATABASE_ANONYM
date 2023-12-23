@@ -86,12 +86,13 @@ class AdminUserCreateSerializer(serializers.ModelSerializer):
                         }
 
     def create(self, validated_data):
-        groups_data = validated_data.pop('groups', [])  # 移除 groups 数据
-        user = User.objects.create_user(**validated_data)
-        for group_data in groups_data:
-            group_name = group_data['name']
-            group, created = Group.objects.get_or_create(name=group_name)
-            user.groups.add(group)
+        group_names = validated_data.pop('groups', [])  # 取出组名列表
+        user = super().create(validated_data)  # 先创建用户对象
+
+        for group_name in group_names:
+            group, created = Group.objects.get_or_create(name=group_name)  # 获取或创建组对象
+            user.groups.add(group)  # 将用户添加到组中
+
         return user
 
 

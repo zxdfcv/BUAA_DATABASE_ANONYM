@@ -223,12 +223,14 @@ class UserAllDetailView(APIView):
 
     def put(self, request):
         # data = request.data.copy()
+        # print(request.data)
         groups = request.data.getlist('groups', [])
         if not groups or all(not group for group in groups):
-            request.data.pop('groups', None)
-            # request.data._mutable = True
+            # request.data['groups'] = ','.join(groups)
             # request.data.pop('groups', None)
-            # request.data._mutable = False
+            request.data._mutable = True
+            request.data.pop('groups', None)
+            request.data._mutable = False
         serializer = AdminUserCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
