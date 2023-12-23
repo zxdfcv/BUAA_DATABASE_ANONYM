@@ -131,7 +131,7 @@ import {
 } from '@ant-design/icons-vue'
 
 import {ref} from 'vue'
-import {useUserStore} from "/@/store"
+import {useAppStore, useUserStore} from "/@/store"
 
 const userStore = useUserStore();
 
@@ -155,6 +155,7 @@ const handlePreview = ()=>{
 
 onMounted(() => {
   console.log('当前路由===>', route.name)
+  useAppStore().getC1()
   selectedKeys.value = [route.name]
 })
 
