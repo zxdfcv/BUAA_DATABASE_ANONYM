@@ -121,8 +121,8 @@
                       v-model:file-list="fileList"
                   >
                     <p class="ant-upload-drag-icon">
-                      <template v-if="modal.form.coverUrl">
-                        <img :src="modal.form.coverUrl" style="width: 60px;height: 80px;"/>
+                      <template v-if="modal.form.imageUrl">
+                        <img :src="modal.form.imageUrl" :style="{ width: `${160 * modal.form.imageUrl / modal.form.imageHeight}px`, height: '160px' }"/>
                       </template>
                       <template v-else>
                         <file-image-outlined/>
@@ -195,7 +195,7 @@
 </template>
 
 <script setup lang="ts">
-import {FormInstance, message, SelectProps, Upload} from 'ant-design-vue';
+import {FormInstance, message, SelectProps, Upload, UploadProps} from 'ant-design-vue';
 import {createApi, listApi, updateApi, deleteApi} from '/@/api/admin/product';
 import {listApi as listClassification1Api} from '/@/api/admin/classification1'
 import {listApi as listClassification2Api} from '/@/api/admin/classification2'
@@ -255,33 +255,9 @@ const columns = reactive([
   },
 ]);
 
-const beforeUpload = (file) => {
-  const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
-  const copyFile = new File([file], fileName);
-  fileList.value = [...(fileList.value || []), copyFile]
-  return Upload.LIST_IGNORE;
-}
-
-const removeImage = (file) => {
-  console.log(fileList.value);
-  const index = fileList.value.indexOf(file);
-  const newFileList = fileList.value.slice();
-  newFileList.splice(index, 1);
-  fileList.value = newFileList;
-  console.log(fileList.value)
-};
-
-const beforeUpload1 = (file: File) => {
-  // 改商品文件名
-  const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
-  const copyFile = new File([file], fileName);
-  console.log(copyFile);
-  modal.form.rawFile = copyFile;
-  return false;
-};
 
 // 文件列表
-const fileList = ref([]);
+const fileList = ref<UploadProps['fileList']>([])
 const fileList1 = ref([]);
 
 const submitting = ref<boolean>(false);
@@ -319,8 +295,10 @@ const modal = reactive({
     status: undefined,
     off_shelf: undefined,
     is_sold: undefined,
-    cover: undefined,
-    coverUrl: undefined,
+    image: undefined,
+    imageUrl: undefined,
+    imageHeight: undefined,
+    imageWidth: undefined,
     imageFile: undefined,
     rawFile: undefined,
     description: undefined
@@ -344,6 +322,56 @@ onMounted(() => {
   getTagDataList();
   appStore.setViewId(userStore.user_id);
 })
+
+const beforeUpload = (file) => {
+  const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
+  const copyFile = new File([file], fileName);
+  const reader = new FileReader();
+
+  let url
+  reader.onload = (event) => {
+    const img = new Image();
+    img.onload = () => {
+      // 获取图片的宽高
+      modal.form.imageUrl = event.target.result
+      url = event.target.result
+      console.log(modal.form.imageUrl)
+      const width = img.width
+      const height = img.height
+      modal.form.imageWidth = width
+      modal.form.imageHeight = height
+      console.log(modal.form.imageWidth)
+      console.log(modal.form.imageHeight)
+      console.log(url)
+
+      fileList.value = [...(fileList.value || []), {url: url, thumbUrl:url, name:fileName, file:copyFile}]
+    }
+
+    // 将文件的内容设置给图片对象
+    img.src = event.target.result as string
+  }
+  reader.readAsDataURL(copyFile)
+  return Upload.LIST_IGNORE;
+}
+
+const removeImage = (file) => {
+  console.log(fileList.value);
+  const index = fileList.value.indexOf(file);
+  const newFileList = fileList.value.slice();
+  newFileList.splice(index, 1);
+  fileList.value = newFileList;
+  console.log(fileList.value)
+};
+
+const beforeUpload1 = (file: File) => {
+  // 改商品文件名
+  const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
+  const copyFile = new File([file], fileName);
+  console.log(copyFile);
+  modal.form.rawFile = copyFile;
+  return false;
+};
+
 
 let option2 = computed(() => {
   console.log(modal.form)
@@ -436,7 +464,7 @@ const handleAdd = () => {
   for (const key in modal.form) {
     modal.form[key] = undefined;
   }
-  modal.form.cover = undefined
+  modal.form.image = undefined
 };
 const handleEdit = (record: any) => {
   resetModal();
@@ -454,9 +482,9 @@ const handleEdit = (record: any) => {
     }
   }
   modal.form.product_id = record['id']
-  if (modal.form.cover) {
-    modal.form.coverUrl = BASE_URL + modal.form.cover
-    modal.form.cover = undefined
+  if (modal.form.image) {
+    modal.form.imageUrl = BASE_URL + modal.form.image
+    modal.form.image = undefined
   }
 };
 
@@ -518,7 +546,7 @@ const handleOk = () => {
           })
         }
         fileList.value.forEach((item) => {
-          formData.append('images', item)
+          formData.append('images', item.file)
         })
         console.log(fileList.value)
         if (modal.form.rawFile) {
@@ -603,5 +631,13 @@ const hideModal = () => {
   margin-right: 8px;
 }
 
+.upload-list-inline :deep(.ant-upload-list-item) {
+  float: left;
+  width: 200px;
+  margin-right: 8px;
+}
+.upload-list-inline [class*='-upload-list-rtl'] :deep(.ant-upload-list-item) {
+  float: right;
+}
 
 </style>

@@ -258,11 +258,14 @@ const handleEdit = (record: any) => {
   for (const key in record) {
     modal.form[key] = record[key];
   }
-  if (modal.form.image) {
-    modal.form.imageUrl = BASE_URL + modal.form.image
-    modal.form.image = undefined
-
-  }
+  modal.form.imageUrl = BASE_URL + modal.form.image;
+  const img = new Image();
+  img.onload = () => {
+    modal.form.imageWidth = img.width;
+    modal.form.imageHeight = img.height;
+  };
+  img.src = modal.form.imageUrl;
+  modal.form.image = undefined;
 };
 
 const confirmDelete = (record: any) => {
