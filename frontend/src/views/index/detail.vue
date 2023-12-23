@@ -47,7 +47,7 @@
                             </div>
                           </div>
                         </div>
-                        <div class="count-item flex-view pointer" @click="addWanted">
+                        <div class="count-item flex-view pointer" @click="raiseChat">
                           <div class="count-img">
                             <img :src="Like_on" v-if="detailData.isWanted === true">
                             <img :src="Like_off" v-else>
@@ -296,7 +296,7 @@ import { addWishUserApi } from '/@/api/index/thing'
 import { addCollectUserApi } from '/@/api/index/thing'
 import { BASE_URL } from "/@/store/constants";
 import { useRoute, useRouter } from "vue-router/dist/vue-router";
-import { useUserStore } from "/@/store";
+import { useUserStore, useWebSocketStore } from "/@/store";
 import { getFormatTime } from "/@/utils";
 import emoji from '/@/assets/emoji'
 import { VueElement, reactive } from 'vue'
@@ -531,7 +531,7 @@ const getThingDetail = () => { /* 收藏、Like 后均需要刷新数据详情�
     message.error('获取详情失败')
   })
 }
-const addWanted = () => {
+const raiseChat = () => {
   if (detailData.value.is_sold || detailData.value.off_shelve) {
     openNotification({
       type: 'error',
@@ -543,8 +543,9 @@ const addWanted = () => {
   if (userStore.user_access) {
     /* TODO: addWantedProductApi here userId/name, productId, state(ONLY ADD) */
     detailData.value.isWanted = true;
-    router.push({name: 'purchase', query: {product: thingId.value}});
-    getPostDetail();
+    router.push({name: 'chatpage'});
+    useWebSocketStore().modifySession(detailData.value);
+    // getPostDetail();
   } else {
     openNotification({
       type: 'error',

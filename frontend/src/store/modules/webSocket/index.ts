@@ -247,6 +247,7 @@ export const useWebSocketStore = defineStore(
             getChatDetailApi({product_id: item.product, other_id: (item.sender === useUserStore().user_id) ? item.recipient : item.sender}).then(res => {
                 console.log(res.data)
                 this.message_list = res.data;
+                this.chat_list[this.sessionSelectId].is_read = true;
                 setTimeout(() => {
                     // @ts-ignore
                     this.chatScrollbar?.setScrollTop(9999);
@@ -292,11 +293,46 @@ export const useWebSocketStore = defineStore(
             this.fillMention('1');
         },
 
-        handleChat(message) {
+        async handleChat(message) {
             console.log('get chat socket', message);
             this.new_chat = 1;
-            this.fillChat();
-            this.fillMessage();
+            await this.fillChat();
+            await this.fillMessage();
+        },
+
+        async modifySession(product) {
+            console.log(product);
+            for (let i = 0; i < this.chat_list.length; i++) {
+                const chat: {product: any, recipient: any, sender: any} = this.chat_list[i];
+                console.log(chat.product, product.id, chat.recipient, product.uploaderId, chat.sender, useUserStore().user_id);
+                if (chat.product === product.id) {
+                    if ((chat.recipient === product.uploaderId && chat.sender === useUserStore().user_id) ||
+                      (chat.sender === product.uploaderId && chat.recipient === useUserStore().user_id)) {
+                        this.sessionSelectId = i;
+                        await this.fillMessage();
+                        return;
+                    }
+                }
+            }
+            const item = {
+                content: "",
+                create_time: Date.now(),
+                id: -114514,
+                image: null,
+                product: product.id,
+                product_name: product.title,
+                recipient: product.uploaderId,
+                recipient_name: product.uploaderName,
+                sender: useUserStore().user_id,
+                sender_name: useUserStore().user_name,
+                is_read: true,
+                recipient_avatar: product.avatarUrl,
+                sender_avatar: "",
+            };
+            // @ts-ignore
+            this.chat_list.unshift(item);
+            this.message_list = [];
+            this.sessionSelectId = 0;
         }
     },
     persist: {
