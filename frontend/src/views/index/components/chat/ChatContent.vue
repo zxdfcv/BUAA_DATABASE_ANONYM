@@ -3,12 +3,17 @@
     
     <!-- 聊天区域 -->
     <div
-      v-if="socketStore.message_list.length !== 0"
+      v-if="socketStore.sessionSelectId !== -1"
     >
       <!-- 聊天头部 -->
       <header class="text-left px-20px h-35px" style="font-size: 20px; height: 35px; text-align: left; margin-top: 5px;">
         <span class="fw-600" style="margin-left: 10px; font-weight: 600;">
-          {{ (conversationList[0].sender === userStore.user_id) ? conversationList[0].recipient_name : conversationList[0].sender_name }}</span>
+          {{chatNow.product_name}} - 用户： {{ (chatNow.sender === userStore.user_id) ? chatNow.recipient_name : chatNow.sender_name }}
+        </span>
+        <a-button
+          @click="router.push({name: 'purchase', query: {product: chatNow.product}});"
+          type="primary"
+        style="margin-top: -5px; margin-left: 20px;">购买商品</a-button>
         <a-divider />
       </header>
 
@@ -29,7 +34,11 @@
                           :src="BASE_URL + '/upload/'+ item.sender_avatar"
                 style="margin-left: 10px; margin-right: 10px;"/>
                 <a-avatar v-else style="margin-left: 10px; margin-right: 10px;" :src="AvatarIcon" />
-                <div v-if="item.image === null" :class="item.sender === userStore.user_id ? 'mr-10px': 'ml-10px'" class="text break-words px-15px rounded-6px text-left py-12px">{{ item.content }}</div>
+                <div v-if="item.image === null" :class="item.sender === userStore.user_id ? 'mr-10px': 'ml-10px'"
+                     class="text break-words px-15px rounded-6px text-left py-12px"
+                     style="display:inline-block; padding: 7px 12px 7px 12px; box-sizing: border-box; border-radius: 8px; position: relative;  word-break: break-all;"
+                     :style="item.sender !== userStore.user_id ? 'background-color: #fefefe' : ''"
+                >{{ item.content }}</div>
                 <div v-else :class="item.sender === userStore.user_id ? 'mr-10px': 'ml-10px'">
                   <el-image
                     class="w-200px ha max-h-200px"
@@ -62,6 +71,7 @@ import {useUserStore, useWebSocketStore} from "/@/store";
 import ChatFoot from "/@/views/index/components/chat/ChatFoot.vue";
 import { BASE_URL } from "/@/store/constants";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
+import router from "/@/router";
 
 const userStore = useUserStore();
 const socketStore = useWebSocketStore();
@@ -74,6 +84,15 @@ onMounted(() => {
   })
 })
 
+watch(
+  () => socketStore.sessionSelectId,
+  () => {
+    nextTick(() => {
+      socketStore.chatScrollbar = chatScrollbar.value
+      socketStore.chatScrollbar?.setScrollTop(9999);
+    })
+  });
+
 // 获取会话列表
 const conversationList = computed(() => {
   let list = [];
@@ -82,6 +101,10 @@ const conversationList = computed(() => {
   }
   return list;
 });
+
+const chatNow = computed(() => {
+  return socketStore.chat_list[socketStore.sessionSelectId];
+})
 
 // 渲染时间每隔5分钟显示一次
 const renderMessageDate = computed(() => {
@@ -93,6 +116,9 @@ const renderMessageDate = computed(() => {
   }
 })
 
+  onUnmounted(() => {
+    socketStore.sessionSelectId = -1;
+  })
 // 发送消息
 function readySend() {
   // socketStore.sessionSelectId = socketStore.readyRecipient.id

@@ -18,11 +18,17 @@
           >
           <el-row type="flex" align="middle" style="min-height: 75px; margin-bottom: 1px; margin-left: 10px;">
             <a-badge :dot="!item.is_read">
-              <a-avatar  size="40" v-if="!(item.sender_avatar === '' || item.sender_avatar === null || item.sender_avatar === undefined)" :src="BASE_URL + '/upload/'+ item.sender_avatar"/>
-              <a-avatar v-else :src="AvatarIcon" />
+              <div v-if="item.sender !== userStore.user_id">
+                <a-avatar  size="40" v-if="!(item.sender_avatar === '' || item.sender_avatar === null || item.sender_avatar === undefined)" :src="BASE_URL + '/upload/'+ item.sender_avatar"/>
+                <a-avatar v-else :src="AvatarIcon" />
+              </div>
+              <div v-else>
+                <a-avatar  size="40" v-if="!(item.recipient_avatar === '' || item.recipient_avatar === null || item.recipient_avatar === undefined)" :src="BASE_URL + '/upload/'+ item.recipient_avatar"/>
+                <a-avatar v-else :src="AvatarIcon" />
+              </div>
             </a-badge>
             <div class=" text-left" style="margin-left: 10px;">
-              <div class="truncate">{{ (item.sender === userStore.user_id) ? item.recipient_name : item.sender_name }}</div>
+              <div class="truncate">{{item.product_name}} - {{ (item.sender === userStore.user_id) ? item.recipient_name : item.sender_name }}</div>
               <div style="color: #8d8d8d; font-size: 12px; width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">
                 {{ item.content }}
               </div>

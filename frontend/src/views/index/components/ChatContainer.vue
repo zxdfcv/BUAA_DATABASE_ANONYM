@@ -6,7 +6,7 @@
       <ChatDomain class="lg:block hidden" style="width: 25%"/>
       <a-divider type="vertical" style="height: 600px"/>
       <!-- 聊天区域 -->
-          <ChatContent />
+      <ChatContent />
     </el-row>
   </el-card>
 
