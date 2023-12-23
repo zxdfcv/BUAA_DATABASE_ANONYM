@@ -92,7 +92,10 @@ class EditUserView(APIView):
 
         excluded_fields = ['is_active', 'id']
         for field in excluded_fields:
+            # request.data.pop(field, None)
+            request.data._mutable = True
             request.data.pop(field, None)
+            request.data._mutable = False
         serializer = UserDetailSerializer(user, data=request.data,
                                           # partial=True
                                           )

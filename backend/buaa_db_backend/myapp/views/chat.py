@@ -84,7 +84,10 @@ class ChatView(generics.ListAPIView):
 
         excluded_fields = ['id', 'is_read']
         for field in excluded_fields:
+            # request.data.pop(field, None)
+            request.data._mutable = True
             request.data.pop(field, None)
+            request.data._mutable = False
         request.data['sender'] = str(sender.id)
         serializer = ChatSerializer(data=request.data)
         if serializer.is_valid():
