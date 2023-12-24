@@ -27,24 +27,6 @@
               <a-checkbox v-model:checked="formState.remember">Remember me</a-checkbox>
             </a-form-item>
           </a-col>
-
-        <!--        <div>-->
-        <!--          <a-alert type="error" :closable="true" v-show="error" :message="error" showIcon-->
-        <!--                   style="margin-bottom: 24px;"></a-alert>-->
-        <!--          <a-form-item-->
-        <!--              fieldDecoratorId="name"-->
-        <!--              :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入账户名', whitespace: true}]}">-->
-        <!--            <a-input size="large">-->
-        <!--              <a-icon slot="prefix" type="user"></a-icon>-->
-        <!--            </a-input>-->
-        <!--          </a-form-item>-->
-        <!--          <a-form-item-->
-        <!--              fieldDecoratorId="password"-->
-        <!--              :fieldDecoratorOptions="{rules: [{ required: true, message: '请输入密码', whitespace: true}]}">-->
-        <!--            <a-input size="large" type="password">-->
-        <!--              <a-icon slot="prefix" type="lock"></a-icon>-->
-        <!--            </a-input>-->
-        <!--          </a-form-item>-->
         <a-form-item>
           <a-button :loading="loading" style="width: 100%; margin-top: 4px" size="large" htmlType="submit"
                     type="primary">
@@ -62,10 +44,10 @@
 
 <script setup lang="ts">
 
-import router from '/@/router';
-import { watch } from 'vue';
-import { useUserStore } from '/@/store';
-import { openNotification } from '/@/utils/notice'
+import router from "/@/router";
+import { watch } from "vue";
+import { useUserStore } from "/@/store";
+import { openNotification } from "/@/utils/notice";
 
 const userStore = useUserStore();
 const props = defineProps(['display']);

@@ -14,9 +14,7 @@ export default {
   methods: {
     handleSource(){
       Modal.info({
-        title: '北航Python程序设计课大作业',
-        content: '组员：任航麒、尹悠阳、张翼翔、范程',
-        onOk() {},
+
       });
     }
   }

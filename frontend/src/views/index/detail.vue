@@ -275,52 +275,34 @@
   </div>
 </template>
 <script setup>
-import WeixinShareIcon from '/@/assets/images/weixin-share.svg';
+import WeixinShareIcon from "/@/assets/images/weixin-share.svg";
 import { message } from "ant-design-vue";
-import Header from '/@/views/index/components/header.vue'
-import Footer from '/@/views/index/components/footer.vue'
-import AddIcon from '/@/assets/images/add.svg';
-import WantIcon from '/@/assets/images/want-read-hover.svg';
-import RecommendIcon from '/@/assets/images/recommend-hover.svg';
-import ShareIcon from '/@/assets/images/share-icon.svg';
-import WeiboShareIcon from '/@/assets/images/wb-share.svg';
-import AvatarIcon from '/@/assets/images/avatar.jpg';
-import PlayIcon from '/@/assets/images/Play.png'
-import Collect_on from '/@/assets/images/collect_on.png'
-import Collect_off from '/@/assets/images/collect_off.png'
-import Like_on from '/@/assets/images/like_on.png'
-import Like_off from '/@/assets/images/like_off.png'
-
+import Header from "/@/views/index/components/header.vue";
+import Footer from "/@/views/index/components/footer.vue";
+import ShareIcon from "/@/assets/images/share-icon.svg";
+import AvatarIcon from "/@/assets/images/avatar.jpg";
+import Collect_on from "/@/assets/images/collect_on.png";
+import Collect_off from "/@/assets/images/collect_off.png";
+import Like_off from "/@/assets/images/like_off.png";
 import {
-  detailApi as thingDetailApi,
-  listApi as listThingList
-} from '/@/api/index/thing'
-import {
-  listThingCommentsApi,
   createCommentApi,
-  likeApi,
-  likeCommentApi,
-  dislikeCommentApi,
-  queryProductCommentApi,
-  queryCommentReplyApi,
   createReplyApi,
-  likeReplyApi,
+  dislikeCommentApi,
   dislikeReplyApi,
-  queryLoggedProductCommentApi, queryLoggedCommentReplyApi
+  likeCommentApi,
+  likeReplyApi,
+  queryCommentReplyApi,
+  queryLoggedCommentReplyApi,
+  queryLoggedProductCommentApi,
+  queryProductCommentApi
 } from "/@/api/index/comment";
-import { addWishUserApi } from '/@/api/index/thing'
-import { addCollectUserApi } from '/@/api/index/thing'
 import { BASE_URL } from "/@/store/constants";
 import { useRoute, useRouter } from "vue-router/dist/vue-router";
 import { useUserStore, useWebSocketStore } from "/@/store";
-import { getFormatTime } from "/@/utils";
-import emoji from '/@/assets/emoji'
-import { VueElement, reactive } from 'vue'
-import { UToast, createObjectURL } from 'undraw-ui'
-import { addCollectCounter, detailApi as counterDetailApi } from '/@/api/index/classification'
-import {getProductDetail, deleteFromCollect, addToCollect, getProductList} from "/@/api/index/product";
+import { reactive } from "vue";
+import { addToCollect, deleteFromCollect, getProductDetail, getProductList } from "/@/api/index/product";
 import { openNotification } from "/@/utils/notice";
-import {getCollectList} from "/@/api/index/user";
+import { getCollectList } from "/@/api/index/user";
 import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
 
 const router = useRouter()
@@ -358,15 +340,6 @@ const replyId = ref(0)
 let showTarget = ref('')
 
 let showReplies = ref(new Map())
-
-const SelfAvatar = (avatar) => {
-  // console.log(avatar)
-  if (avatar === "null" || avatar === null) {
-    return false
-  } else {
-    return true
-  }
-}
 
 const pushToTarget = (targetId) => {
   console.log(targetId)
@@ -511,12 +484,6 @@ const getRecommendPost = async () => {
     });
 }
 
-const push2User = () => {
-  router.push({ path: '/welcome'})
-}
-
-const posterAvatar = AvatarIcon;
-
 onMounted(async () => {
   thingId.value = route.query.id.trim()
   await getPostDetail();
@@ -528,15 +495,6 @@ onMounted(async () => {
     isShow.value.set(idx, false)
     showReplies.value.set(idx, false)
   }
-  // nextTick(() => {
-  //   for (myElementRef in replyRef) {
-  //     const myElementRef = myElementRef.value;
-  //     if (myElementRef) {
-  //       console.log('获取到 ref 引用：', myElementRef);
-  //       // 在这里可以处理 ref 引用，比如修改样式、添加事件监听等操作
-  //     }
-  //   }
-  // });
 })
 
 const selectTab = (index) => {
@@ -544,16 +502,6 @@ const selectTab = (index) => {
   tabUnderLeft.value = 6 + 54 * index
 }
 
-const getThingDetail = () => { /* 收藏、Like 后均需要刷新数据详情，因为自己的操作会改变数据状态 */
-  thingDetailApi({ id: thingId.value }).then(res => {
-    detailData.value = res.data
-    detailData.value.cover = BASE_URL + res.data.cover
-
-    detailData.value.raw = BASE_URL + detailData.value.raw
-  }).catch(err => {
-    message.error('获取详情失败')
-  })
-}
 const raiseChat = () => {
   if (detailData.value.is_sold || detailData.value.off_shelve) {
     openNotification({
@@ -577,6 +525,7 @@ const raiseChat = () => {
     })
   }
 }
+
 const addCollect = async () => {
   if (userStore.user_access) {
     if (detailData.value.isCollected === true) {
@@ -592,62 +541,15 @@ const addCollect = async () => {
       description: "请先登录！",
     })
   }
-
-//   let username = userStore.user_name
-//   if (username) {
-//     console.log(thingId.value)
-//     addCollectUserApi({ thingId: thingId.value, username: username }).then(res => {
-//       message.success(res.msg)
-//       // getThingDetail()
-//     }).catch(err => {
-//       console.log('收藏菜肴失败')
-//     })
-//   } else {
-//     message.warn('请先登录')
-//   }
 }
+
 const type = 'thing'
-const share = () => { /* TODO: 重写 share 方法，或者直接去了*/
+const share = () => {
   let text = router.resolve({ name: 'share', query: { type: type, id: thingId.value } })
   console.log(text)
   window.open(text.href, '_blank')
-  // let content = '分享一个非常好玩的网站 ' + window.location.href
-  // let shareHref = 'http://service.weibo.com/share/share.php?title=' + content
-  // window.open(shareHref)
 }
-const handleOrder = (detailData) => {
-  console.log(detailData)
-  const userId = userStore.user_id
-  router.push({
-    name: 'confirm',
-    query:
-    {
-      id: detailData.id,
-      title: detailData.title,
-      cover: detailData.cover,
-      price: detailData.price
-    }
-  })
-}
-const getRecommendThing = () => {
-  listThingList({ sort: 'recommend' }).then(res => {
-    res.data.forEach((item, index) => {
-      if (item.cover) {
-        item.cover = BASE_URL + item.cover
-      }
-    })
-    console.log(res)
-    console.log(detailData)
-    recommendData.value = res.data.slice(0, 6)
-  }).catch(err => {
-    console.log(err)
-  })
-}
-const handleDetail = (item) => {
-  // 跳转新页面
-  let text = router.resolve({ name: 'detail', query: { id: item.id } })
-  window.open(text.href, '_blank')
-}
+
 const sendComment = () => {
   console.log(commentRef.value.value)
   let text = commentRef.value.value.trim()
@@ -684,15 +586,6 @@ const sendComment = () => {
   }
 }
 
-const getReply = (parentId) => {
-  onMounted(() => {
-    if (!replyRef[parentId]) {
-      replyRef[parentId] = ref
-    }
-    return replyRef[parentId]
-  })
-}
-
 const sendReply = (parentId) => {
   let text = replyText.value.trim()
   if (text.length <= 0) {
@@ -717,6 +610,7 @@ const sendReply = (parentId) => {
     router.push({ name: 'login' })
   }
 }
+
 const like = async (commentId) => {
   if (userStore.user_access) {
     const res = await likeCommentApi({comment_id: commentId});
@@ -856,6 +750,7 @@ const getCommentList = () => {
       });
   }
 }
+
 const sortCommentList = (sortType) => {
   if (sortType === 'recent') {
     sortIndex.value = 0

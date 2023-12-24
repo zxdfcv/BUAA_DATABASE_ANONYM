@@ -110,11 +110,11 @@
 </template>
 
 <script setup lang="ts">
-import { FormInstance, message, SelectProps } from 'ant-design-vue';
-import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/classification2';
-import {listApi as listClassification1Api} from '/@/api/admin/classification1'
-import {BASE_URL} from "/@/store/constants";
-import { FileImageOutlined, VideoCameraOutlined } from '@ant-design/icons-vue';
+import { FormInstance, message } from "ant-design-vue";
+import { createApi, deleteApi, listApi, updateApi } from "/@/api/admin/classification2";
+import { listApi as listClassification1Api } from "/@/api/admin/classification1";
+import { BASE_URL } from "/@/store/constants";
+import { FileImageOutlined } from "@ant-design/icons-vue";
 
 
 const columns = reactive([

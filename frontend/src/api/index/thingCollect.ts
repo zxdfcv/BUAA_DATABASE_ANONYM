@@ -1,6 +1,4 @@
-
-import { get, post } from '/@/utils/http/axios';
-import { UserState } from '/@/store/modules/user/types';
+import { get, post } from "/@/utils/http/axios";
 
 enum URL {
     userCollectList = '/api/thingCollect/getUserCollectList',

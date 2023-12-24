@@ -14,10 +14,8 @@
 
 <script setup>
 
-import ChatDomain from "/@/views/index/components/chat/ChatDomain.vue"
-import ChatContent from "/@/views/index/components/chat/ChatContent.vue"
-
-
+import ChatDomain from "/@/views/index/components/chat/ChatDomain.vue";
+import ChatContent from "/@/views/index/components/chat/ChatContent.vue";
 </script>
 
 <style scoped>

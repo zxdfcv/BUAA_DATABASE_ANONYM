@@ -52,11 +52,11 @@
 
 <script setup lang="ts">
 
-import SIdentify from './SIdentify.vue';
-import { useUserStore } from '/@/store';
+import SIdentify from "./SIdentify.vue";
+import { useUserStore } from "/@/store";
 
-import { openNotification } from '/@/utils/notice';
-import { defineEmits } from 'vue';
+import { openNotification } from "/@/utils/notice";
+import { defineEmits } from "vue";
 
 const userStore = useUserStore();
 const emits = defineEmits(['toLogin']);

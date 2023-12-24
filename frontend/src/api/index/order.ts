@@ -1,4 +1,4 @@
-import {get, post, put} from '/@/utils/http/axios';
+import { get, post, put } from "/@/utils/http/axios";
 
 enum URL {
     createOrder='/myapp/order/create',

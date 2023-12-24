@@ -95,24 +95,16 @@
 </template>
 
 <script setup>
-import {useAppStore, useUserStore} from "/@/store";
+import { useAppStore, useUserStore } from "/@/store";
+import { deleteCommentApi, deleteReplyApi, queryUserCommentApi, queryUserReplyApi } from "/@/api/index/comment";
+import { BASE_URL } from "/@/store/constants";
+import { DeleteOutlined, LikeOutlined, MessageOutlined } from "@ant-design/icons-vue";
+import AvatarIcon from "/@/assets/images/avatar.jpg";
+import { openNotification } from "/@/utils/notice";
 
 const router = useRouter();
 const userStore = useUserStore();
 const appStore = useAppStore();
-
-import {
-  deleteCommentApi,
-  deleteReplyApi,
-  listUserCommentsApi,
-  queryUserCommentApi,
-  queryUserReplyApi
-} from '/@/api/index/comment'
-import {BASE_URL} from "/@/store/constants";
-import {getFormatTime} from '/@/utils'
-import {DeleteOutlined, LikeOutlined, MessageOutlined} from "@ant-design/icons-vue";
-import AvatarIcon from "/@/assets/images/avatar.jpg";
-import {openNotification} from "/@/utils/notice";
 
 const open = ref(false);
 const open2 = ref(false);
@@ -137,11 +129,6 @@ onMounted(()=>{
   getCommentList()
   getReplyList()
 })
-
-const handleClickTitle =(record)=> {
-  let text = router.resolve({name: 'detail', query: {id: record.thing}})
-  window.open(text.href, '_blank')
-}
 
 const push2user = () => {
   router.push({name: 'usercenter', query: {id: userStore.user_id}})
@@ -233,6 +220,7 @@ const deleteReply = () => {
     open.value = false;
   })
 }
+
 </script>
 <style scoped lang="less">
 .flex-view {

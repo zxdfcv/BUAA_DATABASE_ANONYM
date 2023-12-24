@@ -1,4 +1,5 @@
-import { get, post } from '/@/utils/http/axios';
+import { get, post } from "/@/utils/http/axios";
+
 enum URL {
     list = '/myapp/index/classification/list',
     addCollectCounter = '/myapp/index/classification/addCollectCounter',

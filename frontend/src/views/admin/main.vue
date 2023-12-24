@@ -110,28 +110,26 @@
 
 </template>
 <script setup lang="ts">
-import {useRouter, useRoute} from 'vue-router'
-import logo from '/@/assets/images/logo_b.png'
+import { useRoute, useRouter } from "vue-router";
+import logo from "/@/assets/images/logo_b.png";
 
 import {
-  HomeOutlined,
   AppstoreOutlined,
-  FolderOutlined,
-  UserOutlined,
   CommentOutlined,
-  InfoCircleOutlined,
-  TagOutlined,
-  PieChartOutlined,
-  DollarOutlined,
-  MessageOutlined,
-  LayoutOutlined,
   DatabaseOutlined,
-  MenuUnfoldOutlined,
+  FolderOutlined,
+  HomeOutlined,
+  InfoCircleOutlined,
+  LayoutOutlined,
   MenuFoldOutlined,
-} from '@ant-design/icons-vue'
+  MenuUnfoldOutlined,
+  MessageOutlined,
+  TagOutlined,
+  UserOutlined
+} from "@ant-design/icons-vue";
 
-import {ref} from 'vue'
-import {useAppStore, useUserStore} from "/@/store"
+import { ref } from "vue";
+import { useAppStore, useUserStore } from "/@/store";
 
 const userStore = useUserStore();
 

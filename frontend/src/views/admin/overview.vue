@@ -72,12 +72,11 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
-import * as echarts from 'echarts'
-import { InteractionOutlined, StarFilled, StarTwoTone } from '@ant-design/icons-vue'
-import {listApi} from '/@/api/admin/overview'
-import PieChartComponent from '/@/views/admin/components/pieChartComponent.vue'
-import BarChartComponent from '/@/views/admin/components/barChartComponent.vue'
+import { ref } from "vue";
+import * as echarts from "echarts";
+import { listApi } from "/@/api/admin/overview";
+import PieChartComponent from "/@/views/admin/components/pieChartComponent.vue";
+import BarChartComponent from "/@/views/admin/components/barChartComponent.vue";
 
 let showSpin = ref(true)
 

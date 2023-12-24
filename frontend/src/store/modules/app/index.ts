@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import piniaStore from '/@/store/index';
-import {viewC1Api, viewC2Api} from "/@/api/index/classification";
-import {userDetailApi} from "/@/api/index/user";
+import { defineStore } from "pinia";
+import piniaStore from "/@/store/index";
+import { viewC1Api, viewC2Api } from "/@/api/index/classification";
+import { userDetailApi } from "/@/api/index/user";
 
 /**
  * 应用状态信息留存

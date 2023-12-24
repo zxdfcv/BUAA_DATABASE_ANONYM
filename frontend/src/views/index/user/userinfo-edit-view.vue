@@ -82,18 +82,11 @@
 </template>
 
 <script setup>
-import {message} from "ant-design-vue";
-import {
-  userDetailApi,
-  userUpdateApi,
-  userPasswordApi,
-  userDeleteApi
-} from '/@/api/index/user'
-import {BASE_URL, USER_AVATAR} from "/@/store/constants";
-import {useAppStore, useUserStore} from "/@/store";
-import AvatarIcon from '/@/assets/images/avatar.jpg'
-import {openNotification} from "/@/utils/notice";
-// console.log("visit id=", useRoute().query.id.trim())
+import { userDeleteApi, userDetailApi, userPasswordApi, userUpdateApi } from "/@/api/index/user";
+import { BASE_URL, USER_AVATAR } from "/@/store/constants";
+import { useAppStore, useUserStore } from "/@/store";
+import AvatarIcon from "/@/assets/images/avatar.jpg";
+import { openNotification } from "/@/utils/notice";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -151,6 +144,7 @@ const handleDelete = async () => {
   confirmLoading.value = false;
   showDelete.value = false;
 };
+
 const beforeUpload =(file)=> {
   // 改文件名
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6)
@@ -177,6 +171,7 @@ const getUserInfo = () => {
     loading.value = false
   })
 }
+
 const submit =()=> {
   let formData = new FormData()
   let userId = userStore.user_id
@@ -257,6 +252,7 @@ const modifyPassword = () => {
     })
   }
 }
+
 </script>
 
 <style scoped lang="less">

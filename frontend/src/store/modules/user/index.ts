@@ -1,21 +1,9 @@
-import { defineStore } from 'pinia';
-import { loginApi as adminLogin, userRegisterApi as adminRegister} from '/@/api/admin/user';
-import {userDetailApi, userLoginApi, userRegisterApi} from '/@/api/index/user';
-import { UserState } from './types';
-import {
-  USER_ID,
-  USER_NAME,
-  USER_ACCESS,
-  USER_AVATAR,
-  ADMIN_USER_ID,
-  ADMIN_USER_NAME,
-  ADMIN_USER_TOKEN,
-  ADMIN_USER_AVATAR,
-  USER_REFRESH,
-  TOKEN_EXPIRE_TIME,
-  EXPIRE_FRESH_HOUR
-} from "/@/store/constants";
-import {useWebSocketStore} from "/@/store";
+import { defineStore } from "pinia";
+import { loginApi as adminLogin } from "/@/api/admin/user";
+import { userDetailApi, userLoginApi, userRegisterApi } from "/@/api/index/user";
+import { UserState } from "./types";
+import { ADMIN_USER_AVATAR, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN } from "/@/store/constants";
+import { useWebSocketStore } from "/@/store";
 
 /* 对外使用 UserStore 创建的异步方法，UserStore 再去调用登录相关 Api */
 export const useUserStore = defineStore('user', {

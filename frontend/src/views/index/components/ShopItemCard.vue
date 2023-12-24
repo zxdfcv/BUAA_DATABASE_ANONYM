@@ -99,22 +99,13 @@
 <script setup lang="ts">
 import router from "/@/router";
 import placeHolder from "/@/assets/images/placeHolder.svg";
-import failedHolder from '/@/assets/images/failedHolder.svg'
-import {deleteFromCollect, deleteProduct} from "/@/api/index/product";
+import failedHolder from "/@/assets/images/failedHolder.svg";
+import { deleteFromCollect, deleteProduct } from "/@/api/index/product";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
-import {useUserStore} from "/@/store";
-import {openNotification} from "/@/utils/notice";
+import { useUserStore } from "/@/store";
+import { openNotification } from "/@/utils/notice";
 import AddProduct from "/@/views/index/user/addProduct.vue";
-import {BASE_URL} from "/@/store/constants";
-
-import {
-  CheckCircleOutlined,
-  SyncOutlined,
-  CloseCircleOutlined,
-  ExclamationCircleOutlined,
-  ClockCircleOutlined,
-  MinusCircleOutlined,
-} from '@ant-design/icons-vue';
+import { BASE_URL } from "/@/store/constants";
 
 const props = defineProps(['shopCard', 'loading', 'deletable', 'editable']);
 const emits = defineEmits(['deleteCollecter'])

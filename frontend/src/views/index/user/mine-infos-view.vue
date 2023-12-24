@@ -68,22 +68,17 @@
 </template>
 
 <script setup>
-import AvatarImg from '/@/assets/images/avatar.jpg'
-import MyOrderImg from '/@/assets/images/order-icon.svg'
-import CommentIconImg from '/@/assets/images/order-thing-icon.svg'
-import AddressIconImage from '/@/assets/images/order-address-icon.svg'
-import PointIconImage from '/@/assets/images/order-point-icon.svg'
-import SettingIconImage from '/@/assets/images/setting-icon.svg'
-import SafeIconImage from '/@/assets/images/setting-safe-icon.svg'
-import PushIconImage from '/@/assets/images/setting-push-icon.svg'
-import MessageIconImage from '/@/assets/images/setting-msg-icon.svg'
-
-import {getCollectThingListApi} from '/@/api/index/thing'
-import {getWishThingListApi} from '/@/api/index/thing'
-import {useAppStore, useUserStore} from '/@/store';
-import { BASE_URL } from '/@/store/constants';
+import AvatarImg from "/@/assets/images/avatar.jpg";
+import CommentIconImg from "/@/assets/images/order-thing-icon.svg";
+import AddressIconImage from "/@/assets/images/order-address-icon.svg";
+import PointIconImage from "/@/assets/images/order-point-icon.svg";
+import SettingIconImage from "/@/assets/images/setting-icon.svg";
+import PushIconImage from "/@/assets/images/setting-push-icon.svg";
+import { useAppStore, useUserStore } from "/@/store";
+import { BASE_URL } from "/@/store/constants";
 import { userDeleteFollowApi, userFollowApi, userFollowersApi } from "/@/api/index/user";
-import {openNotification} from "/@/utils/notice";
+import { openNotification } from "/@/utils/notice";
+
 const userStore = useUserStore();
 const appStore = useAppStore();
 const router = useRouter();
@@ -97,9 +92,6 @@ const followId = ref(0);
 onMounted(async () => {
   view_id.value = appStore.view_user_id;
   await queryFollow();
-
-  // getCollectThingList()
-  // getWishThingList()
 })
 
 const queryFollow = async () => {
@@ -143,29 +135,9 @@ const deleteFollow = async () => {
     console.log(err);
   });
 }
-const SelfAvatar = (avatar) => {
-  return !(avatar === "null" || avatar === null);
-}
 
 const clickMenu = (name) => {
   router.push({name: name, query: {id: appStore.view_user_id}})
-}
-const getCollectThingList =()=> {
-  let username = userStore.user_name
-  getCollectThingListApi({username: username}).then(res => {
-    collectCount.value = res.data.length
-  }).catch(err => {
-    console.log(err.msg)
-  })
-}
-
-const getWishThingList =()=> {
-  let username = userStore.user_name
-  getWishThingListApi({username: username}).then(res => {
-    wishCount.value = res.data.length
-  }).catch(err => {
-    console.log(err.msg)
-  })
 }
 
 </script>

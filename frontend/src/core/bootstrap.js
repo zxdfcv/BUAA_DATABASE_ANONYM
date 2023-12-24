@@ -1,7 +1,6 @@
 // Remove: 已实现 pinia 持久化，项目中已经不再需要 localStorage
 
-import {useAppStore, useUserStore, useWebSocketStore} from "/@/store";
-import {USER_ID, TOKEN_EXPIRE_TIME, USER_ACCESS, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN, USER_AVATAR, ADMIN_USER_AVATAR} from "/@/store/constants";
+import { useAppStore, useUserStore, useWebSocketStore } from "/@/store";
 
 export default async function Initializer() {
   const userStore = useUserStore()
