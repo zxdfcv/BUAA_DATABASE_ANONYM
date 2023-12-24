@@ -323,7 +323,7 @@ const modal = reactive({
     merchant: undefined,
     addr: '',
     tags: [],
-    repertory: undefined,
+    repertory: '',
     price: undefined,
     status: '',
     off_shelf: undefined,
