@@ -1,4 +1,4 @@
-<!-- NotFound.vue -->
+<!-- 404 -->
 <template>
   <div>
     <h1>404 - 页面未找到</h1>
@@ -14,5 +14,5 @@ export default {
 </script>
 
 <style>
-/* 在这里添加一些样式以美化页面 */
+
 </style>
