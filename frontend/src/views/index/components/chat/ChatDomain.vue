@@ -6,7 +6,7 @@
     />
     <el-scrollbar max-height="500px" style="margin-left: 15px; margin-right: 15px;">
       <!-- 会话列表 -->
-      <template v-for="(item, index) in chatroomList" :key="item">
+      <template v-for="(item, index) in chatroomList" :key="item" v-if="chatroomList.length !== 0">
         <div
           v-if="true"
           class="session-item"
@@ -38,7 +38,7 @@
         </div>
 
       </template>
-      <el-empty v-if="!chatroomList.length" :image-size="100" description="当前列表为空"/>
+      <el-empty v-else :image-size="100" description="当前列表为空"/>
     </el-scrollbar>
   </div>
 </template>

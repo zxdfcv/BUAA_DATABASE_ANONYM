@@ -2,7 +2,7 @@
   <div class="user">
     <Header />
     <div class="user-content">
-      <div class="user-content-left">
+      <div class="user-content-left" style="margin-left: 15px; margin-top: 15px;">
         <MineInfosView />
       </div>
       <div class="user-content-right">
@@ -33,12 +33,13 @@ export default {
 
 .user {
   display: block;
+  background: #dae6f9;
 }
 
 .user-content {
   display: flex;
   flex-direction: row;
-  //background-color: #2a9a44;
+  background-color: #ffffff;
   max-width: 1400px;
   min-width: 800px;
   margin: 80px auto;

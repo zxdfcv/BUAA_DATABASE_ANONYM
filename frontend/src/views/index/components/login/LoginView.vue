@@ -1,7 +1,7 @@
 <template>
   <a-spin :spinning="loading">
   <el-card :bordered="false" shadow="hover" style="top: 5%; left: auto; background-color: #f9f9f9; height: auto">
-    <div style="text-align: left;font-size: 14px;margin-bottom: 30px"><b>BUAA Salty Fish Platform</b></div>
+    <div style="text-align: left;font-size: 14px;margin-bottom: 30px"><b>北航二手交易平台</b></div>
     <div class="login">
       <a-form
           @submit.prevent="doLogin"
@@ -10,14 +10,14 @@
           class="login-form sign-in-form"
       >
         <a-form-item
-            label="Username"
+            label="用户名"
             name="username"
         >
           <a-input v-model:value="formState.username"/>
         </a-form-item>
 
         <a-form-item
-            label="Password"
+            label="密码"
             name="password"
         >
           <a-input-password v-model:value="formState.password"/>
@@ -48,11 +48,11 @@
         <a-form-item>
           <a-button :loading="loading" style="width: 100%; margin-top: 4px" size="large" htmlType="submit"
                     type="primary">
-            Login now
+            登录
           </a-button>
         </a-form-item>
         <div style="float: right">
-          Or... <a @click="$emit('toRegister')">Register here</a>
+          或者 <a @click="$emit('toRegister')">去注册</a>
         </div>
       </a-form>
     </div>

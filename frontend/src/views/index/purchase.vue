@@ -14,6 +14,7 @@
           <a-descriptions-item label="所属分类">{{ detailData.Class1 }} 、{{ detailData.Class2 }}</a-descriptions-item>
           <a-descriptions-item label="发布者">{{ detailData.uploaderName }}</a-descriptions-item>
           <a-descriptions-item label="发布时间">{{ detailData.createTime }}</a-descriptions-item>
+          <a-descriptions-item label="订单金额">{{ detailData.price }} 元</a-descriptions-item>
           <a-descriptions-item label="订单提交时间" v-if="current === 1">{{ createTime }}</a-descriptions-item>
         </a-descriptions>
       </div>
@@ -97,6 +98,7 @@ const getPostDetail = async () => {
     detailData.value["C_1"] = res.data.classification_1;
     detailData.value["C_2"] = res.data.classification_2;
     detailData.value["createTime"] = res.data.create_time;
+    detailData.value["price"] = res.data.price;
     from_detail.value = true;
   }).catch(err => {
     console.log(err)
