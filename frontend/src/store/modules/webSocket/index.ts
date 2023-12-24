@@ -1,14 +1,14 @@
-import {defineStore} from 'pinia';
-import piniaStore, {useUserStore} from '/@/store/index';
-import {MESSAGE_PER_PAGE, WEBSOCKET_URL} from "/@/store/constants";
+import { defineStore } from "pinia";
+import piniaStore, { useUserStore } from "/@/store/index";
+import { MESSAGE_PER_PAGE, WEBSOCKET_URL } from "/@/store/constants";
 import {
-    getChatDetailApi,
-    getChatListApi,
-    getCommentMessageApi,
-    getMentionMessageApi,
-    getReplyMessageApi
+  getChatDetailApi,
+  getChatListApi,
+  getCommentMessageApi,
+  getMentionMessageApi,
+  getReplyMessageApi
 } from "/@/api/index/notice";
-import {openNotification} from "/@/utils/notice";
+import { openNotification } from "/@/utils/notice";
 
 /**
  * 应用状态信息留存

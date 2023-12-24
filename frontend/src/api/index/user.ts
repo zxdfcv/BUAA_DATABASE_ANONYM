@@ -1,4 +1,4 @@
-import {deletes, get, post} from '/@/utils/http/axios';
+import { deletes, get, post } from "/@/utils/http/axios";
 
 enum URL {
     userLogin = '/myapp/login/',

@@ -1,10 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import {ADMIN_USER_TOKEN, EXPIRE_FRESH_HOUR, USER_ACCESS} from '/@/store/constants'
-import { useUserStore } from '/@/store'
-import { loadingOption } from '/@/utils/loading'
-import { ElLoading } from 'element-plus'
+import { createRouter, createWebHistory } from "vue-router";
+import { ADMIN_USER_TOKEN, EXPIRE_FRESH_HOUR } from "/@/store/constants";
+import { useUserStore } from "/@/store";
+import { loadingOption } from "/@/utils/loading";
+import { ElLoading } from "element-plus";
 
-import root from './root'
+import root from "./root";
 
 /* 可直接访问的 page name WhiteList */
 const whiteList = ['welcome', 'adminLogin', 'login', /* 'register' */, 'portal', 'search', 'detail', '403', '404', 'wishThingView', 'myFollow', 'myFans', 'detailCounter']

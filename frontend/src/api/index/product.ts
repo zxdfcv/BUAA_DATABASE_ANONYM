@@ -1,6 +1,6 @@
 // 权限问题后期增加
-import { get, post, put, deletes } from '/@/utils/http/axios';
-import { UserState } from '/@/store/modules/user/types';
+import { deletes, get, post, put } from "/@/utils/http/axios";
+
 // import axios from 'axios';
 enum URL {
     list = '/myapp/product/list',

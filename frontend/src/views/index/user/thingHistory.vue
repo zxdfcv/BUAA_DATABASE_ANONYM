@@ -129,25 +129,13 @@
 </template>
 
 <script setup>
-import {useAppStore, useUserStore} from "/@/store";
+import { useAppStore, useUserStore } from "/@/store";
+import { openNotification } from "/@/utils/notice";
+import { getOrderListApi } from "/@/api/index/order";
 
 const router = useRouter();
 const userStore = useUserStore();
 const appStore = useAppStore();
-
-import {
-  deleteCommentApi,
-  deleteReplyApi,
-  listUserCommentsApi,
-  queryUserCommentApi,
-  queryUserReplyApi
-} from '/@/api/index/comment'
-import {BASE_URL} from "/@/store/constants";
-import {getFormatTime} from '/@/utils'
-import {DeleteOutlined, LikeOutlined, MessageOutlined} from "@ant-design/icons-vue";
-import AvatarIcon from "/@/assets/images/avatar.jpg";
-import {openNotification} from "/@/utils/notice";
-import {getOrderListApi} from "/@/api/index/order";
 
 const open = ref(false);
 const open2 = ref(false);
@@ -230,21 +218,6 @@ onMounted(() => {
   getReplyList()
 })
 
-const handleClickTitle = (record) => {
-  let text = router.resolve({name: 'detail', query: {id: record.thing}})
-  window.open(text.href, '_blank')
-}
-
-const push2user = () => {
-  router.push({name: 'usercenter', query: {id: userStore.user_id}})
-}
-
-const jump2user = (user) => {
-  router.push({name: 'usercenter', query: {id: user}})
-}
-const push2product = (product) => {
-  router.push({name: 'detail', query: {id: product}})
-}
 const getCommentList = () => {
   loading.value = true
   loadingCount.value++;
@@ -306,51 +279,6 @@ const viewOrderDetail2 = (record) => {
   visible2.value = true;
 }
 
-const deleteComment = () => {
-  modalLoading.value = true;
-  deleteCommentApi({ids: targetId.value}).then(res => {
-    if (res.code === 0) {
-      openNotification({
-        type: 'success',
-        message: '成功删除评论！',
-      })
-    }
-    modalLoading.value = false;
-    open.value = false;
-    getCommentList();
-  }).catch(err => {
-    openNotification({
-      type: 'error',
-      message: 'Oops!',
-      description: '删除评论失败！'
-    })
-    modalLoading.value = false;
-    open.value = false;
-  })
-}
-
-const deleteReply = () => {
-  modalLoading.value = true;
-  deleteReplyApi({ids: targetId.value}).then(res => {
-    if (res.code === 0) {
-      openNotification({
-        type: 'success',
-        message: '成功删除回复！',
-      })
-    }
-    modalLoading.value = false;
-    open.value = false;
-    getReplyList();
-  }).catch(err => {
-    openNotification({
-      type: 'error',
-      message: 'Oops!',
-      description: '删除回复失败！'
-    })
-    modalLoading.value = false;
-    open.value = false;
-  })
-}
 </script>
 <style lang="less" scoped>
 .flex-view {

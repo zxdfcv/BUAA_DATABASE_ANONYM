@@ -1,4 +1,4 @@
-import { Recoverable } from 'repl';
+import { Recoverable } from "repl";
 
 // 返回统一格式的接口数据类型定义
 export function successResult<T = Recoverable>(result: T, { message = 'Request success' } = {}) {

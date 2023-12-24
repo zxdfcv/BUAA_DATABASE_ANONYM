@@ -72,8 +72,8 @@
 </template>
 
 <script setup lang="ts">
-import { FormInstance, message } from 'ant-design-vue';
-import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/notice';
+import { FormInstance, message } from "ant-design-vue";
+import { createApi, deleteApi, listApi, updateApi } from "/@/api/admin/notice";
 
 
 const columns = reactive([

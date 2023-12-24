@@ -90,18 +90,12 @@
 </template>
 
 <script setup>
-import { listApi as listClassificationList } from '/@/api/index/classification'
-import { listApi as listCanteenList } from '/@/api/index/canteen'
-import { listApi as listTagList } from '/@/api/index/tag'
-import { listApi as listThingList } from '/@/api/index/thing'
 import { BASE_URL } from "/@/store/constants";
 import { useAppStore, useUserStore } from "/@/store";
-import { USER_ID, USER_NAME, USER_ACCESS, ADMIN_USER_ID, ADMIN_USER_NAME, ADMIN_USER_TOKEN } from "/@/store/constants";
-import FoodIcon from '/@/assets/images/地道美食.svg';
 import { Button } from "view-ui-plus";
 import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
-import {getProductList} from "/@/api/index/product";
-import {openNotification} from "/@/utils/notice";
+import { getProductList } from "/@/api/index/product";
+import { openNotification } from "/@/utils/notice";
 
 const appStore = useAppStore();
 const userStore = useUserStore();
@@ -208,10 +202,6 @@ const handleChange = (index, checked) => {
   changePage(1);
 };
 
-const searchData = () => {
-  contentData.page = 1;
-  fetchData();
-}
 const fetchData = async () => {
   contentData.loading = true;
   searchParams['offset'] = (contentData.page - 1) * contentData.pageSize;
@@ -246,17 +236,6 @@ const initSide = async () => {
   console.log(contentData.total);
 }
 
-const getSelectedKey = () => {
-  if (contentData.selectedKeys.length > 0) {
-    return contentData.selectedKeys[0]
-  } else {
-    return -1
-  }
-}
-const getUserName = () => {
-  return userStore.user_name
-}
-
 const clickTag = (index) => {
   console.log(index.key.split('-'))
   contentData.selectedKeys = []
@@ -282,81 +261,12 @@ const selectTab = () => {
   }
   changePage(1);
 }
-const handleDetail = (item, index) => {
-  // 跳转新页面
-  if (index < 3) {
-    let text = router.resolve({name: 'detail', query: {id: item.id}})
-    window.open(text.href, '_blank')
-  } else if (index === 4) {
-    let text = router.resolve({name: 'detailCanteen', query: {id: item.id}})
-    window.open(text.href, '_blank')
-  } else {
-    let text = router.resolve({name: 'detailCounter', query: {id: item.id}})
-    window.open(text.href, '_blank')
-  }
-}
+
 // 分页事件
 const changePage = async (page) => {
   contentData.page = page
   await fetchData();
   console.log('第' + contentData.page + '页')
-}
-
-const getCanteenList = () => {
-  contentData.loading = true
-  listCanteenList().then(res => {
-    contentData.loading = false
-    res.data.forEach((item, index) => {
-      if (item.cover) {
-        item.cover = BASE_URL + item.cover
-      }
-    })
-    console.log(res)
-    contentData.thingData = res.data
-    contentData.total = contentData.thingData.length
-    changePage(1)
-  }).catch(err => {
-    console.log(err)
-    contentData.loading = false
-  })
-}
-
-const getClassificationList = () => {
-  contentData.loading = true
-  listClassificationList().then(res => {
-    contentData.loading = false
-    res.data.forEach((item, index) => {
-      if (item.cover) {
-        item.cover = BASE_URL + item.cover
-      }
-    })
-    console.log(res)
-    contentData.thingData = res.data
-    contentData.total = contentData.thingData.length
-    changePage(1)
-  }).catch(err => {
-    contentData.loading = false
-  })
-}
-
-const getThingList = (data) => {
-  // console.log(data['username'])
-  contentData.loading = true
-  listThingList(data).then(res => {
-    contentData.loading = false
-    res.data.forEach((item, index) => {
-      if (item.cover) {
-        item.cover = BASE_URL + item.cover
-      }
-    })
-    console.log(res)
-    contentData.thingData = res.data
-    contentData.total = contentData.thingData.length
-    changePage(1)
-  }).catch(err => {
-    console.log(err)
-    contentData.loading = false
-  })
 }
 
 watch(
@@ -366,6 +276,7 @@ watch(
       selectTab();
     }
 );
+
 </script>
 
 <style scoped lang="less">

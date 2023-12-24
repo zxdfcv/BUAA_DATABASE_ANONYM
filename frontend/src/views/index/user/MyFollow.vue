@@ -49,16 +49,10 @@
 </template>
 
 <script setup>
-import {getCollectThingListApi, removeCollectUserApi} from '/@/api/index/thing'
-import {getCollectCounterListApi, removeCollectCounter} from '/@/api/index/classification'
-import {getCollectCanteenListApi, removeCollectCanteen} from '/@/api/index/canteen'
-import {BASE_URL} from "/@/store/constants";
-import {useAppStore, useUserStore} from "/@/store";
-import { StarOutlined, ShoppingCartOutlined, MessageOutlined } from '@ant-design/icons-vue';
-import {getCollectList, userDeleteFollowApi, userFollowersApi} from "/@/api/index/user";
-import {openNotification} from "/@/utils/notice";
+import { BASE_URL } from "/@/store/constants";
+import { useAppStore, useUserStore } from "/@/store";
+import { userDeleteFollowApi, userFollowersApi } from "/@/api/index/user";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
-import {Button} from "view-ui-plus";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -102,33 +96,14 @@ const deleteFollow = async (targetId) => {
   });
 }
 
-const refreshDelete = () => {
-  getCollectCounterList()
-}
 onMounted(async () => {
-  //getCollectThingList()
   if (useRoute().query.id) { /* TODO: 用戶不存在时会出现问题，需要判断跳转后用户不存在的逻辑，in wishThingView，可能需要 go(-1) */
   } else {
     router.push({name: 'scoreView', query: {id: userStore.user_id}});
   }
   await appStore.setViewId(useRoute().query.id.trim());
   await queryFollow();
-  //getCollectCanteenList()
 })
-
-const handleClickItem =(record) =>{
-  let text = router.resolve({name: 'detailCanteen', query: {id: record.id}})
-  window.open(text.href, '_blank')
-}
-const handleRemove =(record)=> {
-  let username = userStore.user_name
-  removeCollectCounter({username: username, classificationId: record.id}).then(res => {
-    message.success('移除成功')
-    getCollectCounterList()
-  }).catch(err => {
-    console.log(err)
-  })
-}
 
 const fillData = (list) => {
   var res = [];
@@ -151,67 +126,6 @@ const fillData = (list) => {
   return res;
 }
 
-const getCollectCounterList = async () => {
-  loading.value = true
-  getCollectList({}).then(res => {
-    const data = res.data;
-    if (res.code === 0) {
-      pageData.collectData = fillData(data);
-      console.log(pageData.collectData)
-    }
-    loading.value = false;
-  }).catch(err => {
-    openNotification({
-      type: 'error',
-      message: 'Oops!',
-      description: err.response.data.detail
-    })
-    loading.value = false;
-  });
-  // getCollectCounterListApi({username: username}).then(res => {
-  //   res.data.forEach(item => {
-  //     item.cover = BASE_URL + item.cover
-  //   })
-  //   console.log(res.data)
-  //   pageData.collectData = res.data
-  //   loading.value = false
-  // }).catch(err => {
-  //   console.log(err.msg)
-  //   loading.value = false
-  // })
-}
-// const getCollectCounterList =()=> {
-//   console.log("test")
-//   loading.value = true
-//   let username = userStore.user_name
-//   getCollectCounterListApi({username: username}).then(res => {
-//     res.data.forEach(item => {
-//       item.cover = BASE_URL + item.cover
-//     })
-//     console.log(res.data)
-//     pageData.collectData += res.data
-//     loading.value = false
-//   }).catch(err => {
-//     console.log(err.msg)
-//     loading.value = false
-//   })
-// }
-// const getCollectCanteenList =()=> {
-//   console.log("test")
-//   loading.value = true
-//   let username = userStore.user_name
-//   getCollectCanteenListApi({username: username}).then(res => {
-//     res.data.forEach(item => {
-//       item.cover = BASE_URL + item.cover
-//     })
-//     console.log(res.data)
-//     pageData.collectData += res.data
-//     loading.value = false
-//   }).catch(err => {
-//     console.log(err.msg)
-//     loading.value = false
-//   })
-// }
 </script>
 <style scoped lang="less">
 .flex-view {

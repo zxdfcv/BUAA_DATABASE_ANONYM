@@ -37,12 +37,10 @@
 </template>
 
 <script setup>
-import {listApi as listThingList} from '/@/api/index/thing'
-import {BASE_URL} from "/@/store/constants";
-import {useAppStore, useUserStore} from "/@/store";
-import PlayIcon from '/@/assets/images/Play.png'
+import { BASE_URL } from "/@/store/constants";
+import { useAppStore, useUserStore } from "/@/store";
 import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
-import {getProductList} from "/@/api/index/product";
+import { getProductList } from "/@/api/index/product";
 
 const userStore = useUserStore()
 const router = useRouter();
@@ -128,28 +126,6 @@ const search = () => {
 const changePage = (page) => {
   tData.page = page;
   search();
-}
-const handleDetail = (item) => {
-  // 跳转新页面
-  let text = router.resolve({name: 'detail', query: {id: item.id}})
-  window.open(text.href, '_blank')
-}
-const getThingList = (data) => {
-  tData.loading = true
-  listThingList(data).then(res => {
-    res.data.forEach((item, index) => {
-      if (item.cover) {
-        item.cover = BASE_URL + item.cover
-      }
-    })
-    tData.thingData = res.data
-    tData.total = tData.thingData.length
-    changePage(1)
-    tData.loading = false
-  }).catch(err => {
-    console.log(err)
-    tData.loading = false
-  })
 }
 
 </script>

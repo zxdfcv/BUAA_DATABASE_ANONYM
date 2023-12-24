@@ -1,4 +1,4 @@
-import {get, post, put, deletes} from '/@/utils/http/axios';
+import { deletes, get, post, put } from "/@/utils/http/axios";
 
 enum URL {
     list = '/myapp/admin/notice/list',

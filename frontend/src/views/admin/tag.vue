@@ -67,11 +67,11 @@
 </template>
 
 <script setup lang="ts">
-  import { FormInstance, message } from 'ant-design-vue';
-  import { createApi, listApi, updateApi, deleteApi } from '/@/api/admin/tag';
+import { FormInstance, message } from "ant-design-vue";
+import { createApi, deleteApi, listApi, updateApi } from "/@/api/admin/tag";
 
 
-  const columns = reactive([
+const columns = reactive([
     {
       title: '序号',
       dataIndex: 'id',

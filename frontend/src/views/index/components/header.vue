@@ -61,65 +61,19 @@
       <div class="right-icon" v-if="userStore.user_access">
         <NoticeCenter />
       </div>
-      <div>
-        <a-drawer
-            title="我的消息"
-            placement="right"
-            :closable="true"
-            :maskClosable="true"
-            :visible="msgVisible"
-            @close="onClose"
-        >
-          <a-spin :spinning="loading" style="min-height: 200px;">
-            <div class="list-content">
-              <div class="notification-view">
-                <div class="list">
-                  <div class="notification-item flex-view" v-for="item in msgData">
-                    <!---->
-                    <div class="content-box">
-                      <div class="header">
-                        <span v-if="item.title!==undefined" class="title-txt">
-                          {{ item.title }}
-                          <Button shape="circle"  @click="setReadState(item.id)">标为已读</Button>
-                        </span>
-                        <span v-else-if="item.canteen_title!==undefined" class="title-txt">
-                          {{ item.canteen_title }}
-                          <Button shape="circle"  @click="setReadState(item.id)">标为已读</Button>
-                        </span>
-                        <span v-else class="title-txt">
-                          {{ item.classification_title }}
-                          <Button shape="circle"  @click="setReadState(item.id)">标为已读</Button>
-                        </span>
-                        <br/>
-                        <span class="time">{{ item.create_time }}</span>
-                      </div>
-                      <div class="head-text">
-                      </div>
-                      <div class="content">
-                        <p>{{ item.content }}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </a-spin>
-        </a-drawer>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { UserOutlined, WalletOutlined, LogoutOutlined } from '@ant-design/icons-vue';
+import { LogoutOutlined, UserOutlined, WalletOutlined } from "@ant-design/icons-vue";
 
-import {listReceiveCommentsApi, SetStateToReadedApi} from '/@/api/index/comment'
-import { useUserStore, useAppStore } from "/@/store";
-import logoImage from '/@/assets/images/logo_b.png';
-import SearchIcon from '/@/assets/images/search-icon.svg';
-import AvatarIcon from '/@/assets/images/avatar.jpg';
-import MessageIcon from '/@/assets/images/message-icon.svg';
-import {BASE_URL} from "/@/store/constants";
+import { listReceiveCommentsApi } from "/@/api/index/comment";
+import { useAppStore, useUserStore } from "/@/store";
+import logoImage from "/@/assets/images/logo_b.png";
+import SearchIcon from "/@/assets/images/search-icon.svg";
+import AvatarIcon from "/@/assets/images/avatar.jpg";
+import { BASE_URL } from "/@/store/constants";
 import NoticeCenter from "/@/views/index/components/NoticeCenter.vue";
 
 const router = useRouter();
@@ -168,38 +122,17 @@ const search = () => {
     return;
   }
   router.push({name: 'search', query: {keyword: keyword}});
-  // if (route.name === 'search') {
-    
-  // } else {
-  //   let text = router.resolve({name: 'search', query: {keyword: keyword}})
-  //   window.open(text.href, '_blank')
-  // }
 }
+
 const goLogin = () => {
   router.push({name: 'login'})
 }
 
-const goUserCenter = (menuName) => {
-  router.push({name: menuName})
-}
 const quit = () => {
   userStore.logout().then(res => {
     router.push({name: 'portal'})
   })
 }
-const onClose = () => {
-  msgVisible.value = false;
-}
-
-const setReadState = (id) => {
-  SetStateToReadedApi({ids:id}).then(res => {
-    console.log("设置已阅状态成功")
-    getMessageList()
-  }).catch(err => {
-    console.log(err)
-  })
-}
-
 
 const checkMessageList = () => {
   if (msgData == undefined || msgData.value.length <= 0) {
@@ -211,16 +144,6 @@ const checkMessageList = () => {
   }
 }
 
-
-const UpdateState = () => {
-  if (HasNewMessage.value == true) {
-    HasNewMessage.value = false
-  } else {
-    HasNewMessage.value = true
-  }
-  pointKey += 1
-  console.log(pointKey)
-}
 </script>
 
 <style scoped lang="less">

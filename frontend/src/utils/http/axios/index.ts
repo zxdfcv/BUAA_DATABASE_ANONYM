@@ -1,8 +1,8 @@
-import axios from 'axios';
-import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { IResponse } from './type';
-import { BASE_URL, EXPIRE_MINUTE } from '/@/store/constants'
-import { useUserStore } from '/@/store';
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios from "axios";
+import { IResponse } from "./type";
+import { BASE_URL, EXPIRE_MINUTE } from "/@/store/constants";
+import { useUserStore } from "/@/store";
 
 let waiting = [] as any;
 let getting = false;

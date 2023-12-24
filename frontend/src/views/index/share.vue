@@ -12,35 +12,13 @@
 	</div>
   </template>
   <script setup>
-  import {message} from "ant-design-vue";
-  import Header from '/@/views/index/components/header.vue'
-  import Footer from '/@/views/index/components/footer.vue'
-  import AddIcon from '/@/assets/images/add.svg';
-  import WantIcon from '/@/assets/images/want-read-hover.svg';
-  import RecommendIcon from '/@/assets/images/recommend-hover.svg';
-  import ShareIcon from '/@/assets/images/share-icon.svg';
-  import WeiboShareIcon from '/@/assets/images/wb-share.svg';
-  import AvatarIcon from '/@/assets/images/avatar.jpg';
-  import PlayIcon from '/@/assets/images/Play.png'
-  
-  import {
-	detailApi as thingDetailApi,
-	listApi as listThingList
-  } from '/@/api/index/thing'
-  import {listThingCommentsApi, createApi as createCommentApi, likeApi} from '/@/api/index/comment'
-  import {addWishUserApi} from '/@/api/index/thing'
-  import {addCollectUserApi} from '/@/api/index/thing'
-  import {BASE_URL} from "/@/store/constants";
-  import {useRoute, useRouter} from "vue-router/dist/vue-router";
-  import {useUserStore} from "/@/store";
-  import {getFormatTime} from "/@/utils";
-  import emoji from '/@/assets/emoji'
-  import { VueElement, reactive } from 'vue'
-  import { UToast, createObjectURL } from 'undraw-ui'
-  import { convertLegacyProps } from "ant-design-vue/es/button/buttonTypes";
-  import {addCollectCanteen, detailApi as canteenDetailApi} from '/@/api/index/canteen'
-  import {addCollectCounter, detailApi as counterDetailApi} from '/@/api/index/classification'
-  
+  import Header from "/@/views/index/components/header.vue";
+  import Footer from "/@/views/index/components/footer.vue";
+  import { useRoute, useRouter } from "vue-router/dist/vue-router";
+  import { useUserStore } from "/@/store";
+  import { reactive, ref } from "vue";
+  import QrcodeVue from "qrcode.vue";
+
   const router = useRouter()
   const route = useRoute()
   const userStore = useUserStore();
@@ -329,10 +307,7 @@
 // 	order.value = sortType
 // 	getCommentList()
 //   }
-  
-import { ref } from 'vue'
-import QrcodeVue from 'qrcode.vue'
-// import {useRoute} from "vue-router/dist/vue-router";
+  // import {useRoute} from "vue-router/dist/vue-router";
 // const route = useRoute()
 let content = window.location.href.slice(0,window.location.href.indexOf('index')) + "index/"
 if (route.query.type=='thing') {

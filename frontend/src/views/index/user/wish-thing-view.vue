@@ -28,14 +28,10 @@
 </template>
 
 <script setup>
-import {message} from 'ant-design-vue';
-import {getCollectThingListApi, removeCollectUserApi} from '/@/api/index/thing'
-import {getCollectCounterListApi, removeCollectCounter} from '/@/api/index/classification'
-import {getCollectCanteenListApi, removeCollectCanteen} from '/@/api/index/canteen'
-import {BASE_URL} from "/@/store/constants";
-import {useAppStore, useUserStore} from "/@/store";
-import {openNotification} from "/@/utils/notice";
-import {getProductList} from "/@/api/index/product";
+import { BASE_URL } from "/@/store/constants";
+import { useAppStore, useUserStore } from "/@/store";
+import { openNotification } from "/@/utils/notice";
+import { getProductList } from "/@/api/index/product";
 import ShopItemCard from "/@/views/index/components/ShopItemCard.vue";
 
 const router = useRouter();
@@ -76,9 +72,6 @@ onMounted(() => {
   }
   appStore.setViewId(useRoute().query.id);
   getProduct();
-  //getCollectThingList()
-  //getCollectCounterList()
-  // getCollectCanteenList()
 })
 
 const getProduct = async () => {
@@ -99,66 +92,7 @@ const getProduct = async () => {
     loading.value = false;
   });
 }
-const handleClickItem =(record) =>{
-  let text = router.resolve({name: 'detailCanteen', query: {id: record.id}})
-  window.open(text.href, '_blank')
-}
-const handleRemove =(record)=> {
-  let username = userStore.user_name
-  removeCollectCanteen({username: username, canteenId: record.id}).then(res => {
-    message.success('移除成功')
-    getCollectCanteenList()
-  }).catch(err => {
-    console.log(err)
-  })
-}
-const getCollectCanteenList =()=> {
-  loading.value = true
-  let username = userStore.user_name
-  getCollectCanteenListApi({username: username}).then(res => {
-    res.data.forEach(item => {
-      item.cover = BASE_URL + item.cover
-    })
-    console.log(res.data)
-    pageData.collectData = res.data
-    loading.value = false
-  }).catch(err => {
-    console.log(err.msg)
-    loading.value = false
-  })
-}
-// const getCollectCounterList =()=> {
-//   console.log("test")
-//   loading.value = true
-//   let username = userStore.user_name
-//   getCollectCounterListApi({username: username}).then(res => {
-//     res.data.forEach(item => {
-//       item.cover = BASE_URL + item.cover
-//     })
-//     console.log(res.data)
-//     pageData.collectData += res.data
-//     loading.value = false
-//   }).catch(err => {
-//     console.log(err.msg)
-//     loading.value = false
-//   })
-// }
-// const getCollectCanteenList =()=> {
-//   console.log("test")
-//   loading.value = true
-//   let username = userStore.user_name
-//   getCollectCanteenListApi({username: username}).then(res => {
-//     res.data.forEach(item => {
-//       item.cover = BASE_URL + item.cover
-//     })
-//     console.log(res.data)
-//     pageData.collectData += res.data
-//     loading.value = false
-//   }).catch(err => {
-//     console.log(err.msg)
-//     loading.value = false
-//   })
-// }
+
 </script>
 
 <style scoped lang="less">
