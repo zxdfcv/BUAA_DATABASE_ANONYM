@@ -88,24 +88,54 @@ def delete_old_file(instance, file_field):
 
 @receiver(pre_save, sender=User)
 def delete_old_user_avatar(sender, instance, **kwargs):
-    delete_old_file(instance, 'avatar')
+    # 检查数据库中是否存在匹配的记录
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+
+    delete_old_file(old_instance, 'avatar')
 
 
 @receiver(pre_save, sender=Classification1)
 def delete_old_c1_image(sender, instance, **kwargs):
-    delete_old_file(instance, 'image')
+    # 检查数据库中是否存在匹配的记录
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+
+    delete_old_file(old_instance, 'image')
 
 
 @receiver(pre_save, sender=Classification2)
 def delete_old_c2_image(sender, instance, **kwargs):
-    delete_old_file(instance, 'image')
+    # 检查数据库中是否存在匹配的记录
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+
+    delete_old_file(old_instance, 'image')
 
 
 @receiver(pre_save, sender=Product)
 def delete_old_product_video(sender, instance, **kwargs):
-    delete_old_file(instance, 'video')
+    # 检查数据库中是否存在匹配的记录
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+
+    delete_old_file(old_instance, 'video')
 
 
 @receiver(pre_save, sender=Chat)
 def delete_old_chat_image(sender, instance, **kwargs):
-    delete_old_file(instance, 'image')
+    # 检查数据库中是否存在匹配的记录
+    try:
+        old_instance = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+
+    delete_old_file(old_instance, 'image')
