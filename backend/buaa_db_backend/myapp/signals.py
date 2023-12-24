@@ -1,9 +1,10 @@
-from django.db.models.signals import post_delete
+from django.core.files.storage import default_storage
+from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
 from django.conf import settings
 import os
 
-from .models import ProductImage, Product, Classification1, Classification2, Chat
+from .models import ProductImage, Product, Classification1, Classification2, Chat, User
 
 
 @receiver(post_delete, sender=Classification1)
@@ -71,4 +72,40 @@ def delete_chat_image(sender, instance, **kwargs):
             print(f"PermissionError: {e}")
 
 
+def delete_old_file(instance, file_field):
+    # 获取旧文件路径
+    old_instance = instance.__class__.objects.get(pk=instance.pk)
+    old_file_path = getattr(old_instance, file_field).path if getattr(old_instance, file_field) else None
 
+    if old_file_path:
+        try:
+            # 删除旧文件
+            if default_storage.exists(old_file_path):
+                default_storage.delete(old_file_path)
+        except Exception as e:
+            print(f"Error deleting old file: {e}")
+
+
+@receiver(pre_save, sender=User)
+def delete_old_user_avatar(sender, instance, **kwargs):
+    delete_old_file(instance, 'avatar')
+
+
+@receiver(pre_save, sender=Classification1)
+def delete_old_c1_image(sender, instance, **kwargs):
+    delete_old_file(instance, 'image')
+
+
+@receiver(pre_save, sender=Classification2)
+def delete_old_c2_image(sender, instance, **kwargs):
+    delete_old_file(instance, 'image')
+
+
+@receiver(pre_save, sender=Product)
+def delete_old_product_video(sender, instance, **kwargs):
+    delete_old_file(instance, 'video')
+
+
+@receiver(pre_save, sender=Chat)
+def delete_old_chat_image(sender, instance, **kwargs):
+    delete_old_file(instance, 'image')
