@@ -3,7 +3,7 @@
     
     <!-- 聊天区域 -->
     <div
-      v-if="socketStore.sessionSelectId !== -1"
+      v-if="socketStore.sessionSelectId !== -1 && socketStore.chat_list.length !== 0"
     >
       <!-- 聊天头部 -->
       <header class="text-left px-20px h-35px" style="font-size: 20px; height: 35px; text-align: left; margin-top: 5px;">
@@ -13,6 +13,7 @@
         <a-button
           @click="router.push({name: 'purchase', query: {product: chatNow.product}});"
           type="primary"
+          v-if="showBuy"
         style="margin-top: -5px; margin-left: 20px;">购买商品</a-button>
         <a-divider />
       </header>
@@ -72,10 +73,12 @@ import ChatFoot from "/@/views/index/components/chat/ChatFoot.vue";
 import { BASE_URL } from "/@/store/constants";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
 import router from "/@/router";
+import { getProductDetail } from "/@/api/index/product";
 
 const userStore = useUserStore();
 const socketStore = useWebSocketStore();
 const chatScrollbar = ref(null)
+const showBuy = ref(false);
 
 onMounted(() => {
   nextTick(() => {
@@ -103,6 +106,7 @@ const conversationList = computed(() => {
 });
 
 const chatNow = computed(() => {
+  buyable(socketStore.chat_list[socketStore.sessionSelectId].product);
   return socketStore.chat_list[socketStore.sessionSelectId];
 })
 
@@ -137,6 +141,17 @@ function readySend() {
   // }
   // socketStore.toBottom()
   // socketStore.changeReaded(socketStore.readyRecipient.id)
+}
+
+const buyable = async (product) => {
+  const merchant = await queryMerchant(product);
+  console.log(merchant !== userStore.user_id);
+  showBuy.value = merchant !== userStore.user_id;
+}
+
+const queryMerchant = async (product) => {
+  const res = await getProductDetail({product_id: product})
+  return res.data.merchant;
 }
 </script>
 

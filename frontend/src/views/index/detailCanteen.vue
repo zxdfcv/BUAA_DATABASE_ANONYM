@@ -510,7 +510,7 @@ const share = () => {
   z-index: 0;
   width: 100%;
   min-height: 100vh;
-  background: url("https://s1.ax1x.com/2023/07/30/pPp2re1.jpg") center center no-repeat;
+  background: #dae6f9;
   background-size: 100% 100%;
   position: absolute; //绝对定位
 }

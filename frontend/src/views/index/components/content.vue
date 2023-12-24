@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="content">
-      <a-card style="width:100%; height: 100%">
+      <a-card style="width:100%; height: fit-content">
         <Row>
           <Col span="5">
             <div class="content-left">

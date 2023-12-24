@@ -2,35 +2,35 @@
   <a-spin :spinning="loading">
     <el-card :bordered="false" shadow="hover" style="top: 5%; left: auto; background-color: #f9f9f9; height: auto">
       <div style="text-align: left;font-size: 14px;margin-bottom: 30px">
-        <b>BUAA Salty Fish Platform</b>
+        <b>北航二手交易平台</b>
       </div>
       <div class="login">
         <a-form @submit.prevent="doRegister" :rules="rules" :model="formState" class="register-form sign-up-form">
-          <a-form-item label="Username" name="username"
+          <a-form-item label="用户名" name="username"
             :rules="[{ required: true, message: 'Please input username' }, { min: 5, max: 15, message: '长度需要介于 5~15 个字符' }]">
             <a-input v-model:value="formState.username" autocomplete="off" />
           </a-form-item>
 
-          <a-form-item label="Password" name="password"
+          <a-form-item label="密码" name="password"
             :rules="[{ required: true, message: 'Please input password' }, { min: 6, max: 16, message: '长度需要介于 6~16 个字符' }, { validator: handlePassword }]">
             <a-input-password v-model:value="formState.password" autocomplete="off" />
           </a-form-item>
-          <a-form-item label="Repeat Password" name="confirm_password"
+          <a-form-item label="重复密码" name="confirm_password"
             :rules="[{ required: true, message: 'Please repeat password' }, { min: 6, max: 16, message: '长度需要介于 6~16 个字符' }, { validator: handlePasswordCheck }]">
             <a-input-password v-model:value="formState.confirm_password" autocomplete="off" />
           </a-form-item>
-          <a-form-item label="Email" name="email" :rules="[{ required: true, message: 'Please input email' }, {
+          <a-form-item label="注册邮箱" name="email" :rules="[{ required: true, message: 'Please input email' }, {
             pattern: /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/,
             message: '无效的邮箱格式'
           }]">
-            <a-input-password v-model:value="formState.email" autocomplete="off" />
+            <a-input v-model:value="formState.email" autocomplete="off" />
           </a-form-item>
           <a-row :gutter="10" justify="start">
 
             <a-col class="gutter-row" :span="8" @click="refreshIdentifyCode">
               <s-identify :identifyCode="identifyCode"></s-identify>
             </a-col>
-            <p style="margin-top: 5px">verifyCode:</p>
+            <p style="margin-top: 5px">验证码:</p>
             <a-col class="gutter-row" :span="4" :offset="1">
               <a-input v-model:value="identifyCodeCheck"></a-input>
             </a-col>
@@ -38,11 +38,11 @@
           <a-form-item>
             <a-button :loading="loading" style="width: 100%; margin-top: 4px" size="large" htmlType="submit"
               type="primary">
-              Register now
+              注册
             </a-button>
           </a-form-item>
           <div style="float: right">
-            Have an account? <a @click="$emit('toLogin')">Login here</a>
+            已有账号？ <a @click="$emit('toLogin')">去登陆</a>
           </div>
         </a-form>
       </div>
@@ -150,7 +150,7 @@ const doRegister = () => {
     openNotification({
       type: 'error',
       message: 'Oops!',
-      description: err.msg
+      description: err.response.data.msg
     });
   });
 }

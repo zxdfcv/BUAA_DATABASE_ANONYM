@@ -25,20 +25,20 @@
     <div class="panels-container">
       <div class="panel left-panel">
         <div class="content">
-          <h3 style="color: #fff">BUAA Salty Fish Platform</h3>
-          <p>只因你太美</p>
+          <h3 style="color: #fff">北航二手交易平台</h3>
+          <p>欢迎使用</p>
           <button @click="signUpMode = !signUpMode" class="btn transparent">
-            注册
+            去注册
           </button>
         </div>
         <!-- <img src="@/assets" alt=""> -->
       </div>
       <div class="panel right-panel">
         <div class="content">
-          <h3 style="color: #fff">Merrily,merrily,merrily,merrily,</h3>
-          <p>Life is but a dream</p>
+          <h3 style="color: #fff">北航二手交易平台</h3>
+          <p>开始使用</p>
           <button @click="signUpMode = !signUpMode" class="btn transparent">
-            登录
+            去登录
           </button>
         </div>
         <!-- <img src="@/assets" alt=""> -->
@@ -241,7 +241,7 @@ watch(signUpMode, () => {
 
 .right-panel .image,
 .right-panel .content {
-  transform: translateX(800px);
+  transform: translateX(1200px);
 }
 
 /* ANIMATION */
@@ -253,7 +253,7 @@ watch(signUpMode, () => {
 
 .container.sign-up-mode .left-panel .image,
 .container.sign-up-mode .left-panel .content {
-  transform: translateX(-800px);
+  transform: translateX(-1200px);
 }
 
 .container.sign-up-mode .signin-signup {

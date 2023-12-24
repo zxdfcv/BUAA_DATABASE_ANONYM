@@ -49,15 +49,13 @@
                         </div>
                         <div class="count-item flex-view pointer" @click="raiseChat">
                           <div class="count-img">
-                            <img :src="Like_on" v-if="detailData.isWanted === true">
-                            <img :src="Like_off" v-else>
+                            <img :src="Like_off" >
                           </div>
                           <div class="count-box flex-view">
                             <div class="count-text-box">
                               <span class="count-title">我想要</span> <!-- TODO: 添加按钮跳转到 socket 聊天室 -->
                             </div>
                             <div class="count-num-box" style="margin-right: 35px">
-                              <span class="num-text">{{ detailData.wish_count }}</span>
                             </div>
                           </div>
                         </div>
@@ -127,6 +125,9 @@
                             </a-descriptions-item>
                             <a-descriptions-item label="发布时间">
                               <div>{{ detailData.createTime }}</div>
+                            </a-descriptions-item>
+                            <a-descriptions-item label="商品价格">
+                              <div>{{ detailData.price }} 元</div>
                             </a-descriptions-item>
                             <a-descriptions-item label="在售状态" v-if="detailData.is_sold || detailData.off_shelve">
                               <div>
@@ -459,6 +460,7 @@ const getPostDetail = async () => {
     detailData.value["createTime"] = res.data.create_time;
     detailData.value['addr'] = res.data.addr;
     detailData.value['status'] = res.data.status;
+    detailData.value['price'] = res.data.price;
   }).catch(err => {
     openNotification({
       type: 'error',
@@ -871,7 +873,7 @@ const sortCommentList = (sortType) => {
   z-index: 0;
   width: 100%;
   min-height: 100vh;
-  background: url("https://s1.ax1x.com/2023/07/30/pPp2re1.jpg") center center no-repeat;
+  background: #dae6f9;
   background-size: 100% 100%;
   position: absolute; //绝对定位
 }
