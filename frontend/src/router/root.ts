@@ -8,17 +8,12 @@ const constantRouterMap = [
   {
     path: '/index',
     name: 'index',
-    redirect: '/welcome',
+    redirect: '/portal',
   },
   {
     path: '/login',
     name: 'login',
     component: () => import('/@/views/index/login.vue')
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: () => import('/@/views/index/register.vue')
   },
   {
     path: '/portal',
@@ -39,16 +34,6 @@ const constantRouterMap = [
     path: '/purchase',
     name: 'purchase',
     component: () => import('/@/views/index/purchase.vue')
-  },
-  {
-    path: '/detailCanteen',
-    name: 'detailCanteen',
-    component: () => import('/@/views/index/detailCanteen.vue')
-  },
-  {
-    path: '/detailCounter',
-    name: 'detailCounter',
-    component: () => import('/@/views/index/detailCounter.vue')
   },
   {
     path: '/search',
@@ -72,11 +57,6 @@ const constantRouterMap = [
     component: () => import('/@/views/index/usercenter.vue'),
     children: [
       {
-        path: 'addressView',
-        name: 'addressView',
-        component: () => import('/@/views/index/user/address-view.vue')
-      },
-      {
         path: 'wishThingView',
         name: 'wishThingView',
         component: () => import('/@/views/index/user/wish-thing-view.vue')
@@ -85,11 +65,6 @@ const constantRouterMap = [
         path: 'thingHistory',
         name: 'thingHistory',
         component: () => import('/@/views/index/user/thingHistory.vue')
-      },
-      {
-        path: 'collectThingView',
-        name: 'collectThingView',
-        component: () => import('/@/views/index/user/collect-thing-view.vue')
       },
       {
         path: 'userInfoEditView',
@@ -105,21 +80,6 @@ const constantRouterMap = [
         path: 'commentView',
         name: 'commentView',
         component: () => import('/@/views/index/user/comment-view.vue')
-      },
-      {
-        path: 'securityView',
-        name: 'securityView',
-        component: () => import('/@/views/index/user/security-view.vue')
-      },
-      {
-        path: 'pushView',
-        name: 'pushView',
-        component: () => import('/@/views/index/user/push-view.vue')
-      },
-      {
-        path: 'messageView',
-        name: 'messageView',
-        component: () => import('/@/views/index/user/message-view.vue')
       },
       {
         path: 'myFollow',

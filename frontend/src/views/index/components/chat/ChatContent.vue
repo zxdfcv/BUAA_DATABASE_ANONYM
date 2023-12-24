@@ -67,8 +67,8 @@
 </template>
 
 <script setup>
-import { formatTime } from "/@/utils/myTimeFormat"
-import {useUserStore, useWebSocketStore} from "/@/store";
+import { formatTime } from "/@/utils/myTimeFormat";
+import { useUserStore, useWebSocketStore } from "/@/store";
 import ChatFoot from "/@/views/index/components/chat/ChatFoot.vue";
 import { BASE_URL } from "/@/store/constants";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
@@ -123,25 +123,6 @@ const renderMessageDate = computed(() => {
   onUnmounted(() => {
     socketStore.sessionSelectId = -1;
   })
-// 发送消息
-function readySend() {
-  // socketStore.sessionSelectId = socketStore.readyRecipient.id
-  // socketStore.recipient = socketStore.readyRecipient
-  // socketStore.navId = '1'
-  // socketStore.initEditor()
-  // let len =
-  //   socketStore.sessionList.filter((x: any) => x.id == socketStore.readyRecipient?.id)
-  //     ?.length ?? 0
-  // if (!len) {
-  //   socketStore.sessionList.push(socketStore.readyRecipient)
-  //   let query = {
-  //     recipient: socketStore.readyRecipient
-  //   }
-  //   socketStore.socket.emit("insertHistorySession", query)
-  // }
-  // socketStore.toBottom()
-  // socketStore.changeReaded(socketStore.readyRecipient.id)
-}
 
 const buyable = async (product) => {
   const merchant = await queryMerchant(product);

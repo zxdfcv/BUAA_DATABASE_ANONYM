@@ -35,8 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { FormInstance, message } from 'ant-design-vue';
-import { listErrorLogListApi } from '/@/api/admin/log';
+import { listErrorLogListApi } from "/@/api/admin/log";
 
 
 const columns = reactive([

@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import {sysInfoApi} from '/@/api/admin/overview'
+import { sysInfoApi } from "/@/api/admin/overview";
 
 export default {
   data () {

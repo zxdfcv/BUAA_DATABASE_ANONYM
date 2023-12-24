@@ -44,12 +44,11 @@
 
 <script setup>
 import { useUserStore, useWebSocketStore } from "/@/store";
-  import { CloudUploadOutlined } from '@ant-design/icons-vue';
-  import Emoji from "/@/assets/images/emoji.svg";
-  import { openNotification } from "/@/utils/notice";
-  import { sendChatMessageApi } from "/@/api/index/notice";
+import { CloudUploadOutlined } from "@ant-design/icons-vue";
+import { openNotification } from "/@/utils/notice";
+import { sendChatMessageApi } from "/@/api/index/notice";
 
-  const store = useWebSocketStore()
+const store = useWebSocketStore()
   const userStore = useUserStore();
   const editor = ref("")
 

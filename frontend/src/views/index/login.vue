@@ -48,8 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import {useUserStore} from '/@/store';
-import {message} from "ant-design-vue";
+import { useUserStore } from "/@/store";
 
 import LoginView from "/@/views/index/components/login/LoginView.vue";
 import RegisterView from "/@/views/index/components/login/RegisterView.vue";

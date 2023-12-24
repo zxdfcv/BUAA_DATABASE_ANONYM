@@ -1,4 +1,4 @@
-import {deletes, get, post, put} from '/@/utils/http/axios';
+import { deletes, get, post, put } from "/@/utils/http/axios";
 
 enum URL {
     createComment = '/myapp/comment/create',

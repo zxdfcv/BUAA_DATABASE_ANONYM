@@ -44,12 +44,12 @@
 </template>
 
 <script setup>
-import {useUserStore, useWebSocketStore} from "/@/store";
-import {BASE_URL} from "/@/store/constants";
+import { useUserStore, useWebSocketStore } from "/@/store";
+import { BASE_URL } from "/@/store/constants";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
 import router from "/@/router";
 
-  const socketStore = useWebSocketStore();
+const socketStore = useWebSocketStore();
   const userStore = useUserStore();
 
 
@@ -59,11 +59,7 @@ import router from "/@/router";
   // 选择聊天用户
   const selectSession = (item, index) => {
     socketStore.sessionSelectId = index
-    // socketStore.recipient = item
     socketStore.fillMessage();
-    // socketStore.initEditor()
-    // socketStore.toBottom()
-
   }
 </script>
 

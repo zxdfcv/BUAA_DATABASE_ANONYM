@@ -225,16 +225,16 @@
 </template>
 
 <script setup lang="ts">
-import {FormInstance, message, SelectProps, Upload, UploadProps} from 'ant-design-vue';
-import {createApi, listApi, updateApi, deleteApi} from '/@/api/admin/product';
-import {listApi as listClassification1Api} from '/@/api/admin/classification1'
-import {listApi as listClassification2Api} from '/@/api/admin/classification2'
-import {listApi as listTagApi} from '/@/api/admin/tag'
-import {BASE_URL} from "/@/store/constants";
-import {FileImageOutlined, VideoCameraOutlined} from '@ant-design/icons-vue';
-import {useAppStore, useUserStore} from "/@/store";
-import {exportCsv} from "/@/utils/exportCsv";
-import {listApi as listUserApi} from "/@/api/admin/user";
+import { FormInstance, message, Upload, UploadProps } from "ant-design-vue";
+import { createApi, deleteApi, listApi, updateApi } from "/@/api/admin/product";
+import { listApi as listClassification1Api } from "/@/api/admin/classification1";
+import { listApi as listClassification2Api } from "/@/api/admin/classification2";
+import { listApi as listTagApi } from "/@/api/admin/tag";
+import { BASE_URL } from "/@/store/constants";
+import { FileImageOutlined, VideoCameraOutlined } from "@ant-design/icons-vue";
+import { useAppStore, useUserStore } from "/@/store";
+import { exportCsv } from "/@/utils/exportCsv";
+import { listApi as listUserApi } from "/@/api/admin/user";
 
 const userStore = useUserStore()
 const appStore = useAppStore()

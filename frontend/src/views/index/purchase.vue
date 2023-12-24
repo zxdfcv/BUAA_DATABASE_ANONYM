@@ -39,16 +39,15 @@
 </template>
 
 <script setup>
-import Header from '/@/views/index/components/header.vue'
-import {cancelOrderApi, createOrderApi, getOrderListApi, payOrderApi} from "/@/api/index/order";
-import {useRoute} from "vue-router";
-import {openNotification} from "/@/utils/notice";
+import Header from "/@/views/index/components/header.vue";
+import { cancelOrderApi, createOrderApi, getOrderListApi, payOrderApi } from "/@/api/index/order";
+import { useRoute } from "vue-router";
+import { openNotification } from "/@/utils/notice";
 import router from "/@/router";
-import {useUserStore} from "/@/store";
-import {getProductDetail} from "/@/api/index/product";
-import {BASE_URL} from "/@/store/constants";
-import {getCollectList} from "/@/api/index/user";
-import {getFormatTime} from "/@/utils";
+import { useUserStore } from "/@/store";
+import { getProductDetail } from "/@/api/index/product";
+import { BASE_URL } from "/@/store/constants";
+import { getFormatTime } from "/@/utils";
 
 const route = useRoute();
 const current = ref(0);

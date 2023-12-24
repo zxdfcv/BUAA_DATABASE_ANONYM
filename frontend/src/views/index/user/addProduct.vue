@@ -154,18 +154,9 @@
 </template>
 
 <script setup>
-import {message} from "ant-design-vue";
-import {
-  userDetailApi,
-  userUpdateApi,
-  userPasswordApi,
-  userDeleteApi
-} from '/@/api/index/user'
-import {BASE_URL, USER_AVATAR} from "/@/store/constants";
-import {useAppStore, useUserStore} from "/@/store";
-import AvatarIcon from '/@/assets/images/avatar.jpg'
-import {openNotification} from "/@/utils/notice";
-import {addProduct, getProductDetail, updateProduct} from "/@/api/index/product";
+import { useAppStore, useUserStore } from "/@/store";
+import { openNotification } from "/@/utils/notice";
+import { addProduct, getProductDetail, updateProduct } from "/@/api/index/product";
 // console.log("visit id=", useRoute().query.id.trim())
 const props = defineProps(['modify', 'mid']);
 const emits = defineEmits(['close'])
@@ -271,24 +262,6 @@ const removeVideo = () => {
   return true;
 }
 
-const getUserInfo = () => {
-  loading.value = true
-  let userId = userStore.user_id
-  userDetailApi({user_id: userId}).then(res => {
-    tData.form = res.data
-    console.log(tData.form)
-    if (tData.form.avatar) {
-      userStore.user_avatar = tData.form.avatar
-      tData.form.avatar = BASE_URL  + tData.form.avatar
-      appStore.view_user_avatar = tData.form.avatar
-      localStorage.setItem(USER_AVATAR, userStore.user_avatar)
-    }
-    loading.value = false
-  }).catch(err => {
-    console.log(err)
-    loading.value = false
-  })
-}
 const submit = () => {
   let submitForm = new FormData();
   console.log(tData.form)
@@ -416,49 +389,6 @@ const refillData = (data) => {
   tData.form.description = (data.description === null || data.description === undefined || data.description === "null") ? "" : data.description;
 }
 
-const modifyPassword = () => {
-  if (!(password.old) || !(password.new1) || !(password.new2)) {
-    openNotification({
-      type: 'error',
-      message: '修改密码失败',
-      description: '请输入字段！'
-    })
-  } else if (password.new1 !== password.new2) {
-    openNotification({
-      type: 'error',
-      message: '修改密码失败',
-      description: '两次输入的密码不一致！'
-    })
-  } else {
-    userPasswordApi({user_id: userStore.user_id}, {old_password: password.old, new_password1: password.new1, new_password2: password.new2}).then(res => {
-      console.log(res)
-      openNotification({
-        type: 'success',
-        message: '修改密码成功！',
-        description: res.msg
-      });
-        }
-    ).catch(err => {
-      console.log(err)
-      let loger = '';
-      if (err.response.data.data.old_password) {
-        loger = err.response.data.data.old_password[0];
-      } else if (err.response.data.data.new_password1) {
-        loger = err.response.data.data.new_password1[0];
-      } else if (err.response.data.data.new_password2) {
-        loger = err.response.data.data.new_password2[0];
-        console.log(loger)
-      } else {
-        loger = err.response.data.detail;
-      }
-      openNotification({
-        type: 'error',
-        message: '修改密码失败',
-        description: loger
-      });
-    })
-  }
-}
 </script>
 
 <style scoped lang="less">

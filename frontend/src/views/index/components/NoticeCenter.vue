@@ -168,21 +168,14 @@
 </template>
 
 <script setup>
-  import MessageIcon from '/@/assets/images/message-icon.svg';
-  import { reactive } from 'vue';
-  import {
-    getCommentMessageApi,
-    readCommentMessageApi,
-    readMentionMessageApi,
-    readReplyMessageApi
-  } from "/@/api/index/notice";
-  import {openNotification} from "/@/utils/notice";
-  import {BASE_URL} from "/@/store/constants";
-  import router from "/@/router";
-  import AvatarIcon from "/@/assets/images/avatar.jpg";
-  import {useWebSocketStore} from "/@/store";
+import MessageIcon from "/@/assets/images/message-icon.svg";
+import { readCommentMessageApi, readMentionMessageApi, readReplyMessageApi } from "/@/api/index/notice";
+import { BASE_URL } from "/@/store/constants";
+import router from "/@/router";
+import AvatarIcon from "/@/assets/images/avatar.jpg";
+import { useWebSocketStore } from "/@/store";
 
-  const socketStore = useWebSocketStore();
+const socketStore = useWebSocketStore();
 
   const newComment = socketStore.new_comment;
   const newReply = socketStore.new_reply;

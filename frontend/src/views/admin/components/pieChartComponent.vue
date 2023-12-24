@@ -3,7 +3,7 @@
 </template>
 
 <script setup>
-import * as echarts from 'echarts'
+import * as echarts from "echarts";
 
 const chartContainer = ref()
 const pieChart = ref()

@@ -62,13 +62,12 @@
 </template>
 
 <script setup lang="ts">
-import {useUserStore} from '/@/store';
-import logoImage from '/@/assets/images/logo_b.png';
+import { useUserStore } from "/@/store";
+import logoImage from "/@/assets/images/logo_b.png";
+import { message } from "ant-design-vue";
 
 const router = useRouter();
 const userStore = useUserStore();
-
-import {message} from "ant-design-vue";
 
 const myform = ref()
 

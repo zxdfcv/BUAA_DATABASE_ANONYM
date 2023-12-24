@@ -107,10 +107,9 @@
 </template>
 
 <script setup lang="ts">
-import {listApi, createApi, updateApi, cancelApi, deleteApi} from '/@/api/admin/order'
-import {message, FormInstance} from "ant-design-vue";
-import {FileImageOutlined, VideoCameraOutlined} from "@ant-design/icons-vue";
-import {exportCsv} from "/@/utils/exportCsv";
+import { createApi, deleteApi, listApi, updateApi } from "/@/api/admin/order";
+import { FormInstance, message } from "ant-design-vue";
+import { exportCsv } from "/@/utils/exportCsv";
 
 onMounted(() => {
   getDataList()

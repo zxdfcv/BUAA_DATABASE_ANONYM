@@ -1,4 +1,4 @@
-import {get, post, deletes, put} from '/@/utils/http/axios';
+import { deletes, get, post, put } from "/@/utils/http/axios";
 
 enum URL {
     list = '/myapp/admin/chat/list',

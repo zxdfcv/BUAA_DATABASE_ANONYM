@@ -1,4 +1,4 @@
-import {get} from '/@/utils/http/axios';
+import { get } from "/@/utils/http/axios";
 
 enum URL {
     list = '/myapp/admin/permission/list',
