@@ -163,7 +163,6 @@ const constantRouterMap = [
       { path: 'classification1', name: 'classification1', component: () => import('/@/views/admin/classification1.vue') },
       { path: 'classification2', name: 'classification2', component: () => import('/@/views/admin/classification2.vue') },
       { path: 'tag', name: 'tag', component: () => import('/@/views/admin/tag.vue') },
-      { path: 'notice', name: 'notice', component: () => import('/@/views/admin/notice.vue') },
       { path: 'loginLog', name: 'loginLog', component: () => import('/@/views/admin/login-log.vue') },
       { path: 'opLog', name: 'opLog', component: () => import('/@/views/admin/op-log.vue') },
       { path: 'errorLog', name: 'errorLog', component: () => import('/@/views/admin/error-log.vue') },
