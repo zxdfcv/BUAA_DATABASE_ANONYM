@@ -27,14 +27,14 @@
                 <div
                     :style="{ textAlign: 'center', marginTop: '12px', marginBottom: '12px', height: '32px', lineHeight: '32px' }"
                 >
-                  <a-button @click="fillComment" v-if="(commentChoice === '0' ? hasMoreComment : hasMoreAllComment)">loading more</a-button>
+                  <a-button @click.stop="fillComment" v-if="(commentChoice === '0' ? hasMoreComment : hasMoreAllComment)">loading more</a-button>
                   <div v-else-if="commentChoice === '0' ? (commentList.length !== 0) : (commentAllList.length !== 0)">到底啦 ~</div>
                 </div>
               </template>
               <template #renderItem="{ item }">
                 <a-list-item
                     :class="item.is_read ? 'back_read' : 'back_unread'"
-                    @click="comment_product(item)"
+                    @click.stop="comment_product(item)"
                     style="margin-right: 15px; margin-left: 10px; cursor: pointer">
                     <a-list-item-meta
                         :description="item.create_time"
@@ -73,14 +73,14 @@
                 <div
                     :style="{ textAlign: 'center', marginTop: '12px', marginBottom: '12px', height: '32px', lineHeight: '32px' }"
                 >
-                  <a-button @click="fillReply" v-if="(replyChoice === '0' ? hasMoreReply : hasMoreAllReply)">loading more</a-button>
+                  <a-button @click.stop="fillReply" v-if="(replyChoice === '0' ? hasMoreReply : hasMoreAllReply)">loading more</a-button>
                   <div v-else-if="replyChoice === '0' ? (replyList.length !== 0) : (replyAllList.length !== 0)">到底啦 ~</div>
                 </div>
               </template>
               <template #renderItem="{ item }">
                 <a-list-item
                     :class="item.is_read ? 'back_read' : 'back_unread'"
-                    @click="reply_product(item)"
+                    @click.stop="reply_product(item)"
                     style="margin-right: 15px; margin-left: 10px; cursor: pointer">
                   <a-list-item-meta
                       :description="item.create_time"
@@ -119,14 +119,14 @@
                 <div
                     :style="{ textAlign: 'center', marginTop: '12px', marginBottom: '12px', height: '32px', lineHeight: '32px' }"
                 >
-                  <a-button @click="fillMention" v-if="(mentionChoice === '0' ? hasMoreMention : hasMoreAllMention)">loading more</a-button>
+                  <a-button @click.stop="fillMention" v-if="(mentionChoice === '0' ? hasMoreMention : hasMoreAllMention)">loading more</a-button>
                   <div v-else-if="mentionChoice === '0' ? (mentionList.length !== 0) : (mentionAllList.length !== 0)">到底啦 ~</div>
                 </div>
               </template>
               <template #renderItem="{ item }">
                 <a-list-item
                     :class="item.comment_read ? 'back_read' : 'back_unread'"
-                    @click="mention_product(item)"
+                    @click.stop="mention_product(item)"
                     style="margin-right: 15px; margin-left: 10px; cursor: pointer">
                   <a-list-item-meta
                       :description="item.create_time"
@@ -155,7 +155,7 @@
           <el-scrollbar>
             <div style="margin: 30px; text-align: center">
               <div style="margin-bottom: 10px" v-if="newChat === 1">你有新的私聊消息哦，快来聊天室看看吧！</div>
-              <a-button type="primary" @click="push2chat">前往聊天室</a-button>
+              <a-button type="primary" @click.stop="push2chat">前往聊天室</a-button>
             </div>
           </el-scrollbar>
         </a-tab-pane>
@@ -252,6 +252,7 @@
     await readReplyMessageApi({ids: item.id})
         .then(res => console.log(res))
         .catch(err => console.log(err))
+    console.log(item);
     push2product(item.product_id)
   }
 
@@ -264,19 +265,19 @@
 
   const comment_product = async (item) => {
     await readComment(item);
-    await socketStore.refreshMessage();
     push2product(item.product);
+    await socketStore.refreshMessage();
   }
 
   const comment_user = async (item) => {
-    await socketStore.refreshMessage();
     router.push({name: 'usercenter', query: {id: item.user}});
+    await socketStore.refreshMessage();
   }
 
   const reply_product = async (item) => {
     await readReply(item);
     await socketStore.refreshMessage();
-    push2product(item.product);
+    // push2product(item.product);
   }
 
   const reply_user = async (item) => {
@@ -287,7 +288,7 @@
   const mention_product = async (item) => {
     await readMention(item);
     await socketStore.refreshMessage();
-    push2product(item.product);
+    // push2product(item.product);
   }
 
   const mention_user = async (item) => {
@@ -296,6 +297,7 @@
   }
 
   const push2product = (product) => {
+    console.log(product);
     router.push({name: 'detail', query: {id: product}})
   }
 

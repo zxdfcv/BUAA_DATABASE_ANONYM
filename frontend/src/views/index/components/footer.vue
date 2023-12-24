@@ -1,12 +1,5 @@
 <template>
-  <div class="footer-view">
-    <div class="foot-link-box flex-view">
-      <div class="link-split"></div>
-      <a href="/admin" class="foot-link" target="_blank">前往后台</a>
-      <div class="link-split"></div>
-      <a class="foot-link" @click="handleSource">关于我们</a>
-    </div>
-    <div class="footer-infos"></div>
+  <div class="footer-view" style="min-height: 10px;">
   </div>
 </template>
 

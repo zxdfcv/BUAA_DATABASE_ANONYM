@@ -8,10 +8,10 @@
       <img :src="SearchIcon" class="search-icon">
       <input placeholder="今天想搜些什么？" ref="keywordRef" @keyup.enter="search"/>
     </div>
-    <Button type="primary" shape="circle" icon="ios-search" style="margin-left: 15px;" @click="search">Search</Button>
+    <Button type="primary" shape="circle" icon="ios-search" style="margin-left: 15px;" @click="search">搜索</Button>
     <a-dropdown trigger="click">
       <Button type="default" style="margin-left: 15px;">
-        All Category
+        全部分类
         <Icon type="ios-arrow-down" />
       </Button>
       <template #overlay>

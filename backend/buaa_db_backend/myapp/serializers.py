@@ -86,12 +86,13 @@ class AdminUserCreateSerializer(serializers.ModelSerializer):
                         }
 
     def create(self, validated_data):
-        groups_data = validated_data.pop('groups', [])  # 移除 groups 数据
-        user = User.objects.create_user(**validated_data)
-        for group_data in groups_data:
-            group_name = group_data['name']
-            group, created = Group.objects.get_or_create(name=group_name)
-            user.groups.add(group)
+        group_names = validated_data.pop('groups', [])  # 取出组名列表
+        user = super().create(validated_data)  # 先创建用户对象
+
+        for group_name in group_names:
+            group, created = Group.objects.get_or_create(name=group_name)  # 获取或创建组对象
+            user.groups.add(group)  # 将用户添加到组中
+
         return user
 
 
@@ -136,6 +137,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ['id', 'username', 'first_name', 'last_name', 'email', 'phone', 'nickname', 'gender', 'avatar',
                   'description', 'date_joined', 'following_count', 'follower_count', 'is_active']
+        extra_kwargs = {'id': {'read_only': True},
+                        'is_active': {'read_only': True},
+                        }
 
     # def update(self, instance, validated_data):
     #     # 自定义 update 方法，处理更新逻辑
@@ -604,7 +608,8 @@ class ChatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chat
         fields = '__all__'
-        extra_kwargs = {'id': {'read_only': True}}
+        extra_kwargs = {'id': {'read_only': True},
+                        'is_read': {'read_only': True}}
 
     def get_sender_avatar(self, obj):
         return str(obj.sender.avatar) if obj.sender.avatar else ''
