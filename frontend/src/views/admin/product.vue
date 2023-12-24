@@ -65,6 +65,23 @@
                   <a-input placeholder="请输入" v-model:value="modal.form.name"></a-input>
                 </a-form-item>
               </a-col>
+              <a-col span="24">
+                <a-form-item label="卖家" name="merchanrt">
+                  <a-select placeholder="请选择"
+                            v-model:value="modal.form.merchant">
+                    <a-select-option v-for="item in data.userList" :value="item.id">{{ item.username }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col span="24">
+                <a-form-item label="地址" name="addr">
+                  <a-radio-group v-model:value="modal.form.addr" button-style="solid">
+                    <a-radio-button value="1">学院路校区</a-radio-button>
+                    <a-radio-button value="2">沙河校区</a-radio-button>
+                    <a-radio-button value="3">两校区均可</a-radio-button>
+                  </a-radio-group>
+                </a-form-item>
+              </a-col>
               <a-col span="12">
                 <a-form-item label="一级分类" name="classification1">
                   <a-select placeholder="请选择"
@@ -217,6 +234,7 @@ import {BASE_URL} from "/@/store/constants";
 import {FileImageOutlined, VideoCameraOutlined} from '@ant-design/icons-vue';
 import {useAppStore, useUserStore} from "/@/store";
 import {exportCsv} from "/@/utils/exportCsv";
+import {listApi as listUserApi} from "/@/api/admin/user";
 
 const userStore = useUserStore()
 const appStore = useAppStore()
@@ -277,6 +295,7 @@ const submitting = ref<boolean>(false);
 
 // 页面数据
 const data = reactive({
+  userList: [],
   dataList: [],
   loading: false,
   keyword: '',
@@ -302,11 +321,11 @@ const modal = reactive({
     classification_1: undefined,
     classification_2: undefined,
     merchant: undefined,
-    addr: undefined,
+    addr: '',
     tags: [],
     repertory: undefined,
     price: undefined,
-    status: undefined,
+    status: '',
     off_shelf: undefined,
     is_sold: undefined,
     image: undefined,
@@ -330,7 +349,25 @@ const modal = reactive({
 
 const myform = ref<FormInstance>()
 
+const getUserList = () => {
+  data.loading = true
+  listUserApi({})
+      .then((res) => {
+        data.loading = false
+        console.log(res)
+        res.data.forEach((item: any, index: any) => {
+          item.index = index + 1
+        })
+        data.userList = res.data
+      })
+      .catch((err) => {
+        data.loading = false
+        console.log(err)
+      })
+}
+
 onMounted(() => {
+  getUserList();
   getDataList();
   getCDataList();
   getBDataList();
@@ -551,7 +588,7 @@ const handleOk = () => {
           formData.append('addr', modal.form.addr || "")
         }
         if (modal.form.merchant) {
-          formData.append('merchant', modal.form.merchant || "")
+          formData.append('merchant', modal.form.merchant)
         }
         if (modal.form.tags) {
           modal.form.tags.forEach(function (value) {
@@ -577,6 +614,7 @@ const handleOk = () => {
         if (modal.form.repertory >= 0) {
           formData.append('repertory', modal.form.repertory)
         }
+        formData.append('addr', modal.form.addr)
         formData.append('status', modal.form.status)
         formData.append('is_sold', modal.form.is_sold === '1' ? "true" : "false")
         formData.append('off_shelf', modal.form.off_shelf === '1' ? "true" : "false")
