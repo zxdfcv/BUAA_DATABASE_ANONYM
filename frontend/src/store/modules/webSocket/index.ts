@@ -301,6 +301,11 @@ export const useWebSocketStore = defineStore(
         async handleChat(message) {
             console.log('get chat socket', message);
             this.new_chat = 1;
+            if (this.sessionSelectId === -1) {
+                await this.fillChat();
+                console.log(this.chat_list);
+                return ;
+            }
             const product = {
                 id: this.chat_list[this.sessionSelectId].product,
                 uploaderId: this.chat_list[this.sessionSelectId].recipient === useUserStore().user_id ?
