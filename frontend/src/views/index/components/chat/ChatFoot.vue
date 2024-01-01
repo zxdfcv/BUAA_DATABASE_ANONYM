@@ -67,8 +67,7 @@ const store = useWebSocketStore()
         content: editor.value})
         .then(async res => {
           console.log(res.data);
-          await store.fillChat();
-          await store.fillMessage();
+          await store.handleChat("");
           editor.value = "";
         }).catch(err => {
         console.log(err);
@@ -82,8 +81,7 @@ const store = useWebSocketStore()
       sendChatMessageApi(submitForm)
         .then(async res => {
           console.log(res.data);
-          await store.fillChat();
-          await store.fillMessage();
+          await store.handleChat("");
           image.value = [];
         }).catch(err => {
         console.log(err);

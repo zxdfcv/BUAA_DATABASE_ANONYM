@@ -12,7 +12,7 @@
           class="session-item"
           style="cursor: pointer;"
           :class="[
-            (index === socketStore.sessionSelectId) ? 'session-active' : '',
+            (index === activeSession) ? 'session-active' : '',
           ]"
           @click="selectSession(item, index)"
           >
@@ -55,6 +55,14 @@ const socketStore = useWebSocketStore();
 
   // 返回对应选择列表
   const chatroomList = computed(() => { return socketStore.chat_list; });
+
+  const activeSession = ref(-1);
+
+watch(
+  () => socketStore.sessionSelectId,
+  () => {
+    activeSession.value = socketStore.sessionSelectId;
+  });
 
   // 选择聊天用户
   const selectSession = (item, index) => {

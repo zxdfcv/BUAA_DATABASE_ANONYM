@@ -113,8 +113,9 @@ const chatNow = computed(() => {
 // 渲染时间每隔5分钟显示一次
 const renderMessageDate = computed(() => {
   return (message, index, messages) =>{
+    console.log(message.create_time, formatTime(message.create_time), Date.parse(message.create_time));
     if ((message && index === 0) || (message && Date.parse(message.create_time) - Date.parse(messages[index - 1].create_time) > 5 * 60 * 1000)) {
-      return `- - ${formatTime(Date.parse(message.create_time))} - -`
+      return `- - ${formatTime(message.create_time)} - -`
     }
     return "";
   }

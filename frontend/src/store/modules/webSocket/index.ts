@@ -53,7 +53,7 @@ export const useWebSocketStore = defineStore(
 
         chat_list: ref([]),
         message_list: ref([]),
-        sessionSelectId: 0,
+        sessionSelectId: -1,
         chatScrollbar: undefined,
     }),
     getters: {},
@@ -241,7 +241,7 @@ export const useWebSocketStore = defineStore(
         },
 
         async fillChat() {
-            getChatListApi({})
+            await getChatListApi({})
                 .then(res => this.chat_list = res.data)
                 .catch(err => console.log(err))
         },
@@ -301,8 +301,16 @@ export const useWebSocketStore = defineStore(
         async handleChat(message) {
             console.log('get chat socket', message);
             this.new_chat = 1;
+            const product = {
+                id: this.chat_list[this.sessionSelectId].product,
+                uploaderId: this.chat_list[this.sessionSelectId].recipient === useUserStore().user_id ?
+                  this.chat_list[this.sessionSelectId].sender :
+                  this.chat_list[this.sessionSelectId].recipient,
+            };
+            console.log(product);
             await this.fillChat();
-            await this.fillMessage();
+            console.log(this.chat_list);
+            await this.modifySession(product);
         },
 
         async modifySession(product) {

@@ -20,7 +20,7 @@
                       arrow="hover"
                       style="width: 100%">
                     <CarouselItem v-for="(item, index) in detailData.cover" :key="index"
-                    style="height: 600px">
+                    style="height: 600px; max-width: 80%">
                       <div :style="{
                         backgroundImage: 'url(' + item + ')',
                         backgroundPosition: 'center center',

@@ -3,9 +3,10 @@
  * @param {string} option
  * @returns {string}
  */
-export function formatTime(time: any){
+export function formatTime(timeString: any){
+    let time = Date.parse(timeString)
     if (('' + time).length === 10) {
-        time = parseInt(time) * 1000
+        time = parseInt(String(time)) * 1000
     } else {
         time = +time
     }
@@ -21,7 +22,7 @@ export function formatTime(time: any){
         return Math.ceil(diff / 60) + '分钟前'
     } else if (diff < 3600 * 24) {
         return Math.ceil(diff / 3600) + '小时前'
-    } else if (diff < 3600 * 24 * 2) {
-        return '1天前'
+    } else {
+        return timeString
     }
 }
