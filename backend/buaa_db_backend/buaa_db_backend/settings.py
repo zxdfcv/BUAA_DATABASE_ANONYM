@@ -96,7 +96,7 @@ DATABASES = {
         "ENGINE": "django.db.backends.mysql",
         "NAME": "buaa_db",
         'USER': 'root',
-        'PASSWORD': 'Fc20030126@',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
         'OPTIONS': {
