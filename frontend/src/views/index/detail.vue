@@ -11,16 +11,16 @@
 <!--                <img :src="detailData.cover" width="1000" height="500">-->
                 <div>
                   <el-row>
-                    <el-col :span="18">
+                    <el-col :span="15">
                   <Carousel
                       v-model="value"
                       dots="outside"
                       :radius-dot=false
                       trigger="hover"
                       arrow="hover"
-                      style="max-width: 100%">
+                      style="width: 100%">
                     <CarouselItem v-for="(item, index) in detailData.cover" :key="index"
-                    style="height: 600px; max-width: 100%">
+                    style="height: 600px;">
                       <div :style="{
                         backgroundImage: 'url(' + item + ')',
                         backgroundPosition: 'center center',
@@ -31,7 +31,7 @@
                       }"></div>
                     </CarouselItem>
                   </Carousel></el-col>
-                    <el-col :span="6">
+                    <el-col :offset="2" :span="7">
                       <div class="" style="margin: 35px">
                         <div class="count-item flex-view pointer" @click="addCollect()">
                           <div class="count-img">

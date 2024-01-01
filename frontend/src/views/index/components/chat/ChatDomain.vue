@@ -12,12 +12,12 @@
           class="session-item"
           style="cursor: pointer;"
           :class="[
-            (index === socketStore.sessionSelectId) ? 'session-active' : '',
+            (index === activeSession) ? 'session-active' : '',
           ]"
           @click="selectSession(item, index)"
           >
           <el-row type="flex" align="middle" style="min-height: 75px; margin-bottom: 1px; margin-left: 10px;">
-            <a-badge :dot="!item.is_read">
+            <a-badge :dot="!item.is_read && item.sender !== userStore.user_id">
               <div v-if="item.sender !== userStore.user_id">
                 <a-avatar  size="40" v-if="!(item.sender_avatar === '' || item.sender_avatar === null || item.sender_avatar === undefined)" :src="BASE_URL + '/upload/'+ item.sender_avatar"/>
                 <a-avatar v-else :src="AvatarIcon" />
@@ -55,6 +55,14 @@ const socketStore = useWebSocketStore();
 
   // 返回对应选择列表
   const chatroomList = computed(() => { return socketStore.chat_list; });
+
+  const activeSession = ref(-1);
+
+watch(
+  () => socketStore.sessionSelectId,
+  () => {
+    activeSession.value = socketStore.sessionSelectId;
+  });
 
   // 选择聊天用户
   const selectSession = (item, index) => {
