@@ -10,6 +10,9 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 import os
 import sys
 
+import django
+
+django.setup()
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter

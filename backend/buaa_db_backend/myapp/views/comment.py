@@ -132,7 +132,9 @@ class MyCommentsView(generics.ListAPIView):
         if serializer.is_valid():
             serializer.save()
             product = Product.objects.get(pk=product_id)
+            print("begin")
             send_notification(product.merchant, "comment_notice", serializer.data)
+            print("end")
             return APIResponse(code=0, msg='评论成功', data=serializer.data)
 
         make_error_log(request, '评论失败')
