@@ -13,7 +13,8 @@
           size: 'default',
           current: data.page,
           pageSize: data.pageSize,
-          onChange: (current) => (data.page = current),
+          total: data.total,
+          onChange: (current) => {data.page = current; getDataList();},
           showSizeChanger: false,
           showTotal: (total) => `共${total}条数据`,
         }"
@@ -75,6 +76,7 @@ const data = reactive({
   selectedRowKeys: [] as any[],
   pageSize: 10,
   page: 1,
+  total: 0,
 });
 
 
@@ -85,15 +87,19 @@ onMounted(() => {
 const getDataList = () => {
   data.loading = true;
   listOpLogListApi({
+    limit: data.pageSize,
+    offset: data.pageSize * (data.page - 1),
     keyword: data.keyword,
   })
       .then((res) => {
         data.loading = false;
-        console.log(res);
-        res.data.forEach((item: any, index: any) => {
-          item.index = index + 1;
+        console.log(res.data.results);
+        let datas = res.data.results;
+        datas.forEach((item: any, index: any) => {
+          item.index = index + 1 + (data.pageSize * (data.page - 1));
         });
-        data.dataList = res.data;
+        data.dataList = datas;
+        data.total = res.data.count;
       })
       .catch((err) => {
         data.loading = false;
