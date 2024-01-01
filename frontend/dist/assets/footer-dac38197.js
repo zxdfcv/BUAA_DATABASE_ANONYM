@@ -1,0 +1,1 @@
+import{_ as e}from"./_plugin-vue_export-helper-c27b6911.js";import{V as o,o as t,n as s}from"./index-6b603672.js";const _={name:"Footer",data(){return{}},methods:{handleSource(){o.info({})}}},n={class:"footer-view",style:{"min-height":"10px"}};function r(a,c,d,p,i,f){return t(),s("div",n)}const u=e(_,[["render",r],["__scopeId","data-v-e3849131"]]);export{u as F};
