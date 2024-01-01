@@ -1,1 +1,0 @@
-import{W as s}from"./index-6d07a472.js";const r=async a=>s({url:"/myapp/log/login",params:a,data:{},headers:{}}),t=async a=>s({url:"/myapp/log/op",params:a,data:{},headers:{}}),p=async a=>s({url:"/myapp/log/error",params:a,data:{},headers:{}});export{t as a,p as b,r as l};
