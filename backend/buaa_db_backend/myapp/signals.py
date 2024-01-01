@@ -72,70 +72,70 @@ def delete_chat_image(sender, instance, **kwargs):
             print(f"PermissionError: {e}")
 
 
-def delete_old_file(instance, file_field):
-    # 获取旧文件路径
-    old_instance = instance.__class__.objects.get(pk=instance.pk)
-    old_file_path = getattr(old_instance, file_field).path if getattr(old_instance, file_field) else None
-
-    if old_file_path:
-        try:
-            # 删除旧文件
-            if default_storage.exists(old_file_path):
-                default_storage.delete(old_file_path)
-        except Exception as e:
-            print(f"Error deleting old file: {e}")
-
-
-@receiver(pre_save, sender=User)
-def delete_old_user_avatar(sender, instance, **kwargs):
-    # 检查数据库中是否存在匹配的记录
-    try:
-        old_instance = sender.objects.get(pk=instance.pk)
-    except sender.DoesNotExist:
-        return
-
-    delete_old_file(old_instance, 'avatar')
-
-
-@receiver(pre_save, sender=Classification1)
-def delete_old_c1_image(sender, instance, **kwargs):
-    # 检查数据库中是否存在匹配的记录
-    try:
-        old_instance = sender.objects.get(pk=instance.pk)
-    except sender.DoesNotExist:
-        return
-
-    delete_old_file(old_instance, 'image')
-
-
-@receiver(pre_save, sender=Classification2)
-def delete_old_c2_image(sender, instance, **kwargs):
-    # 检查数据库中是否存在匹配的记录
-    try:
-        old_instance = sender.objects.get(pk=instance.pk)
-    except sender.DoesNotExist:
-        return
-
-    delete_old_file(old_instance, 'image')
-
-
-@receiver(pre_save, sender=Product)
-def delete_old_product_video(sender, instance, **kwargs):
-    # 检查数据库中是否存在匹配的记录
-    try:
-        old_instance = sender.objects.get(pk=instance.pk)
-    except sender.DoesNotExist:
-        return
-
-    delete_old_file(old_instance, 'video')
-
-
-@receiver(pre_save, sender=Chat)
-def delete_old_chat_image(sender, instance, **kwargs):
-    # 检查数据库中是否存在匹配的记录
-    try:
-        old_instance = sender.objects.get(pk=instance.pk)
-    except sender.DoesNotExist:
-        return
-
-    delete_old_file(old_instance, 'image')
+# def delete_old_file(instance, file_field):
+#     # 获取旧文件路径
+#     old_instance = instance.__class__.objects.get(pk=instance.pk)
+#     old_file_path = getattr(old_instance, file_field).path if getattr(old_instance, file_field) else None
+#
+#     if old_file_path:
+#         try:
+#             # 删除旧文件
+#             if default_storage.exists(old_file_path):
+#                 default_storage.delete(old_file_path)
+#         except Exception as e:
+#             print(f"Error deleting old file: {e}")
+#
+#
+# @receiver(pre_save, sender=User)
+# def delete_old_user_avatar(sender, instance, **kwargs):
+#     # 检查数据库中是否存在匹配的记录
+#     try:
+#         old_instance = sender.objects.get(pk=instance.pk)
+#     except sender.DoesNotExist:
+#         return
+#
+#     delete_old_file(old_instance, 'avatar')
+#
+#
+# @receiver(pre_save, sender=Classification1)
+# def delete_old_c1_image(sender, instance, **kwargs):
+#     # 检查数据库中是否存在匹配的记录
+#     try:
+#         old_instance = sender.objects.get(pk=instance.pk)
+#     except sender.DoesNotExist:
+#         return
+#
+#     delete_old_file(old_instance, 'image')
+#
+#
+# @receiver(pre_save, sender=Classification2)
+# def delete_old_c2_image(sender, instance, **kwargs):
+#     # 检查数据库中是否存在匹配的记录
+#     try:
+#         old_instance = sender.objects.get(pk=instance.pk)
+#     except sender.DoesNotExist:
+#         return
+#
+#     delete_old_file(old_instance, 'image')
+#
+#
+# @receiver(pre_save, sender=Product)
+# def delete_old_product_video(sender, instance, **kwargs):
+#     # 检查数据库中是否存在匹配的记录
+#     try:
+#         old_instance = sender.objects.get(pk=instance.pk)
+#     except sender.DoesNotExist:
+#         return
+#
+#     delete_old_file(old_instance, 'video')
+#
+#
+# @receiver(pre_save, sender=Chat)
+# def delete_old_chat_image(sender, instance, **kwargs):
+#     # 检查数据库中是否存在匹配的记录
+#     try:
+#         old_instance = sender.objects.get(pk=instance.pk)
+#     except sender.DoesNotExist:
+#         return
+#
+#     delete_old_file(old_instance, 'image')
