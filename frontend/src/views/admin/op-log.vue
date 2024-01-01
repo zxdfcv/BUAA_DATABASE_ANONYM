@@ -96,7 +96,7 @@ const getDataList = () => {
         console.log(res.data.results);
         let datas = res.data.results;
         datas.forEach((item: any, index: any) => {
-          item.index = index + 1;
+          item.index = index + 1 + (data.pageSize * (data.page - 1));
         });
         data.dataList = datas;
         data.total = res.data.count;
