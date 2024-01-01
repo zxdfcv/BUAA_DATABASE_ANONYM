@@ -1,1 +1,0 @@
-import{j as s}from"./index-68c43909.js";const o=async a=>s({url:"/myapp/admin/loginLog/list",params:a,data:{},headers:{}}),t=async a=>s({url:"/myapp/admin/opLog/list",params:a,data:{},headers:{}}),r=async a=>s({url:"/myapp/admin/errorLog/list",params:a,data:{},headers:{}});export{t as a,r as b,o as l};
