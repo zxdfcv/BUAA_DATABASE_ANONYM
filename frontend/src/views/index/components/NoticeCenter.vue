@@ -173,9 +173,10 @@ import { readCommentMessageApi, readMentionMessageApi, readReplyMessageApi } fro
 import { BASE_URL } from "/@/store/constants";
 import router from "/@/router";
 import AvatarIcon from "/@/assets/images/avatar.jpg";
-import { useWebSocketStore } from "/@/store";
+import {useUserStore, useWebSocketStore} from "/@/store";
 
 const socketStore = useWebSocketStore();
+const userStore = useUserStore();
 
   const newComment = socketStore.new_comment;
   const newReply = socketStore.new_reply;
@@ -183,7 +184,7 @@ const socketStore = useWebSocketStore();
   const newChat = computed(() => {
     let lists = socketStore.chat_list;
     for (let i = 0; i < lists.length; i++) {
-      if (lists[i].is_read === false) {
+      if (lists[i].is_read === false && lists[i].sender !== userStore.user_id) {
         return 1;
       }
     }
