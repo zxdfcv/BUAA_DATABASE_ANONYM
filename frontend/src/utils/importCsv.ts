@@ -22,6 +22,7 @@ export function importCsv(file: File): Promise<CsvRow[]> {
                     const entry: CsvRow = {};
                     header.forEach((col, index) => {
                         console.log(row[index])
+                        if (row[0] == '') { return null; }
                         let value = row[index].trim();
                         console.log(value)
                         // Check if the value is enclosed in quotes and contains commas

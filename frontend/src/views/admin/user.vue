@@ -236,7 +236,7 @@ const beforeCSVUpload = (file) => {
           batchCreate(item)
         });
       }).then(() =>{
-        message.success("操作成功")
+        message.success("操作完成")
       })
       .catch((error) => {
         message.warn(error.msg || "操作失败, 请检查数据")
