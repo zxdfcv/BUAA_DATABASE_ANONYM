@@ -1,0 +1,1 @@
+import{W as r,X as e,Y as s}from"./index-e9b87848.js";const t=async a=>e({url:"/myapp/order/create",data:a,headers:{}}),c=async a=>r({url:"/myapp/order/pay",params:a,data:{},headers:{}}),d=async a=>s({url:"/myapp/order/cancel",params:a,headers:{}}),o=async a=>r({url:"/myapp/order/list",params:a,data:{},headers:{}});export{d as a,t as c,o as g,c as p};
