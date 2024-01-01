@@ -36,7 +36,7 @@
           </div>
         </div>
       <div class="text-right mt-10px" style="align-self: center; padding-left: 20px;">
-        <a-button @click="sendMessage" >发 送</a-button>
+        <a-button @click="sendMessage" :loading="loading">发 送</a-button>
       </div>
     </div>
   </footer>
@@ -53,6 +53,7 @@ const store = useWebSocketStore()
   const editor = ref("")
 
   const image = ref([]);
+  const loading = ref(false);
 
   const sendMessage = () => {
     const item = store.chat_list[store.sessionSelectId];
@@ -61,6 +62,7 @@ const store = useWebSocketStore()
       openNotification({type: 'warning', message: '不允许同时发送图片和文字！'});
       return ;
     } else if (editor.value.length > 0) {
+      loading.value = true;
       sendChatMessageApi({
         recipient: (item.sender === userStore.user_id) ? item.recipient : item.sender,
         product: item.product,
@@ -69,10 +71,13 @@ const store = useWebSocketStore()
           console.log(res.data);
           await store.handleChat("");
           editor.value = "";
+          loading.value = false;
         }).catch(err => {
         console.log(err);
+        loading.value = false;
       })
     } else if (image.value.length > 0) {
+      loading.value = true;
       let submitForm = new FormData();
       submitForm.append('recipient', (item.sender === userStore.user_id) ? item.recipient : item.sender);
       submitForm.append('product', item.product);
@@ -83,8 +88,10 @@ const store = useWebSocketStore()
           console.log(res.data);
           await store.handleChat("");
           image.value = [];
+          loading.value = false;
         }).catch(err => {
         console.log(err);
+        loading.value = false;
       })
     } else {
       openNotification({type: 'error', message: '需要至少发送图片和文字中的一种！'});

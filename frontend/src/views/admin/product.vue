@@ -447,7 +447,11 @@ watch(option2, val => {
   if (isFirst.value) { // 后面改
     isFirst.value = false;
   } else {
-    modal.form.classification_2 = val[0].id;
+    if (val !== null && val.length > 0) {
+      modal.form.classification_2 = val[0].id;
+    } else {
+      modal.form.classification_2 = undefined
+    }
   }
 })
 
@@ -623,7 +627,6 @@ const handleOk = () => {
         formData.append('addr', modal.form.addr)
         formData.append('status', modal.form.status)
         formData.append('is_sold', modal.form.is_sold === '1' ? "true" : "false")
-        console.log(modal.form.off_shelve === '1')
         formData.append('off_shelve', modal.form.off_shelve === '1' ? "true" : "false")
 
         if (modal.editFlag) {
