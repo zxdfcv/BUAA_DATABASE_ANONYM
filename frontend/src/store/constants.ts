@@ -1,6 +1,6 @@
 const BASE_URL = 'http://118.178.121.33:90'
 // const BASE_URL = 'http://118.178.121.33:80'
-const WEBSOCKET_URL = 'ws://118.178.121.33:9000/ws/notification/'
+const WEBSOCKET_URL = 'ws://118.178.121.33:90/ws/notification/'
 
 const USER_ID = 'user_id'
 const USER_NAME = 'user_name'

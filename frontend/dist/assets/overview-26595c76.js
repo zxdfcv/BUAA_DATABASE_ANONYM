@@ -1,1 +1,0 @@
-import{W as a}from"./index-6b603672.js";const i=async s=>a({url:"/myapp/admin/statistics",params:s,data:{},headers:{}}),n=async s=>a({url:"/myapp/admin/sysinfo",params:s,data:{},headers:{}});export{i as l,n as s};
