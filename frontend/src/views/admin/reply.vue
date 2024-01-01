@@ -383,6 +383,9 @@ const handleOk = () => {
         if (modal.form.comment) {
           formData.append('comment', modal.form.comment)
         }
+        if (modal.form.mentioned_user) {
+          formData.append('mentioned_user', modal.form.mentioned_user)
+        }
         if (modal.editFlag) {
           updateApi({
             reply_id: modal.form.id

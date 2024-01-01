@@ -122,7 +122,8 @@ const columns = reactive([
     title: '简介',
     dataIndex: 'description',
     key: 'description',
-    customRender: ({text, record, index, column}) => text ? text.substring(0, 40) + '...' : '--',
+    customRender: ({text, record, index, column}) => text ? text.length > 40 ?
+        text.substring(0, 40) +  '...' : text : '--',
     width: 600,
   },
   {
@@ -147,17 +148,16 @@ const beforeUpload = (file: File) => {
     const img = new Image();
     img.onload = () => {
       // 获取图片的宽高
-      modal.form.imageUrl = event.target.result
+      modal.form.imageUrl = String(event.target.result)
       console.log(modal.form.imageUrl)
       const width = img.width
       const height = img.height
       modal.form.imageWidth = width
       modal.form.imageHeight = height
-      console.log(modal.form.imageWidth)
-      console.log(modal.form.imageHeight)
     }
 
     // 将文件的内容设置给图片对象
+
     img.src = event.target.result as string
   }
 
@@ -193,10 +193,10 @@ const modal = reactive({
     name: undefined,
     description: undefined,
     image: undefined,
-    imageUrl: undefined,
+    imageUrl: '',
     imageFile: undefined,
-    imageWidth: undefined,
-    imageHeight: undefined
+    imageWidth: 0,
+    imageHeight: 0
   },
   rules: {
     name: [{required: true, message: '请输入', trigger: 'change'}],

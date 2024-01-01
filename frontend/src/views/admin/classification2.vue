@@ -138,7 +138,8 @@ const columns = reactive([
     title: '简介',
     dataIndex: 'description',
     key: 'description',
-    customRender: ({ text, record, index, column }) => text ? text.substring(0, 40) + '...' : '--',
+    customRender: ({text, record, index, column}) => text ? text.length > 40 ?
+        text.substring(0, 40) +  '...' : text : '--',
     width: 600,
   },
   {

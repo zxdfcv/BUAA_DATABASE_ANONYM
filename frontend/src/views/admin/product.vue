@@ -254,6 +254,11 @@ const columns = reactive([
     key: 'name'
   },
   {
+    title: '卖家',
+    dataIndex: 'merchant_name',
+    key: 'merchant_name'
+  },
+  {
     title: '是否下架',
     dataIndex: 'off',
     key: 'status',
@@ -273,8 +278,9 @@ const columns = reactive([
     title: '简介',
     dataIndex: 'description',
     key: 'description',
-    customRender: ({text, record, index, column}) => text ? text.substring(0, 40) + '...' : '--',
-    width: 600,
+    customRender: ({text, record, index, column}) => text ? text.length > 40 ?
+        text.substring(0, 40) +  '...' : text : '--',
+    width: 400,
   },
   {
     title: '操作',
