@@ -414,6 +414,7 @@ const handleAdd = () => {
   for (const key in modal.form) {
     modal.form[key] = undefined;
   }
+  modal.form.groups = []
 };
 const handleEdit = (record: any) => {
   resetModal();

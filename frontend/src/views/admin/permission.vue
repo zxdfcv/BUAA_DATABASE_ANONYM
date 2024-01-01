@@ -228,12 +228,14 @@ const handleAdd = () => {
   modal.editFlag = false;
   modal.title = '新增';
   // 重置
+  // modal.form.permissions.forEach((item) => {
+  //   item['id'] = String(item['id']) as String
+  // })
   for (const key in modal.form) {
     modal.form[key] = undefined;
   }
-  modal.form.permissions.forEach((item) => {
-    item['id'] = String(item['id']) as String
-  })
+  modal.form.permissions = []
+  modal.form.selectedKeys = []
 };
 const handleEdit = (record: any) => {
   resetModal();
@@ -320,7 +322,7 @@ const handleOk = () => {
                 message.error(err.msg || '操作失败');
               });
         } else {
-          createApi(modal.form)
+          createApi(formData)
               .then((res) => {
                 hideModal();
                 getDataList();
