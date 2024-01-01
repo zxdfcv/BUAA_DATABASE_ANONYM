@@ -177,18 +177,18 @@
               </a-col>
 
               <a-col span="12">
-                <a-form-item label="是否下架" name="off_shelf">
-                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.off_shelf">
-                    <a-select-option key="0" value="0">是</a-select-option>
-                    <a-select-option key="1" value="1">否</a-select-option>
+                <a-form-item label="是否下架" name="off_shelve">
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.off_shelve">
+                    <a-select-option key="1" value="1">是</a-select-option>
+                    <a-select-option key="0" value="0">否</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col span="12">
                 <a-form-item label="是否已售出" name="is_sold">
-                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.off_shelf">
-                    <a-select-option key="0" value="0">是</a-select-option>
-                    <a-select-option key="1" value="1">否</a-select-option>
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.is_sold">
+                    <a-select-option key="1" value="1">是</a-select-option>
+                    <a-select-option key="0" value="0">否</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -211,7 +211,7 @@
                       style="width: 100%"
                       placeholder="Please select"
                       :options="modal.form.images"
-                      :field-names="{ label: 'product', value: 'id'}"
+                      :field-names="{ label: 'id', value: 'id'}"
                       :render="item => item.id"
                   />
                 </a-form-item>
@@ -332,8 +332,8 @@ const modal = reactive({
     repertory: '',
     price: undefined,
     status: '',
-    off_shelf: undefined,
-    is_sold: undefined,
+    off_shelve: '',
+    is_sold: '',
     image: undefined,
     images: undefined,
     imageUrl: undefined,
@@ -385,7 +385,7 @@ const beforeUpload = (file) => {
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
   const copyFile = new File([file], fileName);
   const reader = new FileReader();
-
+  // TODO: 修改图片命名
   let url
   reader.onload = (event) => {
     const img = new Image();
@@ -462,7 +462,7 @@ const getDataList = () => {
         res.data.forEach((item: any, index: any) => {
           item.index = index + 1
           item.is_sold = item.is_sold ? '1' : '0'
-          item.off_shelf = item.off_shelf ? '1' : '0'
+          item.off_shelve = item.off_shelve ? '1' : '0'
         })
         data.dataList = res.data
       })
@@ -623,7 +623,8 @@ const handleOk = () => {
         formData.append('addr', modal.form.addr)
         formData.append('status', modal.form.status)
         formData.append('is_sold', modal.form.is_sold === '1' ? "true" : "false")
-        formData.append('off_shelf', modal.form.off_shelf === '1' ? "true" : "false")
+        console.log(modal.form.off_shelve === '1')
+        formData.append('off_shelve', modal.form.off_shelve === '1' ? "true" : "false")
 
         if (modal.editFlag) {
           submitting.value = true
