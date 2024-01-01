@@ -139,6 +139,7 @@ def get_monday():
 #     )
 def send_notification(recipient, notification_type, data):
     # recipient = User.objects.get(pk=recipient_id)
+    print("now in send_notification")
     channel_layer = get_channel_layer()
     if channel_layer is None:
         return

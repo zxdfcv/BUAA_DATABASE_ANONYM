@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/asgi/
 
 import os
 import sys
+
 import django
 
 django.setup()
@@ -30,3 +31,4 @@ application = ProtocolTypeRouter(
         # "websocket": URLRouter(websocket_urlpatterns),
     }
 )
+
