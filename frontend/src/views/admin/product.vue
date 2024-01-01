@@ -186,7 +186,7 @@
               </a-col>
               <a-col span="12">
                 <a-form-item label="是否已售出" name="is_sold">
-                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.off_shelf">
+                  <a-select placeholder="请选择" allowClear v-model:value="modal.form.is_sold">
                     <a-select-option key="0" value="0">是</a-select-option>
                     <a-select-option key="1" value="1">否</a-select-option>
                   </a-select>
@@ -211,7 +211,7 @@
                       style="width: 100%"
                       placeholder="Please select"
                       :options="modal.form.images"
-                      :field-names="{ label: 'product', value: 'id'}"
+                      :field-names="{ label: 'id', value: 'id'}"
                       :render="item => item.id"
                   />
                 </a-form-item>
@@ -385,7 +385,7 @@ const beforeUpload = (file) => {
   const fileName = new Date().getTime().toString() + '.' + file.type.substring(6);
   const copyFile = new File([file], fileName);
   const reader = new FileReader();
-
+  // TODO: 修改图片命名
   let url
   reader.onload = (event) => {
     const img = new Image();
